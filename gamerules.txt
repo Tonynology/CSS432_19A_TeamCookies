@@ -1,0 +1,8 @@
+Sea Battle rules
+rev.1
+
+Each player has their own board of empty squares, which the server will randomly populate with 8 ships.
+They can also see their opponent’s board, but not the ships on that board.
+Players alternate turns entering locations they believe the opponent’s ships reside, and will receive confirmation and a board marker from the server for each guess.
+Before entering their location, a player may also enter a message they wish to be seen by the other player.
+Once a player has correctly guessed all enemy ship locations, the game ends, and that player wins the game.
