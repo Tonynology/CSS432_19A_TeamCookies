@@ -1,0 +1,17 @@
+uw1-320-10:~$ here?
+> d2
+##################
+
+player:  opponent:
+ abcdef   abcdef
+1□□□■□□  1■□□□□□
+2○○○●■□  2●●●●□□
+3□□□■□□  3□□□□■□
+4□□□□○□  4□□□□□□
+5○●□□○□  5□■□□□□
+6○●□□○□  6□□□□□□
+
+turn 7: hit and sink!
+sent message: here?
+waiting for opponent.
+##################
