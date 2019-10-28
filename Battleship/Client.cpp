@@ -10,8 +10,8 @@
 #define YOUR_ID 6932    
 #define SERVER_NAME "localhost"
 #define REPETITION 20000
-#define NBUFS 3
-#define BUFSIZE 500
+#define NBUFS 6
+#define BUFSIZE 6
 #define TYPE 3
 
 #include <string>
@@ -65,7 +65,7 @@ bool bad_bufsize(int bufsize)
 
 bool bad_nbufs_bufsize(int nbufs, int bufsize)
 {
-	if (nbufs * bufsize != 1500)
+	if (nbufs * bufsize != 6 * 6)
 	{
 		std::cout << "valid nbufs * bufsize == 1500" << std::endl;
 		return true;
@@ -104,12 +104,31 @@ int main(int argc, char const *argv[])
 		std::cout << "Usage: ./client.out [server_port] [server_name] [repetition] [nbufs] [bufsize] [type]" << std::endl;
 	}
 	char databuf[nbufs][bufsize];
-	std::string alphabet = "abcdefghijklmnopqrstuvwxyz0123456789";
+	
+	//Initialize with empty squares
 	for (int i = 0; i < nbufs; i++) {
 		for (int j = 0; j < bufsize; j++) {
-			databuf[i][j] = alphabet[j % alphabet.size()];
+			databuf[i][j] = '□';
 		}
 	}
+	
+	//Users fill in squares of their choice
+	databuf[0][3] = '■';
+	databuf[1][0] = '○';
+	databuf[1][1] = '○';
+	databuf[1][2] = '○';
+	databuf[1][2] = '●';
+	databuf[2][3] = '■';
+	databuf[3][4] = '○';
+	databuf[4][0] = '○';
+	databuf[4][1] = '●';
+	databuf[4][4] = '○';
+	databuf[5][0] = '○';
+	databuf[5][1] = '●';
+	databuf[5][4] = '○';
+
+	std::cout << server_port << server_name << repetition << nbufs << bufsize << type << std::endl;
+	
 	struct hostent* host = gethostbyname( server_name );
     sockaddr_in sendSockAddr;
     bzero( (char*)&sendSockAddr, sizeof( sendSockAddr ) );

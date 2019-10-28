@@ -17,6 +17,7 @@
 #include <iostream>
 
 bool bad_port(int port)
+{
 	if (port < 1024 || port > 9999)
 	{
 		std::cout << "valid port numbers are between 1024 and 9999" << std::endl;
@@ -26,6 +27,7 @@ bool bad_port(int port)
 }
 
 bool bad_repetition(int repetition)
+{
 	if (repetition < 0)
 	{
 		std::cout << "valid repetition numbers are greater than 0" << std::endl;
