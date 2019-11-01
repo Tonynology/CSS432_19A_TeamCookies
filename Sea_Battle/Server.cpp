@@ -1,20 +1,11 @@
 /**
 CSS 432 AU19
-HW2 - Intro to Network Programming
+Sea Battle - Intro to Network Programming
 Lloyd Deng
 
 	Build: g++ -o server.out Server.cpp -pthread
 	
 	Usage: ./server.out [port] [n]
-
-Server.cpp opens a simple server defaulting at port 6932 and ip address localhost,
-unless otherwise specified during runtime.
-The server stays open, waiting for requests from Client.cpp, or from Safari browser.
-It can handle up to n clients at any moment,
-and after it is finished serving requests,
-it returns to the waiting state until manually killed by the user.
-
-This server can handle HTML files up to 2147483647 characters long, and files are saved at filesystem/server/file.html.
 **/
 
 
@@ -38,16 +29,16 @@ This server can handle HTML files up to 2147483647 characters long, and files ar
 #include <fstream>
 #include <sstream>
 #include <string.h>
-
 using namespace std;
 
-char board[BOARD_SIZE][BOARD_SIZE]; //Initialize empty game board
+char serverBoard[BOARD_SIZE][BOARD_SIZE]; //Initialize empty server board
+char clientBoard[BOARD_SIZE][BOARD_SIZE]; //Initialize empty client board
 
 void printBoard(){
 	std::cout << "player:" << endl;
 	for (int i = 0; i < BOARD_SIZE; i++) {
 		for (int j = 0; j < BOARD_SIZE; j++) {
-			std::cout << board[i][j] << " ";
+			std::cout << serverBoard[i][j] << " ";
 		};
 		std::cout << std::endl;
 	}
@@ -57,29 +48,33 @@ void printBoard(){
 void initBoard(){
 	for (int i = 0; i < BOARD_SIZE; i++) {
 		for (int j = 0; j < BOARD_SIZE; j++) {
-			board[i][j] = '-'; //□
+			serverBoard[i][j] = '-'; //□
 		};
 	}
-	//TODO: Users fill in squares of their choice
-	board[0][3] = 'O'; //■
-	board[1][0] = 'O';//○
-	board[1][1] = 'O';//○
-	board[1][2] = 'O';//○
-	board[1][2] = 'X';//●
-	board[2][3] = '+';//■
-	board[3][4] = 'O';//○
-	board[4][0] = 'O';//○
-	board[4][1] = 'X';//●
-	board[4][4] = 'O';//○
-	board[5][0] = 'O';//○
-	board[5][1] = 'X';//●
-	board[5][4] = 'O';//○
+	//TODO: Server randomly generated ships
+	//serverBoard[0][3] = '+';//■
+	serverBoard[1][0] = 'O';//○
+	serverBoard[1][1] = 'O';//○
+	serverBoard[1][2] = 'O';//○
+	//serverBoard[1][3] = 'X';//● //Client will send these commands
+	serverBoard[1][3] = 'O';//○
+	//serverBoard[1][4] = '+';//■
+	//serverBoard[2][3] = '+';//■
+	serverBoard[3][4] = 'O';//○
+	serverBoard[4][0] = 'O';//○
+	//serverBoard[4][1] = 'X';//●
+	serverBoard[4][1] = 'O';//●
+	serverBoard[4][4] = 'O';//○
+	serverBoard[5][0] = 'O';//○
+	//serverBoard[5][1] = 'X';//●
+	serverBoard[5][1] = 'O';//●
+	serverBoard[5][4] = 'O';//○
 	printBoard();
 }
 
 int errChk(int errVal, string errMsg){
 	if (errVal < 0) {
-		std::cout << errMsg << std::endl;
+		std::cerr << errMsg << std::endl;
 		exit(errVal);
 	}
 	return errVal;

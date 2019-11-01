@@ -1,15 +1,11 @@
 /**
 CSS 432 AU19
-HW2 - Intro to Network Programming
+Sea Battle - Intro to Network Programming
 Lloyd Deng
 
-	Build:g++ -o client.out Client.cpp
+	Build: g++ -o client.out Client.cpp
 	
 	Usage: ./client.out [server_name] [server_path] [server_port]
-
-Client.cpp will send a basic GET request to a server and port of your choice, and retrieve from that server a file of your choice. In most scenarios it ends in a redirect, but the program will display and save the html file of the page, and it's very interesting to see!
-
-This client can handle HTML files up to 2147483647 characters long, and files are saved at filesystem/client/file.html.
 **/
 
 #include <sys/types.h>    // socket, bind
@@ -35,13 +31,14 @@ This client can handle HTML files up to 2147483647 characters long, and files ar
 #include <string.h>
 using namespace std;
 
-char board[BOARD_SIZE][BOARD_SIZE]; //Initialize empty game board
+char clientBoard[BOARD_SIZE][BOARD_SIZE]; //Initialize empty client board
+char serverBoard[BOARD_SIZE][BOARD_SIZE]; //Initialize empty server board
 
 void printBoard(){
 	std::cout << "player:" << endl;
 	for (int i = 0; i < BOARD_SIZE; i++) {
 		for (int j = 0; j < BOARD_SIZE; j++) {
-			std::cout << board[i][j] << " ";
+			std::cout << clientBoard[i][j] << " ";
 		};
 		std::cout << std::endl;
 	}
@@ -51,23 +48,27 @@ void printBoard(){
 void initBoard(){
 	for (int i = 0; i < BOARD_SIZE; i++) {
 		for (int j = 0; j < BOARD_SIZE; j++) {
-			board[i][j] = '-'; //□
+			clientBoard[i][j] = '-'; //□
 		};
 	}
-	//TODO: Users fill in squares of their choice
-	board[0][3] = 'O'; //■
-	board[1][0] = 'O';//○
-	board[1][1] = 'O';//○
-	board[1][2] = 'O';//○
-	board[1][2] = 'X';//●
-	board[2][3] = '+';//■
-	board[3][4] = 'O';//○
-	board[4][0] = 'O';//○
-	board[4][1] = 'X';//●
-	board[4][4] = 'O';//○
-	board[5][0] = 'O';//○
-	board[5][1] = 'X';//●
-	board[5][4] = 'O';//○
+	//TODO: Client randomly generated ships
+	//clientBoard[0][3] = '+';//■
+	clientBoard[1][0] = 'O';//○
+	clientBoard[1][1] = 'O';//○
+	clientBoard[1][2] = 'O';//○
+	//clientBoard[1][3] = 'X';//● //Server will send these commands
+	clientBoard[1][3] = 'O';//○
+	//clientBoard[1][4] = '+';//■
+	//clientBoard[2][3] = '+';//■
+	clientBoard[3][4] = 'O';//○
+	clientBoard[4][0] = 'O';//○
+	//clientBoard[4][1] = 'X';//●
+	clientBoard[4][1] = 'O';//●
+	clientBoard[4][4] = 'O';//○
+	clientBoard[5][0] = 'O';//○
+	//clientBoard[5][1] = 'X';//●
+	clientBoard[5][1] = 'O';//●
+	clientBoard[5][4] = 'O';//○
 	printBoard();
 }
 
