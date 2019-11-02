@@ -3,6 +3,8 @@ CSS 432 AU19
 Sea Battle - Intro to Network Programming
 Team Cookies
 
+This is the golden master release of Sea Battle Alpha.
+
 	Build: g++ -o server.out Server.cpp -pthread
 	
 	Usage: ./server.out [port] [n]
@@ -20,12 +22,13 @@ Team Cookies
 #define DEFAULT_PORT 6932
 #define DEFAULT_N 10
 #define ALPHABET "abcdefghijklmnopqrstuvwxyz"
-#define INT_MAX 2147483647
+//#define INT_MAX 2147483647
 #define BOARD_SIZE 6
 #define SHIP 'O' //○
 #define HIT 'X' //●
 #define SEA '-' //□
 #define MISS '+' //■
+#define SERVER_WELCOME "Welcome to Sea Battle v1.0 alpha, a game by Team Cookies\nThis is the server application which manages the game board. Keep this window open while playing the game through the client to see the networking between the two applications.\n"
 
 #include <iostream>
 #include <fstream>
@@ -35,6 +38,10 @@ using namespace std; //TODO: Remove namespace
 
 char serverBoard[BOARD_SIZE][BOARD_SIZE]; //Initialize empty server board
 //char clientBoard[BOARD_SIZE][BOARD_SIZE]; //Initialize empty client board
+
+int to_int(char c){
+	return c - 48; //convert from 
+}
 
 int errChk(int errVal, string errMsg){
 	//errVals under 0 will result in printing errMsg and exiting the program.
@@ -100,6 +107,7 @@ int atkHlp(char c){
 }
 
 char getBoard(char (&board) [BOARD_SIZE][BOARD_SIZE], int x, int y){
+	//TODO: Move all board functions into it's own cpp module.
 	return serverBoard[x][y];
 }
 
@@ -138,21 +146,28 @@ std::string attackBoard(char a, char b){
 	int y = atkHlp(b);
 	char c = getBoard(serverBoard, x, y);
 	
+	//This attackcode is used by Client to determine a hit or miss.
+	std::string attackCode = to_string(x) + to_string(y);
+	
 	if (c == SHIP){
 		setBoard(serverBoard, x, y, HIT);
-		return "hit!\n";
+		attackCode += HIT;
+		return attackCode + "...hit!\n";
 	}
 	else if (c == HIT){
 		setBoard(serverBoard, x, y, HIT);
-		return "hey, you already hit this spot...\n";
+		attackCode += HIT;
+		return attackCode + "...hey, you already hit this spot...\n";
 	}
 	else if (c == SEA){
 		setBoard(serverBoard, x, y, MISS);
-		return "miss!\n";
+		attackCode += MISS;
+		return attackCode + "...miss!\n";
 	}
 	else if (c == MISS){
 		setBoard(serverBoard, x, y, MISS);
-		return "hey, you already missed this spot...\n";
+		attackCode += MISS;
+		return attackCode + "...hey, you already missed this spot...\n";
 	}
 }
 
@@ -220,14 +235,6 @@ int main(int argc, char const *argv[])
 		errChk(-1, "Usage: ./server.out [port] [n]");
 	}
 	
-	//Initialization here
-	initBoardSea(serverBoard);
-	initBoardShips(serverBoard);
-	std::cout << "Welcome to Sea Battle, a game by Team Cookies" << std::endl;
-	std::cout << "This is the server application, which stores the game board and calculates all hits and misses. Keep this window open, and run the client, to play the game using that window." << std::endl;
-	std::cout << "Enjoy the game!" << std::endl;
-	printBoard(serverBoard);
-
 	/*Your server only needs to respond to HTTP GET request.*/
     sockaddr_in acceptSockAddr;
     bzero( (char*)&acceptSockAddr, sizeof( acceptSockAddr ) );
@@ -243,6 +250,12 @@ int main(int argc, char const *argv[])
 	sockaddr_in newSockAddr;
 	socklen_t newSockAddrSize = sizeof( newSockAddr );
 	int newSd = errChk(accept( serverSd, ( sockaddr *)&newSockAddr, &newSockAddrSize ), "Error: Socket failed to accept.");
+	
+	//User interactions begin here.
+	std::cout << "Port: " << port << " n: " << n << std::endl << SERVER_WELCOME;
+	initBoardSea(serverBoard);
+	initBoardShips(serverBoard);
+	printBoard(serverBoard);
 
 	accept:
 	/*Your server waits for a connection and an HTTP GET request*/
@@ -252,10 +265,12 @@ int main(int argc, char const *argv[])
 	std::cout << "reading: " << readbuf << std::endl;
 	
 	string swritebuf = attackBoard(readbuf[0], readbuf[1]);
-	swritebuf += getBoard(serverBoard);
+	//swritebuf += getBoard(serverBoard);
 	const char * writebuf = swritebuf.c_str();
 	write(newSd, writebuf, strlen(writebuf));
 	std::cout << "writing: " << swritebuf << std::endl;
+	
+	printBoard(serverBoard);
 
 	/*After you handle the request, your server should return to waiting for the next request.*/
 	goto accept;
