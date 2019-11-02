@@ -1,13 +1,12 @@
 /**
 CSS 432 AU19
 Sea Battle - Intro to Network Programming
-Lloyd Deng
+Team Cookies
 
 	Build: g++ -o server.out Server.cpp -pthread
 	
 	Usage: ./server.out [port] [n]
 **/
-
 
 #include <sys/types.h>    // socket, bind
 #include <sys/socket.h>   // socket, bind, listen, inet_ntoa
@@ -20,8 +19,6 @@ Lloyd Deng
 #include <sys/uio.h>      // writev
 #define DEFAULT_PORT 6932
 #define DEFAULT_N 10
-#define DEFAULT_FILESYSTEM "filesystem/server"
-#define DEFAULT_FILE "filesystem/server/file.html"
 #define ALPHABET "abcdefghijklmnopqrstuvwxyz"
 #define INT_MAX 2147483647
 #define BOARD_SIZE 6
@@ -40,6 +37,8 @@ char serverBoard[BOARD_SIZE][BOARD_SIZE]; //Initialize empty server board
 //char clientBoard[BOARD_SIZE][BOARD_SIZE]; //Initialize empty client board
 
 int errChk(int errVal, string errMsg){
+	//errVals under 0 will result in printing errMsg and exiting the program.
+	//errVals over 0 will return the errVal.
 	if (errVal < 0) {
 		std::cerr << errMsg << std::endl;
 		exit(errVal);
@@ -96,8 +95,7 @@ int atkHlp(char c){
 		return 6;
 	}
 	else{ //TODO: Do this with errChk
-		std::cerr << "INVALID INPUT: " << c << std::endl;
-		return -1;
+		errChk(-1, "invalid input: " + to_string(c)); 
 	}
 }
 
@@ -108,7 +106,7 @@ char getBoard(char (&board) [BOARD_SIZE][BOARD_SIZE], int x, int y){
 std::string getBoard(char (&board) [BOARD_SIZE][BOARD_SIZE]){
 	//Overloaded constructor of getBoard which returns the entire board as a string.
 	//TODO: This is very similar to printBoard. How can we combine them?
-	//TODO: Something in this method is causing a memory leak after ctrl c exiting the program
+	//TODO: Something in this method is causing a memory leak after ctrl c exiting the program??
 	string s = "  ";
 	for (int k = 1; k <= BOARD_SIZE; k++) {
 		s += std::to_string(k);
@@ -176,7 +174,7 @@ void printBoard(char (&board) [BOARD_SIZE][BOARD_SIZE]){
 }
 
 void initBoardShips(char (&board) [BOARD_SIZE][BOARD_SIZE]){//TODO: Place ships based on randomly generated list of coordinates?
-	//setBoard(serverBoard, 0, 3, MISS);
+	//setBoard(serverBoard, 0, 3, MISS); //To be entered by user
 	setBoard(serverBoard, 1, 0, SHIP);
 	setBoard(serverBoard, 1, 1, SHIP);
 	setBoard(serverBoard, 1, 2, SHIP);
@@ -221,11 +219,14 @@ int main(int argc, char const *argv[])
 	else{ //None of the above: Exit
 		errChk(-1, "Usage: ./server.out [port] [n]");
 	}
-		
+	
+	//Initialization here
 	initBoardSea(serverBoard);
 	initBoardShips(serverBoard);
-	printBoard(serverBoard);
 	std::cout << "Welcome to Sea Battle, a game by Team Cookies" << std::endl;
+	std::cout << "This is the server application, which stores the game board and calculates all hits and misses. Keep this window open, and run the client, to play the game using that window." << std::endl;
+	std::cout << "Enjoy the game!" << std::endl;
+	printBoard(serverBoard);
 
 	/*Your server only needs to respond to HTTP GET request.*/
     sockaddr_in acceptSockAddr;

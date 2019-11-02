@@ -1,7 +1,7 @@
 /**
 CSS 432 AU19
 Sea Battle - Intro to Network Programming
-Lloyd Deng
+Team Cookies
 
 	Build: g++ -o client.out Client.cpp
 	
@@ -20,15 +20,6 @@ Lloyd Deng
 #define DEFAULT_NAME "localhost"
 #define DEFAULT_PATH "/"
 #define DEFAULT_PORT 6932
-#define DEFAULT_FILESYSTEM "filesystem/client"
-#define DEFAULT_FILE "filesystem/client/file.html"
-#define ALPHABET "abcdefghijklmnopqrstuvwxyz"
-#define INT_MAX 2147483647
-#define BOARD_SIZE 6
-#define SHIP 'O' //○
-#define HIT 'X' //●
-#define SEA '-' //□
-#define MISS '+' //■
 
 #include <iostream>
 #include <fstream>
@@ -45,11 +36,7 @@ int errChk(int errVal, string errMsg){
 }
 
 int main(int argc, char const *argv[])
-{	
-	string DEFAULT_METHOD = "GET";
-	string DEFAULT_PROTOCOL = "HTTP/1.0";
-	string DEFAULT_USERAGENT = "HTMLynx/1.0";
-
+{
 	/*Your retriever takes in an input from the command line and parses the server address and file (web page) that is being requested.*/
 	int ticker = 0;
 	int server_port;
@@ -90,27 +77,10 @@ int main(int argc, char const *argv[])
 		server_path = argv[2];
 		server_port = stoi(argv[3]);
 	}
-	
-	else if (argc == 5){ //four arguments: Assume user input = server_name server_path server_port method
-		server_name = argv[1];
-		server_path = argv[2];
-		server_port = stoi(argv[3]);
-		DEFAULT_METHOD = "POST";
-	}
 
 	else{ //None of the above: Exit
 		errChk(-1, "Usage: ./client.out [server_name] [server_path] [server_port]");
 	}
-	std::cout << "IP: " << server_name << " Port: " << server_port << std::endl;
-
-	std::cout << "Welcome to Sea Battle v1.0 alpha, a game by Team Cookies" << std::endl;
-	std::cout << "Please enter coordinates with using [char][num] (no spaces, no brackets) to attack the ships of the enemy." << std::endl;
-	std::cout << "input 'a1' to get started." << std::endl;
-
-	//initBoardSea(clientBoard);
-	//initBoardShips(clientBoard);
-	//printBoard(clientBoard);
-
 
 	/*The program then issues a GET request to the server for the requested file.*/
 	struct hostent* host = gethostbyname( server_name.c_str() );
@@ -123,6 +93,12 @@ int main(int argc, char const *argv[])
 	int clientSd = errChk(socket( AF_INET, SOCK_STREAM, 0 ), "Error: Opening stream socket");
 	errChk(connect( clientSd, ( sockaddr* )&sendSockAddr, sizeof( sendSockAddr ) ), "Error: Socket invalid");
 	
+	//User interactions begin here.
+	std::cout << "IP: " << server_name << " Port: " << server_port << std::endl;
+	std::cout << "Welcome to Sea Battle v1.0 alpha, a game by Team Cookies" << std::endl;
+	std::cout << "This is the client application. Please enter coordinates with using [char][num] (no spaces, no brackets) to attack the ships of the server." << std::endl;
+	std::cout << "input 'a1' to get started." << std::endl;
+
 	send:
 	std::string swritebuf;
 	std::cin >> swritebuf;
