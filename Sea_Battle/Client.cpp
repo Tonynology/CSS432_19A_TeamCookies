@@ -24,6 +24,10 @@ Lloyd Deng
 #define DEFAULT_FILE "filesystem/client/file.html"
 #define INT_MAX 2147483647
 #define BOARD_SIZE 6
+#define SHIP 'O' //○
+#define HIT 'X' //●
+#define SEA '-' //□
+#define MISS '+' //■
 
 #include <iostream>
 #include <fstream>
@@ -34,42 +38,48 @@ using namespace std;
 char clientBoard[BOARD_SIZE][BOARD_SIZE]; //Initialize empty client board
 char serverBoard[BOARD_SIZE][BOARD_SIZE]; //Initialize empty server board
 
-void printBoard(){
+char getBoard(char (&board) [BOARD_SIZE][BOARD_SIZE], int x, int y){
+	return board[x][y];
+}
+
+void setBoard(char (&board) [BOARD_SIZE][BOARD_SIZE], int x, int y, char c){
+	clientBoard[x][y] = c;
+}
+
+void printBoard(char (&board) [BOARD_SIZE][BOARD_SIZE]){
 	std::cout << "player:" << endl;
 	for (int i = 0; i < BOARD_SIZE; i++) {
 		for (int j = 0; j < BOARD_SIZE; j++) {
-			std::cout << clientBoard[i][j] << " ";
+			std::cout << getBoard(clientBoard, i, j) << " ";
 		};
 		std::cout << std::endl;
 	}
 	std::cout << std::endl;
 }
 
-void initBoard(){
+void initBoardShips(char (&board) [BOARD_SIZE][BOARD_SIZE]){//TODO: Place ships based on randomly generated list of coordinates?
+	//setBoard(clientBoard, 0, 3, MISS);
+	setBoard(clientBoard, 1, 0, SHIP);
+	setBoard(clientBoard, 1, 1, SHIP);
+	setBoard(clientBoard, 1, 2, SHIP);
+	setBoard(clientBoard, 1, 3, SHIP); //setBoard(clientBoard, 1, 3, HIT);
+	//setBoard(clientBoard, 1, 4, MISS);
+	//setBoard(clientBoard, 2, 3, MISS);
+	setBoard(clientBoard, 3, 4, SHIP);
+	setBoard(clientBoard, 4, 0, SHIP);
+	setBoard(clientBoard, 4, 1, SHIP); //setBoard(clientBoard, 4, 1, HIT);
+	setBoard(clientBoard, 4, 4, SHIP);
+	setBoard(clientBoard, 5, 0, SHIP);
+	setBoard(clientBoard, 5, 1, SHIP); //setBoard(clientBoard, 5, 1, HIT);
+	setBoard(clientBoard, 5, 4, SHIP);
+}
+
+void initBoardSea(char (&board) [BOARD_SIZE][BOARD_SIZE]){
 	for (int i = 0; i < BOARD_SIZE; i++) {
 		for (int j = 0; j < BOARD_SIZE; j++) {
-			clientBoard[i][j] = '-'; //□
+			setBoard(clientBoard, i, j, SEA);
 		};
 	}
-	//TODO: Client randomly generated ships
-	//clientBoard[0][3] = '+';//■
-	clientBoard[1][0] = 'O';//○
-	clientBoard[1][1] = 'O';//○
-	clientBoard[1][2] = 'O';//○
-	//clientBoard[1][3] = 'X';//● //Server will send these commands
-	clientBoard[1][3] = 'O';//○
-	//clientBoard[1][4] = '+';//■
-	//clientBoard[2][3] = '+';//■
-	clientBoard[3][4] = 'O';//○
-	clientBoard[4][0] = 'O';//○
-	//clientBoard[4][1] = 'X';//●
-	clientBoard[4][1] = 'O';//●
-	clientBoard[4][4] = 'O';//○
-	clientBoard[5][0] = 'O';//○
-	//clientBoard[5][1] = 'X';//●
-	clientBoard[5][1] = 'O';//●
-	clientBoard[5][4] = 'O';//○
-	printBoard();
 }
 
 int errChk(int errVal, string errMsg){
@@ -135,7 +145,9 @@ int main(int argc, char const *argv[])
 		errChk(-1, "Usage: ./client.out [server_name] [server_path] [server_port]");
 	}
 
-	initBoard();
+	initBoardSea(clientBoard);
+	initBoardShips(clientBoard);
+	printBoard(clientBoard);
 	std::cout << "Welcome to Sea Battle, a game by Team Cookies" << std::endl;
 
 	std::cout << "Website: " << server_name << " Path: " << server_path << " Port: " << server_port << std::endl;

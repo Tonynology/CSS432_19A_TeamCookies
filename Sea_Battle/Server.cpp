@@ -34,42 +34,48 @@ using namespace std;
 char serverBoard[BOARD_SIZE][BOARD_SIZE]; //Initialize empty server board
 char clientBoard[BOARD_SIZE][BOARD_SIZE]; //Initialize empty client board
 
-void printBoard(){
+char getBoard(char (&board) [BOARD_SIZE][BOARD_SIZE], int x, int y){
+	return board[x][y];
+}
+
+void setBoard(char (&board) [BOARD_SIZE][BOARD_SIZE], int x, int y, char c){
+	serverBoard[x][y] = c;
+}
+
+void printBoard(char (&board) [BOARD_SIZE][BOARD_SIZE]){
 	std::cout << "player:" << endl;
 	for (int i = 0; i < BOARD_SIZE; i++) {
 		for (int j = 0; j < BOARD_SIZE; j++) {
-			std::cout << serverBoard[i][j] << " ";
+			std::cout << getBoard(serverBoard, i, j) << " ";
 		};
 		std::cout << std::endl;
 	}
 	std::cout << std::endl;
 }
 
-void initBoard(){
+void initBoardShips(char (&board) [BOARD_SIZE][BOARD_SIZE]){//TODO: Place ships based on randomly generated list of coordinates?
+	//setBoard(serverBoard, 0, 3, MISS);
+	setBoard(serverBoard, 1, 0, SHIP);
+	setBoard(serverBoard, 1, 1, SHIP);
+	setBoard(serverBoard, 1, 2, SHIP);
+	setBoard(serverBoard, 1, 3, SHIP); //setBoard(serverBoard, 1, 3, HIT);
+	//setBoard(serverBoard, 1, 4, MISS);
+	//setBoard(serverBoard, 2, 3, MISS);
+	setBoard(serverBoard, 3, 4, SHIP);
+	setBoard(serverBoard, 4, 0, SHIP);
+	setBoard(serverBoard, 4, 1, SHIP); //setBoard(serverBoard, 4, 1, HIT);
+	setBoard(serverBoard, 4, 4, SHIP);
+	setBoard(serverBoard, 5, 0, SHIP);
+	setBoard(serverBoard, 5, 1, SHIP); //setBoard(serverBoard, 5, 1, HIT);
+	setBoard(serverBoard, 5, 4, SHIP);
+}
+
+void initBoardSea(char (&board) [BOARD_SIZE][BOARD_SIZE]){
 	for (int i = 0; i < BOARD_SIZE; i++) {
 		for (int j = 0; j < BOARD_SIZE; j++) {
-			serverBoard[i][j] = '-'; //□
+			setBoard(serverBoard, i, j, SEA);
 		};
 	}
-	//TODO: Server randomly generated ships
-	//serverBoard[0][3] = '+';//■
-	serverBoard[1][0] = 'O';//○
-	serverBoard[1][1] = 'O';//○
-	serverBoard[1][2] = 'O';//○
-	//serverBoard[1][3] = 'X';//● //Client will send these commands
-	serverBoard[1][3] = 'O';//○
-	//serverBoard[1][4] = '+';//■
-	//serverBoard[2][3] = '+';//■
-	serverBoard[3][4] = 'O';//○
-	serverBoard[4][0] = 'O';//○
-	//serverBoard[4][1] = 'X';//●
-	serverBoard[4][1] = 'O';//●
-	serverBoard[4][4] = 'O';//○
-	serverBoard[5][0] = 'O';//○
-	//serverBoard[5][1] = 'X';//●
-	serverBoard[5][1] = 'O';//●
-	serverBoard[5][4] = 'O';//○
-	printBoard();
 }
 
 int errChk(int errVal, string errMsg){
@@ -199,7 +205,9 @@ int main(int argc, char const *argv[])
 		errChk(-1, "Usage: ./server.out [port] [n]");
 	}
 		
-	initBoard();
+	initBoardSea(serverBoard);
+	initBoardShips(serverBoard);
+	printBoard(serverBoard);
 	std::cout << "Welcome to Sea Battle, a game by Team Cookies" << std::endl;
 
 	/*Your server only needs to respond to HTTP GET request.*/
