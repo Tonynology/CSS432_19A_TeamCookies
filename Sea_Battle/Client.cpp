@@ -22,6 +22,7 @@ Lloyd Deng
 #define DEFAULT_PORT 6932
 #define DEFAULT_FILESYSTEM "filesystem/client"
 #define DEFAULT_FILE "filesystem/client/file.html"
+#define ALPHABET "abcdefghijklmnopqrstuvwxyz"
 #define INT_MAX 2147483647
 #define BOARD_SIZE 6
 #define SHIP 'O' //○
@@ -33,54 +34,7 @@ Lloyd Deng
 #include <fstream>
 #include <sstream>
 #include <string.h>
-using namespace std;
-
-char clientBoard[BOARD_SIZE][BOARD_SIZE]; //Initialize empty client board
-char serverBoard[BOARD_SIZE][BOARD_SIZE]; //Initialize empty server board
-
-char getBoard(char (&board) [BOARD_SIZE][BOARD_SIZE], int x, int y){
-	return board[x][y];
-}
-
-void setBoard(char (&board) [BOARD_SIZE][BOARD_SIZE], int x, int y, char c){
-	clientBoard[x][y] = c;
-}
-
-void printBoard(char (&board) [BOARD_SIZE][BOARD_SIZE]){
-	std::cout << "player:" << endl;
-	for (int i = 0; i < BOARD_SIZE; i++) {
-		for (int j = 0; j < BOARD_SIZE; j++) {
-			std::cout << getBoard(clientBoard, i, j) << " ";
-		};
-		std::cout << std::endl;
-	}
-	std::cout << std::endl;
-}
-
-void initBoardShips(char (&board) [BOARD_SIZE][BOARD_SIZE]){//TODO: Place ships based on randomly generated list of coordinates?
-	//setBoard(clientBoard, 0, 3, MISS);
-	setBoard(clientBoard, 1, 0, SHIP);
-	setBoard(clientBoard, 1, 1, SHIP);
-	setBoard(clientBoard, 1, 2, SHIP);
-	setBoard(clientBoard, 1, 3, SHIP); //setBoard(clientBoard, 1, 3, HIT);
-	//setBoard(clientBoard, 1, 4, MISS);
-	//setBoard(clientBoard, 2, 3, MISS);
-	setBoard(clientBoard, 3, 4, SHIP);
-	setBoard(clientBoard, 4, 0, SHIP);
-	setBoard(clientBoard, 4, 1, SHIP); //setBoard(clientBoard, 4, 1, HIT);
-	setBoard(clientBoard, 4, 4, SHIP);
-	setBoard(clientBoard, 5, 0, SHIP);
-	setBoard(clientBoard, 5, 1, SHIP); //setBoard(clientBoard, 5, 1, HIT);
-	setBoard(clientBoard, 5, 4, SHIP);
-}
-
-void initBoardSea(char (&board) [BOARD_SIZE][BOARD_SIZE]){
-	for (int i = 0; i < BOARD_SIZE; i++) {
-		for (int j = 0; j < BOARD_SIZE; j++) {
-			setBoard(clientBoard, i, j, SEA);
-		};
-	}
-}
+using namespace std; //Duplicated comments will be listed in Server.cpp.
 
 int errChk(int errVal, string errMsg){
 	if (errVal < 0) {
@@ -100,20 +54,23 @@ int main(int argc, char const *argv[])
 	int ticker = 0;
 	int server_port;
 	std::string server_name, server_path;
-	std::cout << "Welcome to HTMLynx, the raw HTML browser!" << std::endl;
 
 	if (argc == 1){ //No arguments: Prompt the user
 		server_name = DEFAULT_NAME;
-		std::cout << "Enter your desired website. Leave empty for default value 'localhost'" << std::endl;
-		if (std::cin.peek() != '\n') {std::cin >> server_name;}
-	
 		server_path = DEFAULT_PATH;
-		std::cout << "Enter your desired path. Leave empty for default value '/'" << std::endl;
-		if (std::cin.peek() != '\n') {std::cin >> server_path;}
-	
 		server_port = DEFAULT_PORT;
-		std::cout << "Enter your desired port. Leave empty for default value '80'" << std::endl;
-		if (std::cin.peek() != '\n') {std::cin >> server_port;}
+
+		//server_name = DEFAULT_NAME;
+		//std::cout << "Enter your desired website. Leave empty for default value 'localhost'" << std::endl;
+		//if (std::cin.peek() != '\n') {std::cin >> server_name;}
+		//
+		//server_path = DEFAULT_PATH;
+		//std::cout << "Enter your desired path. Leave empty for default value '/'" << std::endl;
+		//if (std::cin.peek() != '\n') {std::cin >> server_path;}
+		//
+		//server_port = DEFAULT_PORT;
+		//std::cout << "Enter your desired port. Leave empty for default value '80'" << std::endl;
+		//if (std::cin.peek() != '\n') {std::cin >> server_port;}
 	}
 	
 	else if (argc == 2){ //One argument: Assume user input = server_name
@@ -144,13 +101,16 @@ int main(int argc, char const *argv[])
 	else{ //None of the above: Exit
 		errChk(-1, "Usage: ./client.out [server_name] [server_path] [server_port]");
 	}
+	std::cout << "IP: " << server_name << " Port: " << server_port << std::endl;
 
-	initBoardSea(clientBoard);
-	initBoardShips(clientBoard);
-	printBoard(clientBoard);
-	std::cout << "Welcome to Sea Battle, a game by Team Cookies" << std::endl;
+	std::cout << "Welcome to Sea Battle v1.0 alpha, a game by Team Cookies" << std::endl;
+	std::cout << "Please enter coordinates with using [char][num] (no spaces, no brackets) to attack the ships of the enemy." << std::endl;
+	std::cout << "input 'a1' to get started." << std::endl;
 
-	std::cout << "Website: " << server_name << " Path: " << server_path << " Port: " << server_port << std::endl;
+	//initBoardSea(clientBoard);
+	//initBoardShips(clientBoard);
+	//printBoard(clientBoard);
+
 
 	/*The program then issues a GET request to the server for the requested file.*/
 	struct hostent* host = gethostbyname( server_name.c_str() );

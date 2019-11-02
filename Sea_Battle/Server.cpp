@@ -22,6 +22,7 @@ Lloyd Deng
 #define DEFAULT_N 10
 #define DEFAULT_FILESYSTEM "filesystem/server"
 #define DEFAULT_FILE "filesystem/server/file.html"
+#define ALPHABET "abcdefghijklmnopqrstuvwxyz"
 #define INT_MAX 2147483647
 #define BOARD_SIZE 6
 #define SHIP 'O' //○
@@ -33,24 +34,141 @@ Lloyd Deng
 #include <fstream>
 #include <sstream>
 #include <string.h>
-using namespace std;
+using namespace std; //TODO: Remove namespace
 
 char serverBoard[BOARD_SIZE][BOARD_SIZE]; //Initialize empty server board
-char clientBoard[BOARD_SIZE][BOARD_SIZE]; //Initialize empty client board
+//char clientBoard[BOARD_SIZE][BOARD_SIZE]; //Initialize empty client board
+
+int errChk(int errVal, string errMsg){
+	if (errVal < 0) {
+		std::cerr << errMsg << std::endl;
+		exit(errVal);
+	}
+	return errVal;
+}
+
+int atkHlp(char c){
+	//TODO: Must be a better way of doing this.
+	//Maybe switch statement? Maybe key-value dict map?
+	//Also, should support the full alphabet, not just six, since we don't have this hard coded.
+	
+	//TODO: Split this into a converter board.
+	if (c == 'a'){
+		return 0;
+	}
+	else if (c == 'b'){
+		return 1;
+	}
+	else if (c == 'c'){
+		return 2;
+	}
+	else if (c == 'd'){
+		return 3;
+	}
+	else if (c == 'e'){
+		return 4;
+	}
+	else if (c == 'f'){
+		return 5;
+	}
+	else if (c == 'b'){
+		return 6;
+	}
+	else if (c == '1'){
+		return 0;
+	}
+	else if (c == '2'){
+		return 1;
+	}
+	else if (c == '3'){
+		return 2;
+	}
+	else if (c == '4'){
+		return 3;
+	}
+	else if (c == '5'){
+		return 4;
+	}
+	else if (c == '6'){
+		return 5;
+	}
+	else if (c == '7'){
+		return 6;
+	}
+	else{ //TODO: Do this with errChk
+		std::cerr << "INVALID INPUT: " << c << std::endl;
+		return -1;
+	}
+}
 
 char getBoard(char (&board) [BOARD_SIZE][BOARD_SIZE], int x, int y){
-	return board[x][y];
+	return serverBoard[x][y];
+}
+
+std::string getBoard(char (&board) [BOARD_SIZE][BOARD_SIZE]){
+	//Overloaded constructor of getBoard which returns the entire board as a string.
+	//TODO: This is very similar to printBoard. How can we combine them?
+	//TODO: Something in this method is causing a memory leak after ctrl c exiting the program
+	string s = "  ";
+	for (int k = 1; k <= BOARD_SIZE; k++) {
+		s += std::to_string(k);
+		s += " ";
+	}
+	s += "\n";
+
+	for (int i = 0; i < BOARD_SIZE; i++){
+		s += ALPHABET[i % BOARD_SIZE];
+		s += " ";
+
+		for (int j = 0; j < BOARD_SIZE; j++){
+			s += getBoard(serverBoard, i, j);
+			s += " ";
+		}
+		s += "\n";
+	}
+	s += "\n";
+	return s;
 }
 
 void setBoard(char (&board) [BOARD_SIZE][BOARD_SIZE], int x, int y, char c){
 	serverBoard[x][y] = c;
 }
 
+std::string attackBoard(char a, char b){
+	//TODO: Support more formats than just [char][num]
+	int x = atkHlp(a);
+	int y = atkHlp(b);
+	char c = getBoard(serverBoard, x, y);
+	
+	if (c == SHIP){
+		setBoard(serverBoard, x, y, HIT);
+		return "hit!\n";
+	}
+	else if (c == HIT){
+		setBoard(serverBoard, x, y, HIT);
+		return "hey, you already hit this spot...\n";
+	}
+	else if (c == SEA){
+		setBoard(serverBoard, x, y, MISS);
+		return "miss!\n";
+	}
+	else if (c == MISS){
+		setBoard(serverBoard, x, y, MISS);
+		return "hey, you already missed this spot...\n";
+	}
+}
+
 void printBoard(char (&board) [BOARD_SIZE][BOARD_SIZE]){
-	std::cout << "player:" << endl;
+	std::cout << "  ";
+	for (int k = 1; k <= BOARD_SIZE; k++) {
+		cout << std::to_string(k) << " ";
+	}
+	std::cout << std::endl;
+	
 	for (int i = 0; i < BOARD_SIZE; i++) {
+		std::cout << ALPHABET[i % BOARD_SIZE] << " ";
 		for (int j = 0; j < BOARD_SIZE; j++) {
-			std::cout << getBoard(serverBoard, i, j) << " ";
+			std::cout << getBoard(board, i, j) << " ";
 		};
 		std::cout << std::endl;
 	}
@@ -80,14 +198,6 @@ void initBoardSea(char (&board) [BOARD_SIZE][BOARD_SIZE]){
 			setBoard(serverBoard, i, j, SEA);
 		};
 	}
-}
-
-int errChk(int errVal, string errMsg){
-	if (errVal < 0) {
-		std::cerr << errMsg << std::endl;
-		exit(errVal);
-	}
-	return errVal;
 }
 
 int main(int argc, char const *argv[])
@@ -140,7 +250,8 @@ int main(int argc, char const *argv[])
 	read(newSd, readbuf, sizeof(readbuf));
 	std::cout << "reading: " << readbuf << std::endl;
 	
-	string swritebuf = "Server says: OK!";
+	string swritebuf = attackBoard(readbuf[0], readbuf[1]);
+	swritebuf += getBoard(serverBoard);
 	const char * writebuf = swritebuf.c_str();
 	write(newSd, writebuf, strlen(writebuf));
 	std::cout << "writing: " << swritebuf << std::endl;
