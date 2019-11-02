@@ -24,6 +24,10 @@ Lloyd Deng
 #define DEFAULT_FILE "filesystem/server/file.html"
 #define INT_MAX 2147483647
 #define BOARD_SIZE 6
+#define SHIP 'O' //○
+#define HIT 'X' //●
+#define SEA '-' //□
+#define MISS '+' //■
 
 #include <iostream>
 #include <fstream>
@@ -86,103 +90,6 @@ int errChk(int errVal, string errMsg){
 	return errVal;
 }
 
-void *server(void *newSd)
-{
-	int ticker = 0; //Counter for escaping infinite (INT_MAX) loops
-	/*Your server waits for a connection and an HTTP GET request*/
-	int clientSd = *(int*)newSd; 
-	
-	string method, path, protocol, header;
-	char readbuf[2];
-
-	while(read(clientSd, readbuf, 1)){
-		if (ticker++ > INT_MAX){errChk(-1, "Trapped in method loop!");}
-		if (readbuf[0] == ' ' || readbuf[1] == ' ') break;
-		method += readbuf;
-		bzero(readbuf, sizeof(readbuf));
-	}
-	
-	while(read(clientSd, readbuf, 1)){
-		if (ticker++ > INT_MAX){errChk(-1, "Trapped in path loop!");}
-		if (readbuf[0] == ' ' || readbuf[1] == ' ') break;
-		path += readbuf;
-		bzero(readbuf, sizeof(readbuf));
-	}
-	if (path == "/") path = DEFAULT_FILE;
-	else if (path[0] == '/') path = DEFAULT_FILESYSTEM + path;
-	
-	while(read(clientSd, readbuf, 1)){
-		if (ticker++ > INT_MAX){errChk(-1, "Trapped in protocol loop!");}
-		if (readbuf[0] == '\r' || readbuf[0] == '\n' || readbuf[1] == '\r' || readbuf[1] == '\n') break;
-		protocol += readbuf;
-		bzero(readbuf, sizeof(readbuf));
-	}
-	
-	while(read(clientSd, readbuf, 1)){
-		if (ticker++ > INT_MAX){errChk(-1, "Trapped in header loop!");}
-		if (readbuf[0] == '\r' || readbuf[0] == '\n' || readbuf[1] == '\r' || readbuf[1] == '\n') break;
-		header += readbuf;
-		bzero(readbuf, sizeof(readbuf));
-	}
-
-	std::cout << method << " " << path << " " << protocol << "\r\n" << header << "\r\n";
-	
-	string swritebuf, s;
-	ifstream i;
-	i.open(path);
-	/*Finally, if your server cannot understand the request, return a 400 Bad Request.*/
-	if (path.find("filesystem/server/") == -1 || path.find("%") != -1 || method != "GET"){
-		swritebuf += "HTTP/1.0 400 Bad Request\r\n\r\n";
-		swritebuf += "\r\n";
-		const char * writebuf = swritebuf.c_str();
-		write( clientSd, writebuf, strlen(writebuf) ); // single write: allocates an nbufs-sized array of data buffers, and thereafter calls write( ) to send this array, (i.e., all data buffers) at once.
-	}
-	/*If the request is for a file that is above the directory where your web server is running ( for example, "GET ../../../etc/passwd" ), you should return a 403 Forbidden.*/
-	else if (path.find("../") != -1){
-		swritebuf += "HTTP/1.0 403 Forbidden\r\n\r\n";
-		swritebuf += "\r\n";
-		const char * writebuf = swritebuf.c_str();
-		write( clientSd, writebuf, strlen(writebuf) );
-	}
-	/*If the HTTP request is for SecretFile.html then the web server should return a 401 Unauthorized.*/
-	else if (path.find("SecretFile.html") != -1){
-		swritebuf += "HTTP/1.0 401 Unauthorized\r\n\r\n";
-		swritebuf += "\r\n";
-		const char * writebuf = swritebuf.c_str();
-		write( clientSd, writebuf, strlen(writebuf) );
-	}
-	/*If the file exists, the server opens the file that is requested and sends it (along with the HTTP 200 OK code, of course).*/
-	else if (i.is_open()){
-		swritebuf += "HTTP/1.0 200 OK\r\n\r\n";
-		while(getline(i,s)){
-			if (ticker++ > INT_MAX){errChk(-1, "Trapped in getline loop!");}
-			swritebuf += s + "\r\n";		
-		}
-		i.close();
-		swritebuf += "\r\n";
-		const char * writebuf = swritebuf.c_str();
-		write( clientSd, writebuf, strlen(writebuf) );
-	}
-	/*If the file requested does not exist, the server should return a 404 Not Found code along with a custom File Not Found page.*/
-	else if (!i.is_open()){
-		i.open("filesystem/server/notfound.html");
-		errChk(i.is_open() - 1, "Error: Opening notfound.html");
-
-		swritebuf += "HTTP/1.0 404 Not Found\r\n\r\n";
-		while(getline(i,s)){
-			if (ticker++ > INT_MAX){errChk(-1, "Trapped in getline loop!");}
-			swritebuf += s + "\r\n";		
-		}
-		i.close();
-		swritebuf += "\r\n";
-		const char * writebuf = swritebuf.c_str();
-		write( clientSd, writebuf, strlen(writebuf) );
-	}
-	close(clientSd);
-	pthread_exit(NULL);
-	return 0;
-}
-
 int main(int argc, char const *argv[])
 {	
 	int port, n;
@@ -224,16 +131,22 @@ int main(int argc, char const *argv[])
     errChk(listen( serverSd, n ), "Error: Operating system failed to listen.");
 	sockaddr_in newSockAddr;
 	socklen_t newSockAddrSize = sizeof( newSockAddr );
-	
-	accept:
 	int newSd = errChk(accept( serverSd, ( sockaddr *)&newSockAddr, &newSockAddrSize ), "Error: Socket failed to accept.");
+
+	accept:
+	/*Your server waits for a connection and an HTTP GET request*/
+	char readbuf[1024];
+	bzero(readbuf, sizeof(readbuf));
+	read(newSd, readbuf, sizeof(readbuf));
+	std::cout << "reading: " << readbuf << std::endl;
 	
-	/*multi-threaded handling*/
-	pthread_t thread;
-	errChk( pthread_create( &thread, NULL, server, (void*)&newSd ), "Error: Thread failed to create." );
-	errChk( pthread_join( thread, NULL ), "Error: Thread failed to join." );
-	close(newSd);
-	
+	string swritebuf = "Server says: OK!";
+	const char * writebuf = swritebuf.c_str();
+	write(newSd, writebuf, strlen(writebuf));
+	std::cout << "writing: " << swritebuf << std::endl;
+
 	/*After you handle the request, your server should return to waiting for the next request.*/
 	goto accept;
+	close(newSd);
+	exit(0);
 } 

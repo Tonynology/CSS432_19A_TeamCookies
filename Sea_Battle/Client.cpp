@@ -19,7 +19,7 @@ Lloyd Deng
 #include <sys/uio.h>      // writev
 #define DEFAULT_NAME "localhost"
 #define DEFAULT_PATH "/"
-#define DEFAULT_PORT 80
+#define DEFAULT_PORT 6932
 #define DEFAULT_FILESYSTEM "filesystem/client"
 #define DEFAULT_FILE "filesystem/client/file.html"
 #define INT_MAX 2147483647
@@ -162,61 +162,21 @@ int main(int argc, char const *argv[])
     sendSockAddr.sin_port        = htons( server_port );
 	int clientSd = errChk(socket( AF_INET, SOCK_STREAM, 0 ), "Error: Opening stream socket");
 	errChk(connect( clientSd, ( sockaddr* )&sendSockAddr, sizeof( sendSockAddr ) ), "Error: Socket invalid");
-	std::string swritebuf = DEFAULT_METHOD + " " + server_path + " " + DEFAULT_PROTOCOL + "\r\nUser-Agent: " + DEFAULT_USERAGENT + "\r\n\r\n";
+	
+	send:
+	std::string swritebuf;
+	std::cin >> swritebuf;
 	const char * writebuf = swritebuf.c_str();
 	write( clientSd, writebuf, strlen(writebuf) ); // single write: allocates an nbufs-sized array of data buffers, and thereafter calls write( ) to send this array, (i.e., all data buffers) at once.
+	std::cout << "writing: " << swritebuf << std::endl;
 	
-	/* Response format: [protocol] [code] [status]\r\n[header]\r\n[HTML]\r\n\r\n */
-	string protocol, code, status;
-	char readbuf[2];
-
-	while(read(clientSd, readbuf, 1)){
-		if (ticker++ > INT_MAX){errChk(-1, "Trapped in protocol loop!");}
-		if (readbuf[0] == ' ' || readbuf[1] == ' ') break;
-		protocol += readbuf;
-		bzero(readbuf, sizeof(readbuf));
-	}
-
-	while(read(clientSd, readbuf, 1)){
-		if (ticker++ > INT_MAX){errChk(-1, "Trapped in code loop!");}
-		if (readbuf[0] == ' ' || readbuf[1] == ' ') break;
-		code += readbuf;
-		bzero(readbuf, sizeof(readbuf));
-	}
-
-	while(read(clientSd, readbuf, 1)){
-		if (ticker++ > INT_MAX){errChk(-1, "Trapped in status loop!");}
-		if (readbuf[0] == '\r' || readbuf[0] == '\n' || readbuf[1] == '\r' || readbuf[1] == '\n') break;
-		status += readbuf;
-		bzero(readbuf, sizeof(readbuf));
-	}
-	
-	cout << protocol << " " << code << " " << status << "\r\n";
-
-	/*When the file is returned by the server, the retriever outputs the file to the screen and saves the retrieved file to the file system.*/
-	if (code == "200"){
-		ofstream o;
-		o.open(DEFAULT_FILE);
-		errChk(o.is_open() - 1, "Error: Opening filesystem");
-		while(read(clientSd, readbuf, 1)){
-			if (ticker++ > INT_MAX){errChk(-1, "Trapped in code==200 loop!");}
-			o << readbuf;
-			cout << readbuf;
-			bzero(readbuf, sizeof(readbuf));
-		}
-		o.close();
-	}
-	/*If the server returns an error code instead of an OK code, then the retriever should not save the file and should display on the screen whatever error page was sent with the error.*/
-	else{
-		cout << protocol << " " << code << " " << status << "\r\n";
-		while(read(clientSd, readbuf, 1)){
-			if (ticker++ > INT_MAX){errChk(-1, "Trapped in code!=200 loop!");}
-			cout << readbuf;
-			bzero(readbuf, sizeof(readbuf));
-		}
-	}
+	char readbuf[1024];
+	bzero(readbuf, sizeof(readbuf));
+	read(clientSd, readbuf, sizeof(readbuf));
+	std::cout << "reading: " << readbuf << std::endl;
 
 	/*Your retriever should exit after receiving the response.*/
+	goto send;
 	close(clientSd);
 	exit(0);
 }
