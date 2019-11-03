@@ -35,12 +35,11 @@ This is the golden master release of Sea Battle Alpha.
 #include <fstream>
 #include <sstream>
 #include <string.h>
+#include "Board.h"
+
 using namespace std; //Duplicated comments will be listed in Server.cpp.
 
-char serverBoard[BOARD_SIZE][BOARD_SIZE]; //Initialize empty server board
-//char clientBoard[BOARD_SIZE][BOARD_SIZE]; //Initialize empty client board
-
-int to_int(char c){
+int to_int(char c){ //TODO: standardize message transcription. Encryption?
 	return c - 48; //convert from 
 }
 
@@ -54,161 +53,8 @@ int errChk(int errVal, string errMsg){
 	return errVal;
 }
 
-int atkHlp(char c){
-	//TODO: Must be a better way of doing this.
-	//Maybe switch statement? Maybe key-value dict map?
-	//Also, should support the full alphabet, not just six, since we don't have this hard coded.
-	
-	//TODO: Split this into a converter board.
-	if (c == 'a'){
-		return 0;
-	}
-	else if (c == 'b'){
-		return 1;
-	}
-	else if (c == 'c'){
-		return 2;
-	}
-	else if (c == 'd'){
-		return 3;
-	}
-	else if (c == 'e'){
-		return 4;
-	}
-	else if (c == 'f'){
-		return 5;
-	}
-	else if (c == 'b'){
-		return 6;
-	}
-	else if (c == '1'){
-		return 0;
-	}
-	else if (c == '2'){
-		return 1;
-	}
-	else if (c == '3'){
-		return 2;
-	}
-	else if (c == '4'){
-		return 3;
-	}
-	else if (c == '5'){
-		return 4;
-	}
-	else if (c == '6'){
-		return 5;
-	}
-	else if (c == '7'){
-		return 6;
-	}
-	else{ //TODO: Do this with errChk
-		errChk(-1, "invalid input: " + to_string(c)); 
-	}
-}
-
-char getBoard(char (&board) [BOARD_SIZE][BOARD_SIZE], int x, int y){
-	//TODO: Move all board functions into it's own cpp module.
-	return serverBoard[x][y];
-}
-
-std::string getBoard(char (&board) [BOARD_SIZE][BOARD_SIZE]){
-	//Overloaded constructor of getBoard which returns the entire board as a string.
-	//TODO: This is very similar to printBoard. How can we combine them?
-	//TODO: Something in this method is causing a memory leak after ctrl c exiting the program??
-	string s = "  ";
-	for (int k = 1; k <= BOARD_SIZE; k++) {
-		s += std::to_string(k);
-		s += " ";
-	}
-	s += "\n";
-
-	for (int i = 0; i < BOARD_SIZE; i++){
-		s += ALPHABET[i % BOARD_SIZE];
-		s += " ";
-
-		for (int j = 0; j < BOARD_SIZE; j++){
-			s += getBoard(serverBoard, i, j);
-			s += " ";
-		}
-		s += "\n";
-	}
-	s += "\n";
-	return s;
-}
-
-void setBoard(char (&board) [BOARD_SIZE][BOARD_SIZE], int x, int y, char c){
-	serverBoard[x][y] = c;
-}
-
-std::string attackBoard(char a, char b){
-	//TODO: Support more formats than just [char][num]
-	int x = atkHlp(a);
-	int y = atkHlp(b);
-	char c = getBoard(serverBoard, x, y);
-	
-	if (c == SHIP){
-		setBoard(serverBoard, x, y, HIT);
-		return "hit!\n";
-	}
-	else if (c == HIT){
-		setBoard(serverBoard, x, y, HIT);
-		return "hey, you already hit this spot...\n";
-	}
-	else if (c == SEA){
-		setBoard(serverBoard, x, y, MISS);
-		return "miss!\n";
-	}
-	else if (c == MISS){
-		setBoard(serverBoard, x, y, MISS);
-		return "hey, you already missed this spot...\n";
-	}
-}
-
-void printBoard(char (&board) [BOARD_SIZE][BOARD_SIZE]){
-	std::cout << "  ";
-	for (int k = 1; k <= BOARD_SIZE; k++) {
-		cout << std::to_string(k) << " ";
-	}
-	std::cout << std::endl;
-	
-	for (int i = 0; i < BOARD_SIZE; i++) {
-		std::cout << ALPHABET[i % BOARD_SIZE] << " ";
-		for (int j = 0; j < BOARD_SIZE; j++) {
-			std::cout << getBoard(board, i, j) << " ";
-		};
-		std::cout << std::endl;
-	}
-	std::cout << std::endl;
-}
-
-void initBoardShips(char (&board) [BOARD_SIZE][BOARD_SIZE]){//TODO: Place ships based on randomly generated list of coordinates?
-	//setBoard(serverBoard, 0, 3, MISS); //To be entered by user
-	setBoard(serverBoard, 1, 0, SHIP);
-	setBoard(serverBoard, 1, 1, SHIP);
-	setBoard(serverBoard, 1, 2, SHIP);
-	setBoard(serverBoard, 1, 3, SHIP); //setBoard(serverBoard, 1, 3, HIT);
-	//setBoard(serverBoard, 1, 4, MISS);
-	//setBoard(serverBoard, 2, 3, MISS);
-	setBoard(serverBoard, 3, 4, SHIP);
-	setBoard(serverBoard, 4, 0, SHIP);
-	setBoard(serverBoard, 4, 1, SHIP); //setBoard(serverBoard, 4, 1, HIT);
-	setBoard(serverBoard, 4, 4, SHIP);
-	setBoard(serverBoard, 5, 0, SHIP);
-	setBoard(serverBoard, 5, 1, SHIP); //setBoard(serverBoard, 5, 1, HIT);
-	setBoard(serverBoard, 5, 4, SHIP);
-}
-
-void initBoardSea(char (&board) [BOARD_SIZE][BOARD_SIZE]){
-	for (int i = 0; i < BOARD_SIZE; i++) {
-		for (int j = 0; j < BOARD_SIZE; j++) {
-			setBoard(serverBoard, i, j, SEA);
-		};
-	}
-}
-
 int main(int argc, char const *argv[])
-{
+{	
 	/*Your retriever takes in an input from the command line and parses the server address and file (web page) that is being requested.*/
 	int ticker = 0;
 	int server_port;
@@ -255,9 +101,11 @@ int main(int argc, char const *argv[])
 	
 	//User interactions begin here.
 	std::cout << "IP: " << server_name << " Port: " << server_port << std::endl << CLIENT_WELCOME;
-	initBoardSea(serverBoard);
+	Board serverBoard;
+	//Board clientBoard;
+	serverBoard.initBoardSea();
 	//initBoardShips(serverBoard); //The client does not know the server's ship locations!!
-	printBoard(serverBoard);
+	serverBoard.printBoard();
 
 	send:
 	std::string swritebuf;
@@ -272,8 +120,8 @@ int main(int argc, char const *argv[])
 	read(clientSd, readbuf, sizeof(readbuf));
 	std::cout << "reading: " << readbuf << std::endl;
 	
-	setBoard(serverBoard, to_int(readbuf[0]), to_int(readbuf[1]), readbuf[2]);
-	printBoard(serverBoard);
+	serverBoard.setBoard(to_int(readbuf[0]), to_int(readbuf[1]), readbuf[2]);
+	serverBoard.printBoard();
 	
 	/*Your retriever should exit after receiving the response.*/
 	goto send;
