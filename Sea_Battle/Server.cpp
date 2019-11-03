@@ -20,6 +20,7 @@ Team Cookies
 #include <iostream>
 #include <string.h>
 #include "Board.h"
+#define DEFAULT_NAME "localhost"
 #define DEFAULT_PORT 6932
 #define DEFAULT_N 10
 
@@ -28,7 +29,7 @@ void printEndl(){
 }
 
 void printWlcm(){
-	std::cout << "Welcome to Sea Battle v1.3 beta, a game by Team Cookies\nThis is the server application recieves attack requests from the client and manages the field and responds to the client\nWatch this window while interacting with the client to learn its networking protocol implementation\n" << std::endl;
+	std::cout << "Welcome to Sea Battle v1.4 beta, a game by Team Cookies\nThis is the server application recieves attack requests from the client and manages the field and responds to the client\nWatch this window while interacting with the client to learn its networking protocol implementation\n" << std::endl;
 }
 
 int errChk(int errVal, string errMsg){
@@ -40,20 +41,27 @@ int errChk(int errVal, string errMsg){
 	return errVal;
 }
 
-int main(int argc, char const *argv[])
-{	
+int main(int argc, char const *argv[]){	
 	int port, n;
+	int server_port;
+	std::string server_name;
 	if (argc == 1){
 		port = DEFAULT_PORT;
 		n = DEFAULT_N;
+		server_name = DEFAULT_NAME;
+		server_port = DEFAULT_PORT + 1;
 	}
 	else if (argc == 2){
 		port = stoi(argv[1]);
 		n = DEFAULT_N;
+		server_name = argv[1];
+		server_port = DEFAULT_PORT;
 	}
 	else if (argc == 3){
 		port = stoi(argv[1]);
 		n = stoi(argv[2]);
+		server_name = argv[1];
+		server_port = stoi(argv[3]);
 	}
 	else{
 		errChk(-1, "Usage: ./server.out [port] [n]");
@@ -72,17 +80,31 @@ int main(int argc, char const *argv[])
 	sockaddr_in newSockAddr;
 	socklen_t newSockAddrSize = sizeof( newSockAddr );
 	int newSd = errChk(accept( serverSd, ( sockaddr *)&newSockAddr, &newSockAddrSize ), "Error: Socket failed to accept.");
+	struct hostent* host = gethostbyname( server_name.c_str() );
+    sockaddr_in sendSockAddr;
+    bzero( (char*)&sendSockAddr, sizeof( sendSockAddr ) );
+    sendSockAddr.sin_family      = AF_INET;
+    sendSockAddr.sin_addr.s_addr =
+      inet_addr( inet_ntoa( *(struct in_addr*)*host->h_addr_list ) );
+    sendSockAddr.sin_port        = htons( server_port );
+	int clientSd = errChk(socket( AF_INET, SOCK_STREAM, 0 ), "Error: Opening stream socket");
+	errChk(connect( clientSd, ( sockaddr* )&sendSockAddr, sizeof( sendSockAddr ) ), "Error: Socket invalid");
 	
 	start:	/* Start */
 	///1: Displays welcome to User; Initialize the field
 	std::cout << "Port: " << port << " n: " << n << std::endl;
+	std::cout << "IP: " << server_name << " Port: " << server_port << std::endl;
 	printEndl();
 	printWlcm();
 	int turn = 0;
 	Board field;
 	field.initBoardSea();
-	field.initBoardShips();
+	field.initBoardShips(); //Field knows player ship locations
 	field.printBoard();
+	Board map;
+	map.initBoardSea();
+	//map.initBoardShips(); //Map does not know enemy ship locations
+	map.printBoard();
 
 	loop: /* Loop */
 	///5: Reads request from client
@@ -103,6 +125,22 @@ int main(int argc, char const *argv[])
 	///10: Displays field to User
 	field.printBoard();
 	
+	loop2:
+	turn++;
+	std::string requests;
+	std::cout << "attacking: "; //cout-cin combo creates a GUI facade
+	std::cin >> requests; //waiting on USER
+	requests += " is being attacked!";
+	const char * request2 = requests.c_str();
+	write(clientSd, request2, strlen(request2)); //single write
+	//std::cout << "attacking: " << requests << std::endl; //see: "GUI"
+	char response2[1024];
+	bzero(response2, sizeof(response2));
+	read(clientSd, response2, sizeof(response2)); //waiting on SERVER
+	std::cout << "turn " << turn << ": " << response2 << std::endl;
+	map.setBoard(map.requestTranslator(requests[0]), map.requestTranslator(requests[1]), map.responseTranslator(response2[0]));
+	map.printBoard();
+	
 	///12: if end go to 14; if loop go to 5
 	if (turn > 1024) goto end;
 	else goto loop;
@@ -111,5 +149,6 @@ int main(int argc, char const *argv[])
 	///14: Close the socket and exit the game.
 	std::cout << "Game Over!";
 	close(newSd);
+	close(clientSd);
 	exit(0);
 } 
