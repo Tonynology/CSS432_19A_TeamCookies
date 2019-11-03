@@ -1,7 +1,6 @@
-//#include <iostream>
-//#include <cmath>
 //#include "board.h"
-#define BOARD_SIZE 6
+#define BOARD_HEIGHT 6
+#define BOARD_WIDTH 6
 #define SHIP 'O' //○
 #define HIT 'X' //●
 #define SEA '-' //□
@@ -11,9 +10,10 @@
 using namespace std;
 
 //Board::Board(){
-//	initBoardSea();
 //}
 
+//Board::~Board(){
+//}
 
 int Board::errChk(int errVal, string errMsg){
 	//errVals under 0 will result in printing errMsg and exiting the program.
@@ -28,36 +28,34 @@ int Board::errChk(int errVal, string errMsg){
 char Board::getBoard(int x, int y){
 	return board[x][y];
 }
+
 void Board::setBoard(int x, int y, char c){
 	board[x][y] = c;
 }
 
 void Board::printBoard(){
+	//TODO: Is it even possible to print two boards side-by-side????
 	std::cout << "  ";
-	for (int k = 1; k <= BOARD_SIZE; k++) {
-		cout << std::to_string(k) << " ";
+	for (int x = 1; x <= BOARD_WIDTH; x++) {
+		cout << std::to_string(x) << " ";
 	}
 	std::cout << std::endl;
 	
-	for (int i = 0; i < BOARD_SIZE; i++) {
-		std::cout << ALPHABET[i % BOARD_SIZE] << " ";
-		for (int j = 0; j < BOARD_SIZE; j++) {
-			std::cout << getBoard(i, j) << " ";
+	for (int x = 0; x < BOARD_WIDTH; x++) {
+		std::cout << ALPHABET[x % BOARD_WIDTH] << " ";
+		for (int y = 0; y < BOARD_HEIGHT; y++) {
+			std::cout << getBoard(x, y) << " ";
 		};
 		std::cout << std::endl;
 	}
 	std::cout << std::endl;
 }
-int Board::to_int(char c){
-	return c - 48; //convert from 
-}
 
-int Board::atkHlp(char c){
+int Board::requestTranslator(char c){
 	//TODO: Must be a better way of doing this.
 	//Maybe switch statement? Maybe key-value dict map?
-	//Also, should support the full alphabet, not just six, since we don't have this hard coded.
+	//Also, should support the full alphabet, not just six.
 	
-	//TODO: Split this into a converter board.
 	if (c == 'a'){
 		return 0;
 	}
@@ -105,82 +103,57 @@ int Board::atkHlp(char c){
 	}
 }
 
-//std::string Board::attackBoard(char a, char b){
-//	//TODO: Support more formats than just [char][num]
-//	int x = atkHlp(a);
-//	int y = atkHlp(b);
-//	char c = getBoard(x, y);
-//	
-//	if (c == SHIP){
-//		setBoard(x, y, HIT);
-//		return HIT + "hit!\n";
-//	}
-//	else if (c == HIT){
-//		setBoard(x, y, HIT);
-//		return HIT + "hey, you already hit this spot...\n";
-//	}
-//	else if (c == SEA){
-//		setBoard(x, y, MISS);
-//		return MISS + "miss!\n";
-//	}
-//	else if (c == MISS){
-//		setBoard(x, y, MISS);
-//		return MISS + "hey, you already missed this spot...\n";
-//	}
-//}
+char Board::responseTranslator(char c){
+	//Same comments for the method above
+	if (c == 'h'){
+		return HIT;
+	}
+	else if (c == 'm'){
+		return MISS;
+	}
+	else{
+		errChk(-1, "invalid input: " + to_string(c));
+	}
+}
 
-std::string Board::attackBoard(char a, char b){
-	//TODO: Support more formats than just [char][num]
-	int x = atkHlp(a);
-	int y = atkHlp(b);
-	char c = getBoard(x, y);
-	
-	//This attackcode is used by Client to determine a hit or miss.
-	std::string attackCode = to_string(x) + to_string(y);
-	
-	if (c == SHIP){
+std::string Board::attackBoard(int x, int y){
+	//TODO: error handling for chars as input, 3 ints etc.
+	if (getBoard(x, y) == SHIP){
 		setBoard(x, y, HIT);
-		attackCode += HIT;
-		return attackCode + "...hit!\n";
+		return "hit!\n";
 	}
-	else if (c == HIT){
+	else if (getBoard(x, y) == HIT){
 		setBoard(x, y, HIT);
-		attackCode += HIT;
-		return attackCode + "...hey, you already hit this spot...\n";
+		return "hey, you already hit this spot...\n";
 	}
-	else if (c == SEA){
+	else if (getBoard(x, y) == SEA){
 		setBoard(x, y, MISS);
-		attackCode += MISS;
-		return attackCode + "...miss!\n";
+		return "miss!\n";
 	}
-	else if (c == MISS){
+	else if (getBoard(x, y) == MISS){
 		setBoard(x, y, MISS);
-		attackCode += MISS;
-		return attackCode + "...hey, you already missed this spot...\n";
+		return "my, you already missed this spot...\n";
 	}
 }
 
 void Board::initBoardSea(){
-	for (int i = 0; i < BOARD_SIZE; i++) {
-		for (int j = 0; j < BOARD_SIZE; j++) {
-			setBoard(i, j, SEA);
+	for (int x = 0; x < BOARD_HEIGHT; x++) {
+		for (int y = 0; y < BOARD_WIDTH; y++) {
+			setBoard(x, y, SEA);
 		};
 	}
 }
 
-void Board::initBoardShips(){//TODO: Place ships based on randomly generated list of coordinates?
-	//setBoard(0, 3, MISS); //To be entered by user
+void Board::initBoardShips(){//TODO: Ship initialization
 	setBoard(1, 0, SHIP);
 	setBoard(1, 1, SHIP);
 	setBoard(1, 2, SHIP);
-	setBoard(1, 3, SHIP); //setBoard(1, 3, HIT);
-	//setBoard(1, 4, MISS);
-	//setBoard(2, 3, MISS);
+	setBoard(1, 3, SHIP);
 	setBoard(3, 4, SHIP);
 	setBoard(4, 0, SHIP);
-	setBoard(4, 1, SHIP); //setBoard(4, 1, HIT);
+	setBoard(4, 1, SHIP);
 	setBoard(4, 4, SHIP);
 	setBoard(5, 0, SHIP);
-	setBoard(5, 1, SHIP); //setBoard(5, 1, HIT);
+	setBoard(5, 1, SHIP);
 	setBoard(5, 4, SHIP);
 }
