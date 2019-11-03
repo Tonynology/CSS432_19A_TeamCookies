@@ -91,7 +91,7 @@ int main(int argc, char const *argv[])
 	socklen_t newSockAddrSize = sizeof( newSockAddr );
 	int newSd = errChk(accept( serverSd, ( sockaddr *)&newSockAddr, &newSockAddrSize ), "Error: Socket failed to accept.");
 	
-	//User interactions begin here.
+	/* Game start */
 	std::cout << "Port: " << port << " n: " << n << std::endl << SERVER_WELCOME;
 	Board serverBoard;
 	//Board clientBoard;
@@ -99,23 +99,24 @@ int main(int argc, char const *argv[])
 	serverBoard.initBoardShips();
 	serverBoard.printBoard();
 
+	/* Turn start */
 	accept:
-	/*Your server waits for a connection and an HTTP GET request*/
 	char readbuf[1024];
 	bzero(readbuf, sizeof(readbuf));
-	read(newSd, readbuf, sizeof(readbuf));
+	read(newSd, readbuf, sizeof(readbuf)); //waiting on CLIENT
 	std::cout << "reading: " << readbuf << std::endl;
 	
 	string swritebuf = serverBoard.attackBoard(readbuf[0], readbuf[1]);
 	//swritebuf += serverBoard.getBoard();
 	const char * writebuf = swritebuf.c_str();
-	write(newSd, writebuf, strlen(writebuf));
+	write(newSd, writebuf, strlen(writebuf)); //single write
 	std::cout << "writing: " << swritebuf << std::endl;
 	
 	serverBoard.printBoard();
 
-	/*After you handle the request, your server should return to waiting for the next request.*/
 	goto accept;
+	
+	/* Game Over */
 	close(newSd);
 	exit(0);
 } 

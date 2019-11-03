@@ -99,7 +99,7 @@ int main(int argc, char const *argv[])
 	int clientSd = errChk(socket( AF_INET, SOCK_STREAM, 0 ), "Error: Opening stream socket");
 	errChk(connect( clientSd, ( sockaddr* )&sendSockAddr, sizeof( sendSockAddr ) ), "Error: Socket invalid");
 	
-	//User interactions begin here.
+	/* Game start */
 	std::cout << "IP: " << server_name << " Port: " << server_port << std::endl << CLIENT_WELCOME;
 	Board serverBoard;
 	//Board clientBoard;
@@ -107,24 +107,27 @@ int main(int argc, char const *argv[])
 	//initBoardShips(serverBoard); //The client does not know the server's ship locations!!
 	serverBoard.printBoard();
 
+	/* Turn start */
 	send:
 	std::string swritebuf;
-	std::cout << "writing: ";
-	std::cin >> swritebuf;
+	std::cout << "writing: "; //cout-cin combo creates a GUI facade
+	std::cin >> swritebuf; //waiting on USER
+	//TODO: Encrypt attack code here.
 	const char * writebuf = swritebuf.c_str();
-	write(clientSd, writebuf, strlen(writebuf)); // single write: allocates an nbufs-sized array of data buffers, and thereafter calls write( ) to send this array, (i.e., all data buffers) at once.
-	//std::cout << "writing: " << swritebuf << std::endl;
+	write(clientSd, writebuf, strlen(writebuf)); //single write
+	//std::cout << "writing: " << swritebuf << std::endl; //see: "GUI"
 	
 	char readbuf[1024];
 	bzero(readbuf, sizeof(readbuf));
-	read(clientSd, readbuf, sizeof(readbuf));
+	read(clientSd, readbuf, sizeof(readbuf)); //waiting on SERVER
 	std::cout << "reading: " << readbuf << std::endl;
 	
 	serverBoard.setBoard(to_int(readbuf[0]), to_int(readbuf[1]), readbuf[2]);
 	serverBoard.printBoard();
 	
-	/*Your retriever should exit after receiving the response.*/
 	goto send;
+	
+	/* Game over */
 	close(clientSd);
 	exit(0);
 }

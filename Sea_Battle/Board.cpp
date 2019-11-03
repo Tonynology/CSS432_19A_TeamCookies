@@ -105,27 +105,58 @@ int Board::atkHlp(char c){
 	}
 }
 
+//std::string Board::attackBoard(char a, char b){
+//	//TODO: Support more formats than just [char][num]
+//	int x = atkHlp(a);
+//	int y = atkHlp(b);
+//	char c = getBoard(x, y);
+//	
+//	if (c == SHIP){
+//		setBoard(x, y, HIT);
+//		return HIT + "hit!\n";
+//	}
+//	else if (c == HIT){
+//		setBoard(x, y, HIT);
+//		return HIT + "hey, you already hit this spot...\n";
+//	}
+//	else if (c == SEA){
+//		setBoard(x, y, MISS);
+//		return MISS + "miss!\n";
+//	}
+//	else if (c == MISS){
+//		setBoard(x, y, MISS);
+//		return MISS + "hey, you already missed this spot...\n";
+//	}
+//}
+
 std::string Board::attackBoard(char a, char b){
 	//TODO: Support more formats than just [char][num]
 	int x = atkHlp(a);
 	int y = atkHlp(b);
 	char c = getBoard(x, y);
 	
+	//This attackcode is used by Client to determine a hit or miss.
+	std::string attackCode = to_string(x) + to_string(y);
+	
 	if (c == SHIP){
 		setBoard(x, y, HIT);
-		return "hit!\n";
+		attackCode += HIT;
+		return attackCode + "...hit!\n";
 	}
 	else if (c == HIT){
 		setBoard(x, y, HIT);
-		return "hey, you already hit this spot...\n";
+		attackCode += HIT;
+		return attackCode + "...hey, you already hit this spot...\n";
 	}
 	else if (c == SEA){
 		setBoard(x, y, MISS);
-		return "miss!\n";
+		attackCode += MISS;
+		return attackCode + "...miss!\n";
 	}
 	else if (c == MISS){
 		setBoard(x, y, MISS);
-		return "hey, you already missed this spot...\n";
+		attackCode += MISS;
+		return attackCode + "...hey, you already missed this spot...\n";
 	}
 }
 
