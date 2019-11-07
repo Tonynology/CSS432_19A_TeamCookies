@@ -6,6 +6,8 @@
 #define SEA '-' //□
 #define MISS '+' //■
 #define ALPHABET "abcdefghijklmnopqrstuvwxyz"
+#define RANDOM true
+#define SHIPCOUNT 10
 
 using namespace std;
 
@@ -144,16 +146,28 @@ void Board::initBoardSea(){
 	}
 }
 
-void Board::initBoardShips(){//TODO: Ship initialization
-	setBoard(1, 0, SHIP);
-	setBoard(1, 1, SHIP);
-	setBoard(1, 2, SHIP);
-	setBoard(1, 3, SHIP);
-	setBoard(3, 4, SHIP);
-	setBoard(4, 0, SHIP);
-	setBoard(4, 1, SHIP);
-	setBoard(4, 4, SHIP);
-	setBoard(5, 0, SHIP);
-	setBoard(5, 1, SHIP);
-	setBoard(5, 4, SHIP);
+void Board::initBoardShips(){//TODO: FLESH OUT ship implementation before improving this function!!!!!!!!
+	if (RANDOM){
+		int x, y;
+		srand (time(NULL));
+		for (int i = 0; i < SHIPCOUNT; i++){
+			x = rand() % BOARD_WIDTH;
+			y = rand() % BOARD_HEIGHT;
+			if (getBoard(x, y) == SHIP) i--;
+			else setBoard(x, y, SHIP);
+		}
+	}
+	else{
+		setBoard(1, 0, SHIP);
+		setBoard(1, 1, SHIP);
+		setBoard(1, 2, SHIP);
+		setBoard(1, 3, SHIP);
+		setBoard(3, 4, SHIP);
+		setBoard(4, 0, SHIP);
+		setBoard(4, 1, SHIP);
+		setBoard(4, 4, SHIP);
+		setBoard(5, 0, SHIP);
+		setBoard(5, 1, SHIP);
+		setBoard(5, 4, SHIP);
+	}
 }
