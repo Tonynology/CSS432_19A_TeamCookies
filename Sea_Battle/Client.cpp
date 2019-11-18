@@ -32,6 +32,20 @@ void printWlcm(){
 	std::cout << "Welcome to Sea Battle v1.4 beta, a game by Team Cookies\nThis is the client application which sends attack requests to the server and marks a map based off of its reponse\nPlease enter coordinates formatted as [char][num]<Enter> (no spaces, no brackets)\n" << std::endl;
 }
 
+void printLobby(){
+	std::cout << "Welcome to Sea Battle v1.4 beta, a game by Team Cookies\n. Please select the following options." << std::endl;
+}
+void lobbyIntro(){
+	std::cout << "Please select the following options by typing in the number:"
+	std::cout << "[1] Register";
+	std::cout << "[2] List Games";
+	std::cout << "[3] Create Game";
+	std::cout << "[4] Join Game";
+	std::cout << "[5] Exit Game";
+	std::cout << "[6] Unregister";
+
+}
+
 int errChk(int errVal, string errMsg){
 	//errVals under 0 will result in printing errMsg and exiting the program; at or over 0 will return the errVal
 	if (errVal < 0) {
@@ -90,6 +104,9 @@ int main(int argc, char const *argv[]){
 	socklen_t newSockAddrSize = sizeof( newSockAddr );
 	int newSd = errChk(accept( serverSd, ( sockaddr *)&newSockAddr, &newSockAddrSize ), "Error: Socket failed to accept.");
 	
+	printLobby();
+	
+
 	start: /* Start */
 	std::cout << "IP: " << server_name << " Port: " << server_port << std::endl;
 	std::cout << "Port: " << port << " n: " << n << std::endl;
