@@ -36,7 +36,7 @@ void printLobby(){
 	std::cout << "Welcome to Sea Battle v1.4 beta, a game by Team Cookies\n. Please select the following options." << std::endl;
 }
 void lobbyIntro(){
-	std::cout << "Please select the following options by typing in the number:"
+	std::cout << "Please select the following options by typing in the number:";
 	std::cout << "[1] Register";
 	std::cout << "[2] List Games";
 	std::cout << "[3] Create Game";
