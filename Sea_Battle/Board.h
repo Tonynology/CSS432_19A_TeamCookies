@@ -3,9 +3,6 @@
 #define BOARD_HEIGHT 6
 #define BOARD_WIDTH 6
 
-
-using namespace std;
-
 class Board {
 	public:
 		//Board();
