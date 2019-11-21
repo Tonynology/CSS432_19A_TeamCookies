@@ -44,6 +44,19 @@ void lobbyIntro(){
 	std::cout << "[5] Exit Game";
 	std::cout << "[6] Unregister";
 
+	std::cin << clientChoice;
+
+	switch(clientChoice)
+	case 1:
+	case 2:
+	case 3:
+	case 4:
+	case 5:
+	case 6:
+	default:
+		std::cout << "Not a valid option. Please reselect." << std::endl;
+		break;
+
 }
 
 int errChk(int errVal, string errMsg){
