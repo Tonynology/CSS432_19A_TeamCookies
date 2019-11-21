@@ -32,33 +32,6 @@ void printWlcm(){
 	std::cout << "Welcome to Sea Battle v1.4 beta, a game by Team Cookies\nThis is the client application which sends attack requests to the server and marks a map based off of its reponse\nPlease enter coordinates formatted as [char][num]<Enter> (no spaces, no brackets)\n" << std::endl;
 }
 
-void printLobby(){
-	std::cout << "Welcome to Sea Battle v1.4 beta, a game by Team Cookies\n. Please select the following options." << std::endl;
-}
-void lobbyIntro(){
-	std::cout << "Please select the following options by typing in the number:";
-	std::cout << "[1] Register";
-	std::cout << "[2] List Games";
-	std::cout << "[3] Create Game";
-	std::cout << "[4] Join Game";
-	std::cout << "[5] Exit Game";
-	std::cout << "[6] Unregister";
-
-	std::cin << clientChoice;
-
-	switch(clientChoice)
-	case 1:
-	case 2:
-	case 3:
-	case 4:
-	case 5:
-	case 6:
-	default:
-		std::cout << "Not a valid option. Please reselect." << std::endl;
-		break;
-
-}
-
 int errChk(int errVal, string errMsg){
 	//errVals under 0 will result in printing errMsg and exiting the program; at or over 0 will return the errVal
 	if (errVal < 0) {
