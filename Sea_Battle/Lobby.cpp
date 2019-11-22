@@ -2,10 +2,29 @@
 // #include "Server.cpp"
 
 #include <iostream>
+#include <vector>
 #include <string>
 
 void Lobby::startGame() {
     std::cout << "Welcome to Sea Battle v1.4 beta, a game by Team Cookies\n. Please select the following options." << std::endl;
+
+
+    startMenu();
+}
+
+std::ostream& operator<<(std::ostream& os, const std::vector<std::string>& v) 
+{ 
+    os << "["; 
+    for (int i = 0; i < v.size(); ++i) { 
+        os << v[i]; 
+        if (i != v.size() - 1) 
+            os << ", "; 
+    } 
+    os << "]\n"; 
+    return os; 
+}
+
+void Lobby::startMenu() {
     std::cout << "Please select the following options by typing in the number:" << std::endl;
 	std::cout << "[1] Register" << std::endl;
 	std::cout << "[2] List Games" << std::endl;
@@ -47,10 +66,30 @@ void Lobby::registerUser() {
 
     std::cout << "Please enter a name for this user: " << std::endl;
     std::string username = "";
-    cin >> username;
+    std::cin >> username;
 
-    // set up arraylist to store user information
+    this->listOfUsers.push_back(username);
+
+    std::cout << listOfUsers;   
+
+    std::cout << "User created. Returning to the start menu." << std::endl;
+    std::cout << std::endl;
+
+    startMenu();
+}
+
+void Lobby::unregisterUser() {
+    std::cout << "quitting???" << std::endl;
+    std::cout << "running unregisterUser" << std::endl;
     
+    std::cout << "Please enter a name of the user you want to remove: " << std::endl;
+    std::string username = "";
+    std::cin >> username;
+    
+    // Look up erase-remove vector idiom
+    listOfUsers.erase(std::remove(listOfUsers.begin(), listOfUsers.end(), username), listOfUsers.end());
+
+    std::cout << this->listOfUsers;
 }
 
 void Lobby::listGames() {
@@ -67,8 +106,4 @@ void Lobby::joinGame() {
 
 void Lobby::exitGame() {
     std::cout << "running exitGame" << std::endl;
-}
-
-void Lobby::unregisterUser() {
-    std::cout << "running unregisterUser" << std::endl;
 }
