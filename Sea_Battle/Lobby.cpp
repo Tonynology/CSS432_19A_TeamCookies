@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <vector>
+#include <iterator> 
 #include <string>
 
 void Lobby::startGame() {
@@ -32,6 +33,7 @@ void Lobby::startMenu() {
 	std::cout << "[4] Join Game" << std::endl;
 	std::cout << "[5] Exit Game" << std::endl;
 	std::cout << "[6] Unregister" << std::endl;
+    std::cout << std::endl;
 
     int userResponse = 0;
     std::cin >> userResponse;
@@ -79,17 +81,44 @@ void Lobby::registerUser() {
 }
 
 void Lobby::unregisterUser() {
-    std::cout << "quitting???" << std::endl;
     std::cout << "running unregisterUser" << std::endl;
     
     std::cout << "Please enter a name of the user you want to remove: " << std::endl;
     std::string username = "";
     std::cin >> username;
     
-    // Look up erase-remove vector idiom
-    listOfUsers.erase(std::remove(listOfUsers.begin(), listOfUsers.end(), username), listOfUsers.end());
+    std::vector<int>::iterator iter;
 
-    std::cout << this->listOfUsers;
+    iter = std::find(this->listOfUsers.begin(), this->listOfUsers.end(), username);
+
+    if (iter != this->listofUsers.end()) {
+        std::cout << "User found." << endl;
+        listOfUsers.erase(std::remove(listOfUsers.begin(), listOfUsers.end(), username), listOfUsers.end());
+        std::cout << "User deleted. Returning to the start menu." << std::endl;
+        std::cout << std::endl;
+        
+        startMenu();
+    } else {
+        std::cout << "User not found." << std::endl;
+        std::cout << "Please select the following option by typing in the number: " << std::endl;
+        std::cout << "[1] Re-enter username." << std::endl;
+        std::cout << "[2] Return to menu." << std::endl;
+        std::cout << "[3] Exit game." << std::endl;
+
+        int userResponse = 0;
+        std::cin >> userResponse;
+
+        switch(userResponse) {
+            case 1:
+                unregisterUser();
+            case 2:
+                startGame();
+            case 3:
+                return 0;
+        }
+    }
+
+    return 0;
 }
 
 void Lobby::listGames() {
