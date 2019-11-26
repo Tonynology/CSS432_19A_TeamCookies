@@ -1,4 +1,3 @@
-//#include "board.h"
 #define BOARD_HEIGHT 6
 #define BOARD_WIDTH 6
 #define SHIP 'O' //○
@@ -9,22 +8,18 @@
 #define RANDOM true
 #define SHIPCOUNT 10
 
-using namespace std;
-
 //Board::Board(){
 //}
 
 //Board::~Board(){
 //}
 
-int Board::errChk(int errVal, string errMsg){
-	//errVals under 0 will result in printing errMsg and exiting the program.
-	//errVals over 0 will return the errVal.
-	if (errVal < 0) {
+int Board::errChk(int errVal, std::string errMsg){ // TODO: Make this it's own class, since it's copied over from server and client.
+	if (errVal < 0) { // errVals under 0 will print errMsg and then exit the program with errVal.
 		std::cerr << errMsg << std::endl;
 		exit(errVal);
 	}
-	return errVal;
+	return errVal; // errVals over 0 will return the errVal without printing or exiting.
 }
 
 char Board::getBoard(int x, int y){
@@ -36,10 +31,10 @@ void Board::setBoard(int x, int y, char c){
 }
 
 void Board::printBoard(){
-	//TODO: Is it even possible to print two boards side-by-side????
+	//TODO: Is it even possible to print two boards side-by-side???? may require refactoring.
 	std::cout << "  ";
 	for (int x = 1; x <= BOARD_WIDTH; x++) {
-		cout << std::to_string(x) << " ";
+		std::cout << std::to_string(x) << " ";
 	}
 	std::cout << std::endl;
 	
@@ -47,16 +42,16 @@ void Board::printBoard(){
 		std::cout << ALPHABET[x % BOARD_WIDTH] << " ";
 		for (int y = 0; y < BOARD_HEIGHT; y++) {
 			std::cout << getBoard(x, y) << " ";
-		};
+		}
 		std::cout << std::endl;
 	}
 	std::cout << std::endl;
 }
 
-int Board::requestTranslator(char c){
+int Board::requestTranslator(char c){ // Translates human-readable text into computer-readable code
 	//TODO: Must be a better way of doing this.
 	//Maybe switch statement? Maybe key-value dict map?
-	//Also, should support the full alphabet, not just six.
+	//Also, should support different board sizes, right now only supports up to 6.
 	
 	if (c == 'a'){
 		return 0;
@@ -100,22 +95,18 @@ int Board::requestTranslator(char c){
 	else if (c == '7'){
 		return 6;
 	}
-	else{
-		errChk(-1, "invalid input: " + to_string(c)); 
-	}
+	else return errChk(-1, "invalid input: " + std::to_string(c));
 }
 
-char Board::responseTranslator(char c){
-	//Same comments for the method above
+char Board::responseTranslator(char c){ // Translates human-readable text into computer-readable code
+	//Same todo for the method above
 	if (c == 'h'){
 		return HIT;
 	}
 	else if (c == 'm'){
 		return MISS;
 	}
-	else{
-		errChk(-1, "invalid input: " + to_string(c));
-	}
+	else return errChk(-1, "invalid input: " + std::to_string(c));
 }
 
 std::string Board::attackBoard(int x, int y){
@@ -136,13 +127,14 @@ std::string Board::attackBoard(int x, int y){
 		setBoard(x, y, MISS);
 		return "my, you already missed this spot...\n";
 	}
+	else return std::to_string(errChk(-1, "invalid input: " + std::to_string(x) + std::to_string(y)));
 }
 
 void Board::initBoardSea(){
 	for (int x = 0; x < BOARD_HEIGHT; x++) {
 		for (int y = 0; y < BOARD_WIDTH; y++) {
 			setBoard(x, y, SEA);
-		};
+		}
 	}
 }
 

@@ -32,13 +32,12 @@ void printWlcm(){
 	std::cout << "Welcome to Sea Battle v1.4 beta, a game by Team Cookies\nThis is the server application recieves attack requests from the client and manages the field and responds to the client\nWatch this window while interacting with the client to learn its networking protocol implementation\n" << std::endl;
 }
 
-int errChk(int errVal, string errMsg){
-	//errVals under 0 will result in printing errMsg and exiting the program; at or over 0 will return the errVal
-	if (errVal < 0) {
+int errChk(int errVal, std::string errMsg){
+	if (errVal < 0) { // errVals under 0 will print errMsg and then exit the program with errVal.
 		std::cerr << errMsg << std::endl;
 		exit(errVal);
 	}
-	return errVal;
+	return errVal; // errVals over 0 will return the errVal without printing or exiting.
 }
 
 int main(int argc, char const *argv[]){	
@@ -52,16 +51,16 @@ int main(int argc, char const *argv[]){
 		server_port = DEFAULT_PORT + 1;
 	}
 	else if (argc == 2){
-		port = stoi(argv[1]);
+		port = std::stoi(argv[1]);
 		n = DEFAULT_N;
 		server_name = argv[1];
 		server_port = DEFAULT_PORT;
 	}
 	else if (argc == 3){
-		port = stoi(argv[1]);
-		n = stoi(argv[2]);
+		port = std::stoi(argv[1]);
+		n = std::stoi(argv[2]);
 		server_name = argv[1];
-		server_port = stoi(argv[3]);
+		server_port = std::stoi(argv[3]);
 	}
 	else{
 		errChk(-1, "Usage: ./server.out [port] [n]");
@@ -115,7 +114,7 @@ int main(int argc, char const *argv[]){
 	std::cout << "request: " << request << std::endl;
 	
 	///6: Converts request[0], request[1] to int coordinates; marks field; stores response
-	string responses = field.attackBoard(field.requestTranslator(request[0]), field.requestTranslator(request[1]));
+	std::string responses = field.attackBoard(field.requestTranslator(request[0]), field.requestTranslator(request[1]));
 	
 	///7: Writes response to Client
 	const char * response = responses.c_str();
