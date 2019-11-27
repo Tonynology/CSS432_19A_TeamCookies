@@ -1,9 +1,9 @@
 #define BOARD_HEIGHT 6
 #define BOARD_WIDTH 6
-#define SHIP 'O' //○
-#define HIT 'X' //●
-#define SEA '-' //□
-#define MISS '+' //■
+#define SHIP 'O' // ○
+#define HIT 'X' // ●
+#define SEA '-' // □
+#define MISS '+' // ■
 #define ALPHABET "abcdefghijklmnopqrstuvwxyz"
 #define RANDOM true
 #define SHIPCOUNT 10

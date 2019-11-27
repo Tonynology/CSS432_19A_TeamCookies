@@ -20,25 +20,10 @@ Team Cookies
 #include <iostream>
 #include <string.h>
 #include "Board.h"
+#include "Etc.h"
 #define DEFAULT_NAME "localhost"
 #define DEFAULT_PORT 6932
 #define DEFAULT_N 10
-
-void printEndl(){
-	std::cout << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl;
-}
-
-void printWlcm(){
-	std::cout << "Welcome to Sea Battle v1.4 beta, a game by Team Cookies\nThis is the server application recieves attack requests from the client and manages the field and responds to the client\nWatch this window while interacting with the client to learn its networking protocol implementation\n" << std::endl;
-}
-
-int errChk(int errVal, std::string errMsg){
-	if (errVal < 0) { // errVals under 0 will print errMsg and then exit the program with errVal.
-		std::cerr << errMsg << std::endl;
-		exit(errVal);
-	}
-	return errVal; // errVals over 0 will return the errVal without printing or exiting.
-}
 
 int main(int argc, char const *argv[]){	
 	int port, n;
@@ -63,22 +48,22 @@ int main(int argc, char const *argv[]){
 		server_port = std::stoi(argv[3]);
 	}
 	else{
-		errChk(-1, "Usage: ./server.out [port] [n]");
+		Etc::errChk(-1, "Usage: ./server.out [port] [n]");
 	}
     sockaddr_in acceptSockAddr;
     bzero( (char*)&acceptSockAddr, sizeof( acceptSockAddr ) );
     acceptSockAddr.sin_family      = AF_INET;
     acceptSockAddr.sin_addr.s_addr = htonl( INADDR_ANY );
     acceptSockAddr.sin_port        = htons( port );
-    int serverSd = errChk(socket( AF_INET, SOCK_STREAM, 0 ), "Error: Stream-oriented socket failed to open.");
+    int serverSd = Etc::errChk(socket( AF_INET, SOCK_STREAM, 0 ), "Error: Stream-oriented socket failed to open.");
     const int on = 1;
-    errChk(setsockopt( serverSd, SOL_SOCKET, SO_REUSEADDR, (char *)&on, 
+    Etc::errChk(setsockopt( serverSd, SOL_SOCKET, SO_REUSEADDR, (char *)&on, 
                 sizeof( int ) ), "Error: SO_REUSEADDR failed to set.");
-    errChk(bind( serverSd, ( sockaddr* )&acceptSockAddr, sizeof( acceptSockAddr ) ), "Error: Socket failed to bind.");
-    errChk(listen( serverSd, n ), "Error: Operating system failed to listen.");
+    Etc::errChk(bind( serverSd, ( sockaddr* )&acceptSockAddr, sizeof( acceptSockAddr ) ), "Error: Socket failed to bind.");
+    Etc::errChk(listen( serverSd, n ), "Error: Operating system failed to listen.");
 	sockaddr_in newSockAddr;
 	socklen_t newSockAddrSize = sizeof( newSockAddr );
-	int newSd = errChk(accept( serverSd, ( sockaddr *)&newSockAddr, &newSockAddrSize ), "Error: Socket failed to accept.");
+	int newSd = Etc::errChk(accept( serverSd, ( sockaddr *)&newSockAddr, &newSockAddrSize ), "Error: Socket failed to accept.");
 	struct hostent* host = gethostbyname( server_name.c_str() );
     sockaddr_in sendSockAddr;
     bzero( (char*)&sendSockAddr, sizeof( sendSockAddr ) );
@@ -86,15 +71,15 @@ int main(int argc, char const *argv[]){
     sendSockAddr.sin_addr.s_addr =
       inet_addr( inet_ntoa( *(struct in_addr*)*host->h_addr_list ) );
     sendSockAddr.sin_port        = htons( server_port );
-	int clientSd = errChk(socket( AF_INET, SOCK_STREAM, 0 ), "Error: Opening stream socket");
-	errChk(connect( clientSd, ( sockaddr* )&sendSockAddr, sizeof( sendSockAddr ) ), "Error: Socket invalid");
+	int clientSd = Etc::errChk(socket( AF_INET, SOCK_STREAM, 0 ), "Error: Opening stream socket");
+	Etc::errChk(connect( clientSd, ( sockaddr* )&sendSockAddr, sizeof( sendSockAddr ) ), "Error: Socket invalid");
 	
 	start:	/* Start */
 	///1: Displays welcome to User; Initialize the field
 	std::cout << "Port: " << port << " n: " << n << std::endl;
 	std::cout << "IP: " << server_name << " Port: " << server_port << std::endl;
-	printEndl();
-	printWlcm();
+	std::cout << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl;
+	std::cout << "Welcome to Sea Battle v1.4 beta, a game by Team Cookies\nThis is the server application recieves attack requests from the client and manages the field and responds to the client\nWatch this window while interacting with the client to learn its networking protocol implementation\n" << std::endl;
 	int turn = 0;
 	Board field;
 	field.initBoardSea();

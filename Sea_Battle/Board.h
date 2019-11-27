@@ -18,7 +18,7 @@ class Board {
 		void initBoardShips();
 		
 	private:
-		//int height; //TODO: Allow user to set board size
+		//int height; //TODO: Allow user to set board size. May require refactoring board from an array to vector.
 		//int width;
 		char board[BOARD_HEIGHT][BOARD_WIDTH];
 
