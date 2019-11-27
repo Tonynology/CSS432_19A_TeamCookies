@@ -1,5 +1,6 @@
 #include "Lobby.h"
-// #include "Server.cpp"
+#include "Server.cpp"
+#include "Client.cpp"
 
 #include <iostream>
 #include <vector>
@@ -33,6 +34,9 @@ void Lobby::startMenu() {
 	std::cout << "[4] Join Game" << std::endl;
 	std::cout << "[5] Exit Game" << std::endl;
 	std::cout << "[6] Unregister" << std::endl;
+    std::cout << "[7] Launch server on localhost port 6932" << std::endl;
+    std::cout << "[8] Launch client on localhost port 6932" << std::endl;
+
     std::cout << std::endl;
 
     int userResponse = 0;
@@ -56,6 +60,12 @@ void Lobby::startMenu() {
             break;
         case 6:
             unregisterUser();
+            break;
+        case 7:
+            Server::server(1, NULL);
+            break;
+        case 8:
+            Client::client(1, NULL);
             break;
         default:
             std::cout << "Not a valid option. Please reselect." << std::endl;

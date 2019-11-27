@@ -19,13 +19,14 @@ Team Cookies
 #include <sys/uio.h>      // writev
 #include <iostream>
 #include <string.h>
-#include "Board.h"
-#include "Etc.h"
+// #include "Board.h" // Causes redefinition error when compiling via lobby
+// #include "Etc.h" // Causes redefinition error when compiling via lobby
+#include "Client.h"
 #define DEFAULT_NAME "localhost"
 #define DEFAULT_PORT 6932
 #define DEFAULT_N 10
 
-int Client::main(int argc, char const *argv[]){	
+int Client::client(int argc, char const *argv[]){	
 	int server_port;
 	int port, n;
 	std::string server_name;
@@ -140,3 +141,5 @@ int Client::main(int argc, char const *argv[]){
 	close(newSd);
 	exit(0);
 }
+
+//int main(int argc, char const *argv[]) { return Client::client(argc, argv); } // Causes redefinition error when compiling via lobby

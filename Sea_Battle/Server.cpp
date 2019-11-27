@@ -21,11 +21,12 @@ Team Cookies
 #include <string.h>
 #include "Board.h"
 #include "Etc.h"
+#include "Server.h"
 #define DEFAULT_NAME "localhost"
 #define DEFAULT_PORT 6932
 #define DEFAULT_N 10
 
-int main(int argc, char const *argv[]){	
+int Server::server(int argc, char const *argv[]){
 	int port, n;
 	int server_port;
 	std::string server_name;
@@ -135,4 +136,6 @@ int main(int argc, char const *argv[]){
 	close(newSd);
 	close(clientSd);
 	exit(0);
-} 
+}
+
+// int main(int argc, char const *argv[]) { return Server::server(argc, argv); } // Causes redefinition error when compiling via lobby
