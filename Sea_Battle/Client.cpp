@@ -25,7 +25,7 @@ Team Cookies
 #define DEFAULT_PORT 6932
 #define DEFAULT_N 10
 
-int main(int argc, char const *argv[]){	
+int Client::main(int argc, char const *argv[]){	
 	int server_port;
 	int port, n;
 	std::string server_name;

@@ -80,7 +80,7 @@ void Lobby::registerUser() {
     startMenu();
 }
 
-void Lobby::unregisterUser() {
+void Lobby::unregisterUser() {/**
     std::cout << "running unregisterUser" << std::endl;
     
     std::cout << "Please enter a name of the user you want to remove: " << std::endl;
@@ -91,8 +91,8 @@ void Lobby::unregisterUser() {
 
     iter = std::find(this->listOfUsers.begin(), this->listOfUsers.end(), username);
 
-    if (iter != this->listofUsers.end()) {
-        std::cout << "User found." << endl;
+    if (iter != this->listOfUsers.end()) {
+        std::cout << "User found." << std::endl;
         listOfUsers.erase(std::remove(listOfUsers.begin(), listOfUsers.end(), username), listOfUsers.end());
         std::cout << "User deleted. Returning to the start menu." << std::endl;
         std::cout << std::endl;
@@ -118,7 +118,7 @@ void Lobby::unregisterUser() {
         }
     }
 
-    return 0;
+    return 0;**/
 }
 
 void Lobby::listGames() {
