@@ -1,0 +1,30 @@
+Sea Battle Documentation
+rev.1
+
+The lobby is the main server which manages and stores a database of users in encrypted text.
+When players connect to the lobby, they have the option to:
+
+ required feature - register 
+create a user, which enters a username and password map into the database
+
+ required feature - list games 
+print currently running games
+
+log in, which when given a username and password, assigns a server and port
+
+ required feature - create game 
+start a game, which launches Server.cpp using and port assigned to user,
+    and then creates a Board object and begins waiting for a client to connect
+
+ required feature - join game 
+join a game, which asks which username's game to join,
+    and launches Client.cpp using the server and port assigned to the enemy's username
+
+ required feature - exit game 
+forfeit the game, prompting the loss screen and ending the match for both players
+
+ required feature - unregister 
+delete user, which deletes the currently logged in user upon password confirmation
+
+ required feature - application specific protocol 
+requestTranslator, responseTranslator, as seen in Board.cpp
