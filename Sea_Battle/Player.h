@@ -9,7 +9,7 @@ class Player {
         static std::string playerCin(); // listen to standard input stream
         static std::string playerRead(int newSd); // listen to input at socket newSd
         static void playerWrite( int clientSd, std::string requestString ); // write request to socket clientSd
-
+        static int main( int argc, char *argv[] );
 };
 
 #endif

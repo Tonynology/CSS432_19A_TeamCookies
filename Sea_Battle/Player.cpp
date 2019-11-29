@@ -66,7 +66,7 @@ void Player::playerWrite( int clientSd, std::string requestString ) {
 	write(clientSd, request, sizeof(request)); //single write
 }
 
-int main( int argc, char *argv[] ) {
+int Player::main( int argc, char *argv[] ) {
     ///0: Set up the remote connection
 
     int iport = std::stoi(argv[1]);
@@ -224,4 +224,5 @@ int main( int argc, char *argv[] ) {
     }
 // TODO: win conditions
     std::cerr << "Until updated, this program should never reach here.";
+    //TODO: Socket termination
 }

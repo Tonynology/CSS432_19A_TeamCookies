@@ -1,11 +1,47 @@
 #include "Lobby.h"
-#include "Server.cpp"
-#include "Client.cpp"
+#include "Player.cpp"
 
 #include <iostream>
 #include <vector>
 #include <iterator> 
 #include <string>
+#include <string.h>
+#include <stdio.h>
+static int setargs(char *args, char **argv)
+{
+   int count = 0;
+   while (isspace(*args)) ++args;
+   while (*args) {
+     if (argv) argv[count] = args;
+     while (*args && !isspace(*args)) ++args;
+     if (argv && *args) *args++ = '\0';
+     while (isspace(*args)) ++args;
+     count++;
+   }
+   return count;
+}
+char **parsedargs(char *args, int *argc)
+{
+   char **argv = NULL;
+   int    argn = 0;
+   if (args && *args
+    && (args = strdup(args))
+    && (argn = setargs(args,NULL))
+    && (argv = (char **) malloc((argn+1) * sizeof(char *)))) {
+      *argv++ = args;
+      argn = setargs(args,argv);
+   }
+   if (args && !argv) free(args);
+   *argc = argn;
+   return argv;
+}
+void freeparsedargs(char **argv)
+{
+  if (argv) {
+    free(argv[-1]);
+    free(argv-1);
+  } 
+}
 
 void Lobby::startGame() {
     std::cout << "Welcome to Sea Battle v1.4 beta, a game by Team Cookies\n. Please select the following options." << std::endl;
@@ -61,12 +97,44 @@ void Lobby::startMenu() {
         case 6:
             unregisterUser();
             break;
-        case 7:
-            Server::server(1, NULL);
-            break;
-        case 8:
-            Client::client(1, NULL);
-            break;
+        case 7:{
+    /* Credit to stackOverflow user Remo.D for Parse string into argv/argc
+    https://stackoverflow.com/questions/1706551/parse-string-into-argv-argc */
+
+            int i;// TODO: Move this into a separate function
+            char **av;
+            int ac;
+            char *as = NULL;
+
+            //if (argc > 1) as = argv[1];
+            as = "./player.out 6932 2396 localhost"; //TODO: Add port and address input from user
+            av = parsedargs(as,&ac);
+            printf("== %d\n",ac);
+            for (i = 0; i < ac; i++)
+              printf("[%s]\n",av[i]);
+
+            freeparsedargs(av);
+            //exit(0);
+            Player::main(ac, av);
+            break;}
+
+        case 8:{
+            int i; //see comments above
+            char **av;
+            int ac;
+            char *as = NULL;
+
+            //if (argc > 1) as = argv[1];
+            as = "./player.out 2396 6932 localhost";
+            av = parsedargs(as,&ac);
+            printf("== %d\n",ac);
+            for (i = 0; i < ac; i++)
+              printf("[%s]\n",av[i]);
+
+            freeparsedargs(av);
+            //exit(0);
+            Player::main(ac, av);
+            break;}
         default:
             std::cout << "Not a valid option. Please reselect." << std::endl;
             break;
