@@ -22,6 +22,8 @@ class Lobby {
 
     private:
         std::vector<std::string> listOfUsers;
+
+        bool checkDuplicates();
 };
 
 #endif // LOBBY_H

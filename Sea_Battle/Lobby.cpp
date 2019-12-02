@@ -7,6 +7,9 @@
 #include <string>
 #include <string.h>
 #include <stdio.h>
+#include <algorithm> // std::sort
+#include <unordered_set>
+
 static int setargs(char *args, char **argv)
 {
    int count = 0;
@@ -44,7 +47,7 @@ void freeparsedargs(char **argv)
 }
 
 void Lobby::startGame() {
-    std::cout << "Welcome to Sea Battle v1.4 beta, a game by Team Cookies\n. Please select the following options." << std::endl;
+    std::cout << "Welcome to Sea Battle v1.4 beta, a game by Team Cookies.\n" << std::endl;
 
 
     startMenu();
@@ -97,9 +100,9 @@ void Lobby::startMenu() {
         case 6:
             unregisterUser();
             break;
-        case 7:{
-    /* Credit to stackOverflow user Remo.D for Parse string into argv/argc
-    https://stackoverflow.com/questions/1706551/parse-string-into-argv-argc */
+        case 7: {
+            /* Credit to stackOverflow user Remo.D for Parse string into argv/argc
+            https://stackoverflow.com/questions/1706551/parse-string-into-argv-argc */
 
             int i;// TODO: Move this into a separate function
             char **av;
@@ -116,9 +119,9 @@ void Lobby::startMenu() {
             freeparsedargs(av);
             //exit(0);
             Player::main(ac, av);
-            break;}
-
-        case 8:{
+            break;
+        }
+        case 8: {
             int i; //see comments above
             char **av;
             int ac;
@@ -134,7 +137,8 @@ void Lobby::startMenu() {
             freeparsedargs(av);
             //exit(0);
             Player::main(ac, av);
-            break;}
+            break;
+        }
         default:
             std::cout << "Not a valid option. Please reselect." << std::endl;
             break;
@@ -142,61 +146,88 @@ void Lobby::startMenu() {
 }
 
 void Lobby::registerUser() {
-    std::cout << "running registerUser" << std::endl;
+    bool redo = true;
+    while (true)
+    {
+        if (redo == true) {
+            std::cout << "Please enter a name for this user: " << std::endl;
+            std::string username = "";
+            std::cin >> username;
+            this->listOfUsers.push_back(username);
 
-    std::cout << "Please enter a name for this user: " << std::endl;
-    std::string username = "";
-    std::cin >> username;
+            // Sorts the user
+            std::sort(this->listOfUsers.begin(), this->listOfUsers.end());
+            std::cout << "before:" << listOfUsers << std::endl; 
+            redo = false;
+        }
 
-    this->listOfUsers.push_back(username);
-
-    std::cout << listOfUsers;   
-
-    std::cout << "User created. Returning to the start menu." << std::endl;
-    std::cout << std::endl;
-
-    startMenu();
+        // Checks for duplicates
+        bool hasDuplicates = checkDuplicates();
+        if (hasDuplicates == true) {
+            std::cout << "Username has already been taken. Please re-enter username:" << std::endl;
+            listOfUsers.erase(std::unique(listOfUsers.begin(), listOfUsers.end()), listOfUsers.end());            std::cout << "This user already exists. Please enter another username." << std::endl;
+            redo = true;
+            std::cout << "Size of vector: " << listOfUsers.size() << std::endl; 
+            std::cout << listOfUsers; 
+            // std::unordered_set<std::string> s;
+            // for (std::string i : listOfUsers) {
+            //     s.insert(i);
+            // }
+            // listOfUsers.assign(s.begin(), s.end());
+            // std::sort(listOfUsers.begin(), listOfUsers.end());
+            // std::cout << "Size of vector: " << listOfUsers.size() << std::endl; 
+            // std::cout << listOfUsers;   
+            continue;
+        } else {
+            // Removes duplicates in listOfUsers
+            std::cout << listOfUsers;   
+            std::cout << "User created. Returning to the start menu." << std::endl;
+            std::cout << std::endl;
+            startMenu();
+        }
+    
+    }
 }
 
-void Lobby::unregisterUser() {/**
-    std::cout << "running unregisterUser" << std::endl;
+void Lobby::unregisterUser() {
+    // std::cout << "running unregisterUser" << std::endl;
     
-    std::cout << "Please enter a name of the user you want to remove: " << std::endl;
-    std::string username = "";
-    std::cin >> username;
+    // std::cout << "Please enter a name of the user you want to remove: " << std::endl;
+    // std::string username = "";
+    // std::cin >> username;
     
-    std::vector<int>::iterator iter;
+    // std::vector<int>::iterator iter;
 
-    iter = std::find(this->listOfUsers.begin(), this->listOfUsers.end(), username);
+    // iter = std::find(this->listOfUsers.begin(), this->listOfUsers.end(), username);
 
-    if (iter != this->listOfUsers.end()) {
-        std::cout << "User found." << std::endl;
-        listOfUsers.erase(std::remove(listOfUsers.begin(), listOfUsers.end(), username), listOfUsers.end());
-        std::cout << "User deleted. Returning to the start menu." << std::endl;
-        std::cout << std::endl;
+    // if (iter != this->listOfUsers.end()) {
+    //     std::cout << "User found." << std::endl;
+    //     listOfUsers.erase(std::remove(listOfUsers.begin(), listOfUsers.end(), username), listOfUsers.end());
+    //     std::cout << "User deleted. Returning to the start menu." << std::endl;
+    //     std::cout << std::endl;
         
-        startMenu();
-    } else {
-        std::cout << "User not found." << std::endl;
-        std::cout << "Please select the following option by typing in the number: " << std::endl;
-        std::cout << "[1] Re-enter username." << std::endl;
-        std::cout << "[2] Return to menu." << std::endl;
-        std::cout << "[3] Exit game." << std::endl;
+    //     startMenu();
+    // } else {
+    //     std::cout << "User not found." << std::endl;
+    //     std::cout << "Please select the following option by typing in the number: " << std::endl;
+    //     std::cout << "[1] Re-enter username." << std::endl;
+    //     std::cout << "[2] Return to menu." << std::endl;
+    //     std::cout << "[3] Exit game." << std::endl;
 
-        int userResponse = 0;
-        std::cin >> userResponse;
+    //     int userResponse = 0;
+    //     std::cin >> userResponse;
 
-        switch(userResponse) {
-            case 1:
-                unregisterUser();
-            case 2:
-                startGame();
-            case 3:
-                return 0;
-        }
-    }
+    //     switch(userResponse) {
+    //         case 1:
+    //             unregisterUser();
+    //         case 2:
+    //             startGame();
+    //         case 3:
+    //             return 0;
+    //     }
+    // }
 
-    return 0;**/
+    // return 0;
 }
 
 void Lobby::listGames() {
@@ -213,4 +244,10 @@ void Lobby::joinGame() {
 
 void Lobby::exitGame() {
     std::cout << "running exitGame" << std::endl;
+}
+
+bool Lobby::checkDuplicates() {
+    std::vector<std::string>::iterator iter = std::unique(this->listOfUsers.begin(), this->listOfUsers.end());
+    bool hasDuplicates = !(iter == this->listOfUsers.end());
+    return hasDuplicates;
 }
