@@ -2,13 +2,12 @@
 #include "Player.cpp"
 
 #include <iostream>
-#include <vector>
 #include <iterator> 
 #include <string>
 #include <string.h>
 #include <stdio.h>
-#include <algorithm> // std::sort
-#include <unordered_set>
+#include <unordered_map>
+#include <vector> 
 
 static int setargs(char *args, char **argv)
 {
@@ -48,8 +47,6 @@ void freeparsedargs(char **argv)
 
 void Lobby::startGame() {
     std::cout << "Welcome to Sea Battle v1.4 beta, a game by Team Cookies.\n" << std::endl;
-
-
     startMenu();
 }
 
@@ -146,47 +143,25 @@ void Lobby::startMenu() {
 }
 
 void Lobby::registerUser() {
-    bool redo = true;
-    while (true)
-    {
-        if (redo == true) {
-            std::cout << "Please enter a name for this user: " << std::endl;
-            std::string username = "";
-            std::cin >> username;
-            this->listOfUsers.push_back(username);
 
-            // Sorts the user
-            std::sort(this->listOfUsers.begin(), this->listOfUsers.end());
-            std::cout << "before:" << listOfUsers << std::endl; 
-            redo = false;
-        }
+    struct player p;
 
-        // Checks for duplicates
-        bool hasDuplicates = checkDuplicates();
-        if (hasDuplicates == true) {
-            std::cout << "Username has already been taken. Please re-enter username:" << std::endl;
-            listOfUsers.erase(std::unique(listOfUsers.begin(), listOfUsers.end()), listOfUsers.end());            std::cout << "This user already exists. Please enter another username." << std::endl;
-            redo = true;
-            std::cout << "Size of vector: " << listOfUsers.size() << std::endl; 
-            std::cout << listOfUsers; 
-            // std::unordered_set<std::string> s;
-            // for (std::string i : listOfUsers) {
-            //     s.insert(i);
-            // }
-            // listOfUsers.assign(s.begin(), s.end());
-            // std::sort(listOfUsers.begin(), listOfUsers.end());
-            // std::cout << "Size of vector: " << listOfUsers.size() << std::endl; 
-            // std::cout << listOfUsers;   
-            continue;
-        } else {
-            // Removes duplicates in listOfUsers
-            std::cout << listOfUsers;   
-            std::cout << "User created. Returning to the start menu." << std::endl;
-            std::cout << std::endl;
-            startMenu();
-        }
-    
-    }
+    std::cout << "Please enter a name for this user: " << std::endl;
+    std::string username = "";
+    std::cin >> p.username;
+
+    std::cout << "Please enter a port number between 2000 - 5000" << std::endl;
+    std::string username = "";
+    std::cin >> p.port;
+
+    std::cout << "Please type ip address for this computer (e.g. uw1-320-15) " << std::endl;
+    std::string username = "";
+    std::cin >> p.ipAddress;
+
+    std::unordered_map<std::string, std::vector<person>> userData;
+
+    userData[username, userData.push_back(p)];
+
 }
 
 void Lobby::unregisterUser() {

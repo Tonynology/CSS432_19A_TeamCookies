@@ -7,10 +7,6 @@
 
 class Lobby {
     public:
-        // Vector << operator overload
-        //std::ostream& operator<<(std::ostream& os, const std::vector<std::string>& v);
-
-        // Lobby();
         void startGame();
         void startMenu();
         void registerUser();
@@ -21,9 +17,13 @@ class Lobby {
         void unregisterUser();
 
     private:
-        std::vector<std::string> listOfUsers;
-
         bool checkDuplicates();
+
+        struct player {
+            std::stirng username;
+            int port;
+            std::string ipAddress;
+        }
 };
 
 #endif // LOBBY_H
