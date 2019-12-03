@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <unordered_map>
 
 class Lobby {
     public:
@@ -17,13 +18,20 @@ class Lobby {
         void unregisterUser();
 
     private:
-        bool checkDuplicates();
-
-        struct player {
-            std::stirng username;
+        struct Player {
+            std::string username;
             int port;
             std::string ipAddress;
-        }
+        };
+
+        // Player p;
+        // std::vector<Player> player;
+
+        // std::unordered_map<std::string, Player> userData;
+
+        std::unordered_map<std::string, Player> userData;
+
+        void printMap();
 };
 
 #endif // LOBBY_H

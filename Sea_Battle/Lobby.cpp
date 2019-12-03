@@ -97,45 +97,45 @@ void Lobby::startMenu() {
         case 6:
             unregisterUser();
             break;
-        case 7: {
-            /* Credit to stackOverflow user Remo.D for Parse string into argv/argc
-            https://stackoverflow.com/questions/1706551/parse-string-into-argv-argc */
+        // case 7: {
+        //     /* Credit to stackOverflow user Remo.D for Parse string into argv/argc
+        //     https://stackoverflow.com/questions/1706551/parse-string-into-argv-argc */
 
-            int i;// TODO: Move this into a separate function
-            char **av;
-            int ac;
-            char *as = NULL;
+        //     int i;// TODO: Move this into a separate function
+        //     char **av;
+        //     int ac;
+        //     char *as = NULL;
 
-            //if (argc > 1) as = argv[1];
-            as = "./player.out 6932 2396 localhost"; //TODO: Add port and address input from user
-            av = parsedargs(as,&ac);
-            printf("== %d\n",ac);
-            for (i = 0; i < ac; i++)
-              printf("[%s]\n",av[i]);
+        //     //if (argc > 1) as = argv[1];
+        //     as = "./player.out 6932 2396 localhost"; //TODO: Add port and address input from user
+        //     av = parsedargs(as,&ac);
+        //     printf("== %d\n",ac);
+        //     for (i = 0; i < ac; i++)
+        //       printf("[%s]\n",av[i]);
 
-            freeparsedargs(av);
-            //exit(0);
-            Player::main(ac, av);
-            break;
-        }
-        case 8: {
-            int i; //see comments above
-            char **av;
-            int ac;
-            char *as = NULL;
+        //     freeparsedargs(av);
+        //     //exit(0);
+        //     Player::main(ac, av);
+        //     break;
+        // }
+        // case 8: {
+        //     int i; //see comments above
+        //     char **av;
+        //     int ac;
+        //     char *as = NULL;
 
-            //if (argc > 1) as = argv[1];
-            as = "./player.out 2396 6932 localhost";
-            av = parsedargs(as,&ac);
-            printf("== %d\n",ac);
-            for (i = 0; i < ac; i++)
-              printf("[%s]\n",av[i]);
+        //     //if (argc > 1) as = argv[1];
+        //     as = "./player.out 2396 6932 localhost";
+        //     av = parsedargs(as,&ac);
+        //     printf("== %d\n",ac);
+        //     for (i = 0; i < ac; i++)
+        //       printf("[%s]\n",av[i]);
 
-            freeparsedargs(av);
-            //exit(0);
-            Player::main(ac, av);
-            break;
-        }
+        //     freeparsedargs(av);
+        //     //exit(0);
+        //     Player::main(ac, av);
+        //     break;
+        // }
         default:
             std::cout << "Not a valid option. Please reselect." << std::endl;
             break;
@@ -144,23 +144,27 @@ void Lobby::startMenu() {
 
 void Lobby::registerUser() {
 
-    struct player p;
+    struct Player p;
+    std::string username;
 
     std::cout << "Please enter a name for this user: " << std::endl;
-    std::string username = "";
     std::cin >> p.username;
 
     std::cout << "Please enter a port number between 2000 - 5000" << std::endl;
-    std::string username = "";
     std::cin >> p.port;
 
     std::cout << "Please type ip address for this computer (e.g. uw1-320-15) " << std::endl;
-    std::string username = "";
     std::cin >> p.ipAddress;
 
-    std::unordered_map<std::string, std::vector<person>> userData;
+    userData[p.username] = p;
 
-    userData[username, userData.push_back(p)];
+    std::cout << p << std::endl;
+
+    // for (auto it = userData.begin(); userData.end(); ++it) {
+    //     std::cout << it->first << it->second << std::endl;
+    // }
+    
+    // printMap();
 
 }
 
@@ -221,8 +225,9 @@ void Lobby::exitGame() {
     std::cout << "running exitGame" << std::endl;
 }
 
-bool Lobby::checkDuplicates() {
-    std::vector<std::string>::iterator iter = std::unique(this->listOfUsers.begin(), this->listOfUsers.end());
-    bool hasDuplicates = !(iter == this->listOfUsers.end());
-    return hasDuplicates;
-}
+// void Lobby::printMap()
+// {
+//     for (auto it = userData.begin(); userData.end(); ++it) {
+//         std::cout << it->first << it->second << std::endl;
+//     }
+// }

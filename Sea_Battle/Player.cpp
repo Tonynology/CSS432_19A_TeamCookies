@@ -2,7 +2,6 @@
 CSS 432 AU19
 Sea Battle - Intro to Network Programming
 Team Cookies
-
 	Build: g++ -o player.out Player.cpp -pthread
 	Usage: ./player.out [iport] [uport] [uaddress]
     Example: ./player.out 6932 2396 localhost
@@ -75,7 +74,6 @@ int Player::main( int argc, char *argv[] ) {
     
     /** //TODO: Proper argument handling
 	std::string server_name;
-
     if (argc == 1) {
         cerr << "TODO: Launch Server using default ip and port";
     }
