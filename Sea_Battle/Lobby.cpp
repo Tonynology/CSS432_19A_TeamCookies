@@ -50,32 +50,16 @@ void Lobby::startGame() {
     startMenu();
 }
 
-std::ostream& operator<<(std::ostream& os, const std::vector<Player>& v) 
-{ 
-    Player p;
-    os << "["; 
-    for (int i = 0; i < v.size(); ++i) {
-        os << v[i].port; 
-        if (i != v.size() - 1) 
-            os << ", "; 
-    } 
-    os << "]\n"; 
-    return os; 
+std::ostream& operator<<(std::ostream& os, const std::unordered_map <std::string, Player> &m) {
+    for (const std::pair<std::string, Player>& p : m) {
+        os << "{" << p.first << ": " << p.second << "}\n";
+    }
+    return os;
 }
 
-// std::ostream& operator<<(std::ostream& os, const std::unordered_map <K,V> &m) {
-//     for (const std::pair<K,V>& p: m) {
-//         os << "{" << p.first << ": " << p.second << "}\n";
-//     }
-//     return os;
-// }
-
-// std::ostream& operator<<(std::ostream& os, const std::vecotr<Player> &v) {
-//     for (const std::pair<K,V>& p: m) {
-//         os << "{" << p.first << ": " << p.second << "}\n";
-//     }
-//     return os;
-// }
+std::ostream& operator<<(std::ostream& os, const Player &p) {
+    return os << p.username << p.port << p.ipAddress << std::endl;
+}
 
 void Lobby::startMenu() {
     std::cout << "Please select the following options by typing in the number:" << std::endl;
@@ -172,8 +156,10 @@ void Lobby::registerUser() {
     std::cin >> p.ipAddress;
 
     //playerVector.push_back({p.username, p.port, p.ipAddress});
-    playerVector[0].username.push_back(p.username);
-    userData[p.username] = playerVector;
+    //playerVector[0].username.push_back(p.username);
+    userData[p.username] = p;
+
+    // std::cout << p << std::endl;
 
     // std::cout << userData[0].username << std::endl;
 

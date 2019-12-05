@@ -24,12 +24,13 @@ class Lobby {
             std::string ipAddress;
         };
 
-        // Player p;
-        std::vector<Player> playerVector;
+        Player p;
 
-        std::unordered_map<std::string, std::vector<Player>> userData;
+        // std::vector<Player> playerVector;
+ 
+        //std::unordered_map<std::string, std::vector<Player>> userData;
 
-        // std::unordered_map<std::string, Player> userData;
+        std::unordered_map<std::string, Player> userData;
 
         void printMap();
 };
