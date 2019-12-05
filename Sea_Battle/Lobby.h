@@ -8,6 +8,9 @@
 
 class Lobby {
     public:
+
+        // friend std::ostream& operator <<(std::ostream &os, const std::unordered_map <std::string, Player> &m);
+
         void startGame();
         void startMenu();
         void registerUser();
@@ -29,7 +32,7 @@ class Lobby {
         // std::vector<Player> playerVector;
  
         //std::unordered_map<std::string, std::vector<Player>> userData;
-
+        // ostream& operator <<(std::ostream &os, cconst std::unordered_map <std::string, Player> &m);
         std::unordered_map<std::string, Player> userData;
 
         void printMap();

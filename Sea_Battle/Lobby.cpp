@@ -50,16 +50,16 @@ void Lobby::startGame() {
     startMenu();
 }
 
-std::ostream& operator<<(std::ostream& os, const std::unordered_map <std::string, Player> &m) {
-    for (const std::pair<std::string, Player>& p : m) {
-        os << "{" << p.first << ": " << p.second << "}\n";
-    }
-    return os;
-}
+// std::ostream& operator<<(std::ostream& os, const std::unordered_map <std::string, Player> &m) {
+//     for (const std::pair<std::string, Player>& p : m) {
+//         os << "{" << p.first << ": " << p.second << "}\n";
+//     }
+//     return os;
+// }
 
-std::ostream& operator<<(std::ostream& os, const Player &p) {
-    return os << p.username << p.port << p.ipAddress << std::endl;
-}
+// Lobby::std::ostream& operator<<(std::ostream& os, const Player &p) {
+//     return os << p.username << p.port << p.ipAddress << std::endl;
+// }
 
 void Lobby::startMenu() {
     std::cout << "Please select the following options by typing in the number:" << std::endl;
@@ -158,6 +158,8 @@ void Lobby::registerUser() {
     //playerVector.push_back({p.username, p.port, p.ipAddress});
     //playerVector[0].username.push_back(p.username);
     userData[p.username] = p;
+
+    std::cout << "struct: " << p.username << std::endl;
 
     // std::cout << p << std::endl;
 
