@@ -50,17 +50,32 @@ void Lobby::startGame() {
     startMenu();
 }
 
-std::ostream& operator<<(std::ostream& os, const std::vector<std::string>& v) 
+std::ostream& operator<<(std::ostream& os, const std::vector<Player>& v) 
 { 
+    Player p;
     os << "["; 
-    for (int i = 0; i < v.size(); ++i) { 
-        os << v[i]; 
+    for (int i = 0; i < v.size(); ++i) {
+        os << v[i].port; 
         if (i != v.size() - 1) 
             os << ", "; 
     } 
     os << "]\n"; 
     return os; 
 }
+
+// std::ostream& operator<<(std::ostream& os, const std::unordered_map <K,V> &m) {
+//     for (const std::pair<K,V>& p: m) {
+//         os << "{" << p.first << ": " << p.second << "}\n";
+//     }
+//     return os;
+// }
+
+// std::ostream& operator<<(std::ostream& os, const std::vecotr<Player> &v) {
+//     for (const std::pair<K,V>& p: m) {
+//         os << "{" << p.first << ": " << p.second << "}\n";
+//     }
+//     return os;
+// }
 
 void Lobby::startMenu() {
     std::cout << "Please select the following options by typing in the number:" << std::endl;
@@ -156,9 +171,16 @@ void Lobby::registerUser() {
     std::cout << "Please type ip address for this computer (e.g. uw1-320-15) " << std::endl;
     std::cin >> p.ipAddress;
 
-    userData[p.username] = p;
+    //playerVector.push_back({p.username, p.port, p.ipAddress});
+    playerVector[0].username.push_back(p.username);
+    userData[p.username] = playerVector;
 
-    std::cout << p << std::endl;
+    // std::cout << userData[0].username << std::endl;
+
+    // for (auto x : userData) {
+    //   std::cout << x.first << " " << x.second << std::endl; 
+    // }
+    // std::cout << p << std::endl;
 
     // for (auto it = userData.begin(); userData.end(); ++it) {
     //     std::cout << it->first << it->second << std::endl;

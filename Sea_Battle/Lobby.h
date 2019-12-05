@@ -25,11 +25,11 @@ class Lobby {
         };
 
         // Player p;
-        // std::vector<Player> player;
+        std::vector<Player> playerVector;
+
+        std::unordered_map<std::string, std::vector<Player>> userData;
 
         // std::unordered_map<std::string, Player> userData;
-
-        std::unordered_map<std::string, Player> userData;
 
         void printMap();
 };
