@@ -7,59 +7,27 @@
 #include <string.h>
 #include <stdio.h>
 #include <unordered_map>
-#include <vector> 
+#include <algorithm> // find_if
 
-static int setargs(char *args, char **argv)
-{
-   int count = 0;
-   while (isspace(*args)) ++args;
-   while (*args) {
-     if (argv) argv[count] = args;
-     while (*args && !isspace(*args)) ++args;
-     if (argv && *args) *args++ = '\0';
-     while (isspace(*args)) ++args;
-     count++;
-   }
-   return count;
-}
-char **parsedargs(char *args, int *argc)
-{
-   char **argv = NULL;
-   int    argn = 0;
-   if (args && *args
-    && (args = strdup(args))
-    && (argn = setargs(args,NULL))
-    && (argv = (char **) malloc((argn+1) * sizeof(char *)))) {
-      *argv++ = args;
-      argn = setargs(args,argv);
-   }
-   if (args && !argv) free(args);
-   *argc = argn;
-   return argv;
-}
-void freeparsedargs(char **argv)
-{
-  if (argv) {
-    free(argv[-1]);
-    free(argv-1);
-  } 
-}
+// Server #includes
+#include <sys/types.h>    // socket, bind
+#include <sys/socket.h>   // socket, bind, listen, inet_ntoa
+#include <netinet/in.h>   // htonl, htons, inet_ntoa
+#include <arpa/inet.h>    // inet_ntoa
+#include <netdb.h>        // gethostbyname
+#include <unistd.h>       // read, write, close
+#include <strings.h>      // bzero
+#include <netinet/tcp.h>  // SO_REUSEADDR
+#include <sys/uio.h>      // writev
+
+#define BACKLOG 10 // Number of connections
+
+int sockfd;
 
 void Lobby::startGame() {
     std::cout << "Welcome to Sea Battle v1.4 beta, a game by Team Cookies.\n" << std::endl;
     startMenu();
 }
-
-// std::ostream& operator<<(std::ostream& os, const std::unordered_map <std::string, Player> &m) {
-//     for (const std::pair<std::string, Player>& p : m) {
-//         os << "{" << p.first << ": " << p.second << "}\n";
-//     }
-//     return os;
-// }
-
-// Lobby::std::ostream& operator<<(std::ostream& os, const Player &p) {
-//     return os << p.username << p.port << p.ipAddress << std::endl;
-// }
 
 void Lobby::startMenu() {
     std::cout << "Please select the following options by typing in the number:" << std::endl;
@@ -69,8 +37,6 @@ void Lobby::startMenu() {
 	std::cout << "[4] Join Game" << std::endl;
 	std::cout << "[5] Exit Game" << std::endl;
 	std::cout << "[6] Unregister" << std::endl;
-    std::cout << "[7] Launch server on localhost port 6932" << std::endl;
-    std::cout << "[8] Launch client on localhost port 6932" << std::endl;
 
     std::cout << std::endl;
 
@@ -96,45 +62,6 @@ void Lobby::startMenu() {
         case 6:
             unregisterUser();
             break;
-        // case 7: {
-        //     /* Credit to stackOverflow user Remo.D for Parse string into argv/argc
-        //     https://stackoverflow.com/questions/1706551/parse-string-into-argv-argc */
-
-        //     int i;// TODO: Move this into a separate function
-        //     char **av;
-        //     int ac;
-        //     char *as = NULL;
-
-        //     //if (argc > 1) as = argv[1];
-        //     as = "./player.out 6932 2396 localhost"; //TODO: Add port and address input from user
-        //     av = parsedargs(as,&ac);
-        //     printf("== %d\n",ac);
-        //     for (i = 0; i < ac; i++)
-        //       printf("[%s]\n",av[i]);
-
-        //     freeparsedargs(av);
-        //     //exit(0);
-        //     Player::main(ac, av);
-        //     break;
-        // }
-        // case 8: {
-        //     int i; //see comments above
-        //     char **av;
-        //     int ac;
-        //     char *as = NULL;
-
-        //     //if (argc > 1) as = argv[1];
-        //     as = "./player.out 2396 6932 localhost";
-        //     av = parsedargs(as,&ac);
-        //     printf("== %d\n",ac);
-        //     for (i = 0; i < ac; i++)
-        //       printf("[%s]\n",av[i]);
-
-        //     freeparsedargs(av);
-        //     //exit(0);
-        //     Player::main(ac, av);
-        //     break;
-        // }
         default:
             std::cout << "Not a valid option. Please reselect." << std::endl;
             break;
@@ -142,81 +69,37 @@ void Lobby::startMenu() {
 }
 
 void Lobby::registerUser() {
-
-    struct Player p;
+    struct PlayerData p;
     std::string username;
 
-    std::cout << "Please enter a name for this user: " << std::endl;
-    std::cin >> p.username;
+    std::cout << "Please enter an username for this user: " << std::endl;
+    std::cin >> username;
 
-    std::cout << "Please enter a port number between 2000 - 5000" << std::endl;
-    std::cin >> p.port;
+    if (userData.find(username) == userData.end()) {
+        userData[username] = p;
+        std::cout << "Please enter a port number between 2000 - 5000" << std::endl;
+        std::cin >> p.port;
 
-    std::cout << "Please type ip address for this computer (e.g. uw1-320-15) " << std::endl;
-    std::cin >> p.ipAddress;
+        std::cout << "Please enter your IP address" << std::endl;
+        std::cin >> p.ipAddress;
 
-    //playerVector.push_back({p.username, p.port, p.ipAddress});
-    //playerVector[0].username.push_back(p.username);
-    userData[p.username] = p;
-
-    std::cout << "struct: " << p.username << std::endl;
-
-    // std::cout << p << std::endl;
-
-    // std::cout << userData[0].username << std::endl;
-
-    // for (auto x : userData) {
-    //   std::cout << x.first << " " << x.second << std::endl; 
-    // }
-    // std::cout << p << std::endl;
-
-    // for (auto it = userData.begin(); userData.end(); ++it) {
-    //     std::cout << it->first << it->second << std::endl;
-    // }
-    
-    // printMap();
-
+        std::cout << "User " << username << " registered." << std::endl;
+        std::cout << "Returning to start menu" << std::endl;
+        std::cout << std::endl;
+        startMenu();
+    } else {
+        std::cout << "Username already taken. Please choose another one." << std::endl;
+        std::cout << std::endl;
+        registerUser();
+    }
 }
 
 void Lobby::unregisterUser() {
-    // std::cout << "running unregisterUser" << std::endl;
-    
-    // std::cout << "Please enter a name of the user you want to remove: " << std::endl;
-    // std::string username = "";
-    // std::cin >> username;
-    
-    // std::vector<int>::iterator iter;
+    struct PlayerData p;
+    std::string username;
 
-    // iter = std::find(this->listOfUsers.begin(), this->listOfUsers.end(), username);
-
-    // if (iter != this->listOfUsers.end()) {
-    //     std::cout << "User found." << std::endl;
-    //     listOfUsers.erase(std::remove(listOfUsers.begin(), listOfUsers.end(), username), listOfUsers.end());
-    //     std::cout << "User deleted. Returning to the start menu." << std::endl;
-    //     std::cout << std::endl;
-        
-    //     startMenu();
-    // } else {
-    //     std::cout << "User not found." << std::endl;
-    //     std::cout << "Please select the following option by typing in the number: " << std::endl;
-    //     std::cout << "[1] Re-enter username." << std::endl;
-    //     std::cout << "[2] Return to menu." << std::endl;
-    //     std::cout << "[3] Exit game." << std::endl;
-
-    //     int userResponse = 0;
-    //     std::cin >> userResponse;
-
-    //     switch(userResponse) {
-    //         case 1:
-    //             unregisterUser();
-    //         case 2:
-    //             startGame();
-    //         case 3:
-    //             return 0;
-    //     }
-    // }
-
-    // return 0;
+    std::cout << "Please enter the username of the user you want to remove: " << std::endl;
+    std::cin >> username;
 }
 
 void Lobby::listGames() {
@@ -235,9 +118,87 @@ void Lobby::exitGame() {
     std::cout << "running exitGame" << std::endl;
 }
 
-// void Lobby::printMap()
-// {
-//     for (auto it = userData.begin(); userData.end(); ++it) {
-//         std::cout << it->first << it->second << std::endl;
-//     }
-// }
+int main (int argc, char* argv[]) {
+    int port = atoi(argv[1]);
+
+    int sin_size;
+    
+    // Declaring sockaddr_in structures
+    sockaddr_in server;
+    bzero((char*) &server, sizeof(server));
+    server.sin_family      = AF_INET; // Address Family Internet
+    server.sin_addr.s_addr = htonl(INADDR_ANY);
+    server.sin_port        = htons(port);
+
+    // Create a socket
+    sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    
+    if (sockfd != 0)
+    {
+        printf("Socket creation successfully.\n");
+    }
+    else
+    {
+        perror("Socket creation failed.");
+        exit(EXIT_FAILURE);
+    }
+
+    const int on = 1;
+    setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, (char*) &on, sizeof(int));
+
+    //Bind the ip address and port to a socket
+    if (bind(sockfd, (sockaddr*) &server, sizeof(server)) < 0)
+    {
+        perror("Socket binding failed.");
+        exit(EXIT_FAILURE);
+    }
+    else
+    {
+        printf("Socket successfully binded.\n");
+    }
+    
+    // Tells socket to listen
+    listen(sockfd, BACKLOG);
+    if ((listen(sockfd, BACKLOG) != 0))
+    {
+        perror("Listen failed...");
+        exit(EXIT_FAILURE);
+    }
+    else
+    {
+        printf("Server listening...\n");
+    }
+
+    //A loop that continously listens to new connection by using threads
+    // while (true)
+    // {
+        sockaddr_in newSockAddr;
+        socklen_t newSockAddrSize = sizeof(newSockAddr);
+
+        int newsockfd = accept(sockfd, (sockaddr* ) &newSockAddr, &newSockAddrSize);
+
+        printf("Server: got connection from %s port %d\n", inet_ntoa(newSockAddr.sin_addr), ntohs(newSockAddr.sin_port));
+
+        if (newsockfd < 0)
+        {
+            perror("error with newsockfd: ");
+            exit(EXIT_FAILURE);
+        } 
+
+        int portTemp;
+        int portNum;
+
+        recv(newsockfd, &portTemp, sizeof(portNum), 0);
+        portNum = ntohl(portTemp);
+
+        std::cout << "portNum: " << portTemp << std::endl;
+
+    //     Lobby l;
+    //     pthread_t thread1;
+    //     int re = pthread_create(&thread1, NULL, l.startGame(), &newsockfd);
+    
+    // }
+
+    close(sockfd);
+    return 0;
+}

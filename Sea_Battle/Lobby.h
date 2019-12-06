@@ -21,21 +21,15 @@ class Lobby {
         void unregisterUser();
 
     private:
-        struct Player {
-            std::string username;
+        struct PlayerData {
+            // std::string username;
             int port;
             std::string ipAddress;
         };
 
-        Player p;
+        int sockfd;
 
-        // std::vector<Player> playerVector;
- 
-        //std::unordered_map<std::string, std::vector<Player>> userData;
-        // ostream& operator <<(std::ostream &os, cconst std::unordered_map <std::string, Player> &m);
-        std::unordered_map<std::string, Player> userData;
-
-        void printMap();
+        std::unordered_map<std::string, PlayerData> userData;
 };
 
 #endif // LOBBY_H
