@@ -1,5 +1,5 @@
 #include "Lobby.h"
-#include "Player.cpp"
+// #include "Player.cpp"
 
 #include <iostream>
 #include <iterator> 
@@ -19,104 +19,105 @@
 #include <strings.h>      // bzero
 #include <netinet/tcp.h>  // SO_REUSEADDR
 #include <sys/uio.h>      // writev
+#include <pthread.h>
 
 #define BACKLOG 10 // Number of connections
 
 int sockfd;
 
-void Lobby::startGame() {
+void Lobby::*startGame(void *clientSocket) {
     std::cout << "Welcome to Sea Battle v1.4 beta, a game by Team Cookies.\n" << std::endl;
-    startMenu();
+    //startMenu();
 }
 
-void Lobby::startMenu() {
-    std::cout << "Please select the following options by typing in the number:" << std::endl;
-	std::cout << "[1] Register" << std::endl;
-	std::cout << "[2] List Games" << std::endl;
-	std::cout << "[3] Create Game" << std::endl;
-	std::cout << "[4] Join Game" << std::endl;
-	std::cout << "[5] Exit Game" << std::endl;
-	std::cout << "[6] Unregister" << std::endl;
+// void Lobby::startMenu() {
+//     std::cout << "Please select the following options by typing in the number:" << std::endl;
+// 	std::cout << "[1] Register" << std::endl;
+// 	std::cout << "[2] List Games" << std::endl;
+// 	std::cout << "[3] Create Game" << std::endl;
+// 	std::cout << "[4] Join Game" << std::endl;
+// 	std::cout << "[5] Exit Game" << std::endl;
+// 	std::cout << "[6] Unregister" << std::endl;
 
-    std::cout << std::endl;
+//     std::cout << std::endl;
 
-    int userResponse = 0;
-    std::cin >> userResponse;
+//     int userResponse = 0;
+//     std::cin >> userResponse;
 
-    switch(userResponse) {
-        case 1:
-            registerUser();
-            break;
-        case 2:
-            listGames();
-            break;
-        case 3:
-            createGame();
-            break;
-        case 4:
-            joinGame();
-            break;
-        case 5:
-            exitGame();
-            break;
-        case 6:
-            unregisterUser();
-            break;
-        default:
-            std::cout << "Not a valid option. Please reselect." << std::endl;
-            break;
-    }
-}
+//     switch(userResponse) {
+//         case 1:
+//             registerUser();
+//             break;
+//         case 2:
+//             listGames();
+//             break;
+//         case 3:
+//             createGame();
+//             break;
+//         case 4:
+//             joinGame();
+//             break;
+//         case 5:
+//             exitGame();
+//             break;
+//         case 6:
+//             unregisterUser();
+//             break;
+//         default:
+//             std::cout << "Not a valid option. Please reselect." << std::endl;
+//             break;
+//     }
+// }
 
-void Lobby::registerUser() {
-    struct PlayerData p;
-    std::string username;
+// void Lobby::registerUser() {
+//     struct PlayerData p;
+//     std::string username;
 
-    std::cout << "Please enter an username for this user: " << std::endl;
-    std::cin >> username;
+//     std::cout << "Please enter an username for this user: " << std::endl;
+//     std::cin >> username;
 
-    if (userData.find(username) == userData.end()) {
-        userData[username] = p;
-        std::cout << "Please enter a port number between 2000 - 5000" << std::endl;
-        std::cin >> p.port;
+//     if (userData.find(username) == userData.end()) {
+//         userData[username] = p;
+//         std::cout << "Please enter a port number between 2000 - 5000" << std::endl;
+//         std::cin >> p.port;
 
-        std::cout << "Please enter your IP address" << std::endl;
-        std::cin >> p.ipAddress;
+//         std::cout << "Please enter your IP address" << std::endl;
+//         std::cin >> p.ipAddress;
 
-        std::cout << "User " << username << " registered." << std::endl;
-        std::cout << "Returning to start menu" << std::endl;
-        std::cout << std::endl;
-        startMenu();
-    } else {
-        std::cout << "Username already taken. Please choose another one." << std::endl;
-        std::cout << std::endl;
-        registerUser();
-    }
-}
+//         std::cout << "User " << username << " registered." << std::endl;
+//         std::cout << "Returning to start menu" << std::endl;
+//         std::cout << std::endl;
+//         startMenu();
+//     } else {
+//         std::cout << "Username already taken. Please choose another one." << std::endl;
+//         std::cout << std::endl;
+//         registerUser();
+//     }
+// }
 
-void Lobby::unregisterUser() {
-    struct PlayerData p;
-    std::string username;
+// void Lobby::unregisterUser() {
+//     struct PlayerData p;
+//     std::string username;
 
-    std::cout << "Please enter the username of the user you want to remove: " << std::endl;
-    std::cin >> username;
-}
+//     std::cout << "Please enter the username of the user you want to remove: " << std::endl;
+//     std::cin >> username;
+// }
 
-void Lobby::listGames() {
-    std::cout << "running listGames" << std::endl;
-}
+// void Lobby::listGames() {
+//     std::cout << "running listGames" << std::endl;
+// }
 
-void Lobby::createGame() {
-    std::cout << "running createGame" << std::endl;
-}
+// void Lobby::createGame() {
+//     std::cout << "running createGame" << std::endl;
+// }
 
-void Lobby::joinGame() {
-    std::cout << "running joinGame" << std::endl;
-}
+// void Lobby::joinGame() {
+//     std::cout << "running joinGame" << std::endl;
+// }
 
-void Lobby::exitGame() {
-    std::cout << "running exitGame" << std::endl;
-}
+// void Lobby::exitGame() {
+//     std::cout << "running exitGame" << std::endl;
+// }
 
 int main (int argc, char* argv[]) {
     int port = atoi(argv[1]);
@@ -169,9 +170,9 @@ int main (int argc, char* argv[]) {
         printf("Server listening...\n");
     }
 
-    //A loop that continously listens to new connection by using threads
-    // while (true)
-    // {
+    // A loop that continously listens to new connection by using threads
+    while (true)
+    {
         sockaddr_in newSockAddr;
         socklen_t newSockAddrSize = sizeof(newSockAddr);
 
@@ -193,11 +194,10 @@ int main (int argc, char* argv[]) {
 
         std::cout << "portNum: " << portTemp << std::endl;
 
-    //     Lobby l;
-    //     pthread_t thread1;
-    //     int re = pthread_create(&thread1, NULL, l.startGame(), &newsockfd);
+        pthread_t thread1;
+        int re = pthread_create(&thread1, NULL, startGame(), (void*) &newsockfd);
     
-    // }
+    }
 
     close(sockfd);
     return 0;
