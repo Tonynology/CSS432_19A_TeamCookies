@@ -25,8 +25,9 @@
 
 int sockfd;
 
-void Lobby::*startGame(void *clientSocket) {
+void Lobby::*startGame (void* clientSocket) {
     std::cout << "Welcome to Sea Battle v1.4 beta, a game by Team Cookies.\n" << std::endl;
+    return 1;
     //startMenu();
 }
 
