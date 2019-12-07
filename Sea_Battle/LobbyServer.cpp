@@ -1,4 +1,4 @@
-#include "Lobby.h"
+#include "LobbyServer.h"
 // #include "Player.cpp"
 
 #include <iostream>
@@ -25,9 +25,8 @@
 
 int sockfd;
 
-void Lobby::*startGame (void* clientSocket) {
+void *LobbyServer::startGame (void *) {
     std::cout << "Welcome to Sea Battle v1.4 beta, a game by Team Cookies.\n" << std::endl;
-    return 1;
     //startMenu();
 }
 
@@ -70,7 +69,7 @@ void Lobby::*startGame (void* clientSocket) {
 //     }
 // }
 
-// void Lobby::registerUser() {
+// void LobbyServer::registerUser() {
 //     struct PlayerData p;
 //     std::string username;
 
@@ -119,6 +118,8 @@ void Lobby::*startGame (void* clientSocket) {
 // void Lobby::exitGame() {
 //     std::cout << "running exitGame" << std::endl;
 // }
+
+typedef void * (*THREADFUNCPTR)(void *);
 
 int main (int argc, char* argv[]) {
     int port = atoi(argv[1]);
@@ -196,7 +197,7 @@ int main (int argc, char* argv[]) {
         std::cout << "portNum: " << portTemp << std::endl;
 
         pthread_t thread1;
-        int re = pthread_create(&thread1, NULL, startGame(), (void*) &newsockfd);
+        int re = pthread_create(&thread1, NULL, (THREADFUNCPTR) &LobbyServer::startGame, (void*) &newsockfd);
     
     }
 

@@ -1,17 +1,17 @@
-#ifndef LOBBY_H
-#define LOBBY_H
+#ifndef LOBBYSERVER_H
+#define LOBBYSERVER_H
 
 #include <vector>
 #include <string>
 #include <iostream>
 #include <unordered_map>
 
-class Lobby {
+class LobbyServer {
     public:
 
         // friend std::ostream& operator <<(std::ostream &os, const std::unordered_map <std::string, Player> &m);
 
-        void* (startGame)(void* clientSocket);
+        static void* (startGame)(void* clientSocket);
         void startMenu();
         void registerUser();
         void listGames();
@@ -32,4 +32,4 @@ class Lobby {
         std::unordered_map<std::string, PlayerData> userData;
 };
 
-#endif // LOBBY_H
+#endif // LOBBYSERVER_H
