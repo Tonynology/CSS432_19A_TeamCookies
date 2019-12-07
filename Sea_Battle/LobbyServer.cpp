@@ -25,8 +25,9 @@
 
 int sockfd;
 
-void *LobbyServer::startGame (void *) {
+void* Lobby::startGame (void* clientSocket) {
     std::cout << "Welcome to Sea Battle v1.4 beta, a game by Team Cookies.\n" << std::endl;
+    //return 1;
     //startMenu();
 }
 
@@ -197,7 +198,7 @@ int main (int argc, char* argv[]) {
         std::cout << "portNum: " << portTemp << std::endl;
 
         pthread_t thread1;
-        int re = pthread_create(&thread1, NULL, (THREADFUNCPTR) &LobbyServer::startGame, (void*) &newsockfd);
+        int re = pthread_create(&thread1, NULL, Lobby::startGame, (void*)&newsockfd);
     
     }
 
