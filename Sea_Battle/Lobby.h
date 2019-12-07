@@ -11,7 +11,7 @@ class Lobby {
 
         // friend std::ostream& operator <<(std::ostream &os, const std::unordered_map <std::string, Player> &m);
 
-        void* (startGame)(void* clientSocket);
+        static void* startGame(void* clientSocket);
         void startMenu();
         void registerUser();
         void listGames();
