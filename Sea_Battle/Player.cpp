@@ -44,16 +44,6 @@ void Player::setIAddress( std::string i ) { iAddress = i; }
 void Player::setUPort( int u ) { uPort = u; }
 void Player::setUAddress( std::string u ) { uAddress = u; }
 
-int Player::getIPort( ) { return iPort; }
-std::string Player::getIAddress( ) { return iAddress; }
-int Player::getUPort( ) { return uPort; }
-std::string Player::getUAddress( ) { return uAddress; }
-
-void Player::setIPort( int i ) { iPort = i; }
-void Player::setIAddress( std::string i ) { iAddress = i; }
-void Player::setUPort( int u ) { uPort = u; }
-void Player::setUAddress( std::string u ) { uAddress = u; }
-
 void Player::playerConnect( int clientSd, sockaddr_in sendSockAddr ) {
 	connect( clientSd, ( sockaddr* )&sendSockAddr, sizeof( sendSockAddr ) );
 }
@@ -259,7 +249,7 @@ int main( int argc, char *argv[] ) {
         std::cout << "Map: " << std::endl;
         map.printBoard();
         //std::cout << std::flush << std::endl; // Program hangs right here and I have no idea what is wrong with it. Bth players mst press enter to proceed.
-        std::cout << "PRESS ENTER TO CONTINUE TO NEXT TURN" << std::endl;
+        std::cout << "PRESS ENTER TO CONTINUE TO NEXT TURN" << std::endl; //I htink it may have to do with the lingering playerCin async function.
     }
 // TODO: win conditions
     std::cerr << "Until updated, this program should never reach here.";
