@@ -40,9 +40,9 @@ void LobbyClient::startMenu() {
         case 1:
             registerUser();
             break;
-        // case 2:
-        //     listGames();
-        //     break;
+        case 2:
+            listGames();
+            break;
         // case 3:
         //     createGame();
         //     break;
@@ -70,7 +70,11 @@ void LobbyClient::registerUser() {
     // send(sockfd, username, strlen(username), 0);
 
 
-} 
+}
+
+void LobbyClient::listGames() {
+    std::cout << "multi-client works :)" << std::endl;
+}
 
 int main (int argc, char* argv[])
 {
