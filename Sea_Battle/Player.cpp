@@ -52,7 +52,7 @@ int main( int argc, char *argv[] ) {
 	}
     else if (argc == 5){ // four args: second player informs challenger
 		Player::setIPort(std::stoi(argv[1]));
-		Player::setUAddress(argv[2]);
+		Player::setIAddress(argv[2]);
 		Player::setUPort(std::stoi(argv[3]));
 		Player::setUAddress(argv[4]);
 	}
@@ -134,6 +134,7 @@ int main( int argc, char *argv[] ) {
 			portAccept = std::async(std::launch::async, Etc::portAccept, serverSd, newSockAddr);
 		}
 	}
+
 	std::cout << "\nRemote connection established!" << std::endl;
 	std::this_thread::sleep_for(std::chrono::seconds(1));
 	std::cout << "iport: " << Player::getIPort() << " iaddress: " << Player::getIAddress() << std::endl;
@@ -215,11 +216,9 @@ int main( int argc, char *argv[] ) {
         map.printBoard();
         //std::cout << std::flush << std::endl; // Program hangs right here and I have no idea what is wrong with it. Bth players mst press enter to proceed.
         std::cout << "PRESS ENTER TO CONTINUE TO NEXT TURN" << std::endl; //I htink it may have to do with the lingering Etc::consoleIn async function.
-        //Symptoms so far: Sometimes the "turn sequence" will begin immediately upon pressing enter.
-        //It does this for each player, individually. This most often happens during the first turn, and only during the first turn.
+        //Symptoms so far: Sometimes the "turn sequence" will begin immediately upon pressing enter. It does this for each player, individually.
         //Other times, it will only begin , and for both players at the same time, when BOTH players have pressed enter.
         //Again, this happens imediately, without waiting for 1 second. (perhaps the peers are actuall sending a write??)
-        //This happens on the first turn sometimes, and always after the first turn. 
     }
 // TODO: win conditions
     std::cerr << "Until updated, this program should never reach here.";
