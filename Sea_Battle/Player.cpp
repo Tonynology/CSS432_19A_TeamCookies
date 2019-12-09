@@ -48,6 +48,15 @@ void Player::setServerSd( int s ) { serverSd = s; }
 void Player::setNewSd( int n ) { newSd = n; }
 void Player::setClientSd( int c ) { clientSd = c; }
 
+void validateCoord(std::string &coord){
+    if (coord.size() != 2){
+        Etc::consoleOut("coordinate must be two characters.\n");
+    }
+
+    Etc::consoleOut("[char a-f][int 1-6] launch an attack on coordinate: "); //cout-cin combo creates a GUI facade
+    coord = Etc::consoleIn();
+}
+
 int Player::main( int argc, char *argv[] ) {
 	Etc::consoleOut("\nPreparing local resources...");
 	
@@ -186,6 +195,7 @@ int Player::main( int argc, char *argv[] ) {
 
             if (consoleIn.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
                 mapTargetCoords = consoleIn.get();
+                validateCoord(mapTargetCoords);
                 consoleIn = std::async(std::launch::async, Etc::consoleIn);
                 mapTargetcoordsOut = std::async(std::launch::async, Etc::portOut, clientSd, mapTargetCoords); // Is using future on this line necessary if not blocking program?
             }

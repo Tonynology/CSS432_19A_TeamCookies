@@ -64,7 +64,7 @@ void listGames()
     std::string users = Etc::portIn(cSd);
 	Etc::portOut(cSd, users); /// three-way handshake
 	acknowledgement = Etc::portIn(cSd);
-    Etc::consoleOut("\nusers: \n" + users;// + "\nacknowledgement: \n" + acknowledgement + "\n");
+    Etc::consoleOut("\nusers: \n" + users + "\n");// + "\nacknowledgement: \n" + acknowledgement + "\n");
     Etc::errChk(-1 + (users == acknowledgement), "Something has gone terribly wrong! " + users + " != " + acknowledgement);
 
     Etc::consoleOut("press enter to continue\n");
