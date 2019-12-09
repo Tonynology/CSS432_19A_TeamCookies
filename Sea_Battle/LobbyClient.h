@@ -14,6 +14,7 @@ class LobbyClient {
         void registerUser();
         void createGame();
         void listGames();
+		void unregisterUser();
 
         int clientfd;
 
