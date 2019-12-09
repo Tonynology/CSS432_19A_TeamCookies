@@ -40,21 +40,21 @@ void registerUser()
     getlogin_r(loginname, LOGIN_NAME_MAX);
     cUsername = std::string(loginname);
     //cUsername = Etc::consoleIn();
-    Etc::consoleOut("cUsername: " + cUsername + "\n");
+    //Etc::consoleOut("cUsername: " + cUsername + "\n");
 
     srand(time(NULL));
     cPort = 1023 + rand() % (65535 - 1023);
     //cPort = stoi(Etc::consoleIn());
-    Etc::consoleOut("cPort: " + std::to_string(cPort) + "\n");
+    //Etc::consoleOut("cPort: " + std::to_string(cPort) + "\n");
 
     char hostname[HOST_NAME_MAX];
     gethostname(hostname, HOST_NAME_MAX);
     cAddress = std::string(hostname);
     //cAddress = Etc::consoleIn();
-    Etc::consoleOut("cAddress: " + cAddress + "\n");
+    //Etc::consoleOut("cAddress: " + cAddress + "\n");
 
     registered = true;
-    Etc::consoleOut("registration successful!\n");
+    Etc::consoleOut("\nregistration successful!\n");
     Etc::consoleOut("press enter to continue\n");
     Etc::consoleIn();
 }
@@ -64,7 +64,7 @@ void listGames()
     std::string users = Etc::portIn(cSd);
 	Etc::portOut(cSd, users); /// three-way handshake
 	acknowledgement = Etc::portIn(cSd);
-    Etc::consoleOut("users: \n" + users + "\nacknowledgement: \n" + acknowledgement + "\n");
+    Etc::consoleOut("\nusers: \n" + users;// + "\nacknowledgement: \n" + acknowledgement + "\n");
     Etc::errChk(-1 + (users == acknowledgement), "Something has gone terribly wrong! " + users + " != " + acknowledgement);
 
     Etc::consoleOut("press enter to continue\n");
@@ -76,23 +76,23 @@ void createGame()
 	Etc::portOut(cSd, cUsername); /// three-way handshake
 	acknowledgement = Etc::portIn(cSd);
 	Etc::portOut(cSd, acknowledgement);
-    Etc::consoleOut("cUsername: " + cUsername + "\nacknowledgement: " + acknowledgement + "\n");
+    //Etc::consoleOut("cUsername: " + cUsername + "\nacknowledgement: " + acknowledgement + "\n");
     Etc::errChk(-1 + (cUsername == acknowledgement), "Something has gone terribly wrong! " + cUsername + " != " + acknowledgement);
 
 	Etc::portOut(cSd, std::to_string(cPort)); /// three-way handshake
 	acknowledgement = Etc::portIn(cSd);
 	Etc::portOut(cSd, acknowledgement);
-    Etc::consoleOut("cPort: " + std::to_string(cPort) + "\nacknowledgement: " + acknowledgement + "\n");
+    //Etc::consoleOut("cPort: " + std::to_string(cPort) + "\nacknowledgement: " + acknowledgement + "\n");
     Etc::errChk(-1 + (std::to_string(cPort) == acknowledgement), "Something has gone terribly wrong! " + std::to_string(cPort) + " != " + acknowledgement);
 
 	Etc::portOut(cSd, cAddress); /// three-way handshake
 	acknowledgement = Etc::portIn(cSd);
 	Etc::portOut(cSd, acknowledgement);
-    Etc::consoleOut("cAddress: " + cAddress + "\nacknowledgement: " + acknowledgement + "\n");
+    //Etc::consoleOut("cAddress: " + cAddress + "\nacknowledgement: " + acknowledgement + "\n");
     Etc::errChk(-1 + (cAddress == acknowledgement), "Something has gone terribly wrong! " + cAddress + " != " + acknowledgement);
 
     std::string s = "./player.out " + std::to_string(cPort) + " " + cAddress;
-    Etc::consoleOut(s + "\n");
+    Etc::consoleOut("\n" + s + "\n");
     Etc::consoleOut("press enter to continue\n");
     Etc::consoleIn();
 
@@ -111,23 +111,23 @@ void joinGame()
 	Etc::portOut(cSd, pUsername); /// three-way handshake
 	acknowledgement = Etc::portIn(cSd);
 	Etc::portOut(cSd, acknowledgement);
-    Etc::consoleOut("pUsername: " + pUsername + "\nacknowledgement: " + acknowledgement + "\n");
+    //Etc::consoleOut("pUsername: " + pUsername + "\nacknowledgement: " + acknowledgement + "\n");
     Etc::errChk(-1 + (pUsername == acknowledgement), "Something has gone terribly wrong! " + pUsername + " != " + acknowledgement);
     
     int pPort = stoi(Etc::portIn(cSd));
 	Etc::portOut(cSd, std::to_string(pPort)); /// three-way handshake
 	acknowledgement = Etc::portIn(cSd);
-    Etc::consoleOut("pPort: \n" + std::to_string(pPort) + "\nacknowledgement: \n" + acknowledgement + "\n");
+    //Etc::consoleOut("pPort: \n" + std::to_string(pPort) + "\nacknowledgement: \n" + acknowledgement + "\n");
     Etc::errChk(-1 + (std::to_string(pPort) == acknowledgement), "Something has gone terribly wrong! " + std::to_string(pPort) + " != " + acknowledgement);
 
     std::string pAddress = Etc::portIn(cSd);
 	Etc::portOut(cSd, pAddress); /// three-way handshake
 	acknowledgement = Etc::portIn(cSd);
-    Etc::consoleOut("pAddress: \n" + pAddress + "\nacknowledgement: \n" + acknowledgement + "\n");
+    //Etc::consoleOut("pAddress: \n" + pAddress + "\nacknowledgement: \n" + acknowledgement + "\n");
     Etc::errChk(-1 + (pAddress == acknowledgement), "Something has gone terribly wrong! " + pAddress + " != " + acknowledgement);
 
     std::string s = "./player.out " + std::to_string(cPort) + " " + cAddress + " " + std::to_string(pPort) + " " + pAddress;
-    Etc::consoleOut(s + "\n");
+    Etc::consoleOut("\n" + s + "\n");
     Etc::consoleOut("press enter to continue\n");
     Etc::consoleIn();
 
@@ -143,18 +143,18 @@ void unregisterUser()
 	Etc::portOut(cSd, cUsername); /// three-way handshake
 	acknowledgement = Etc::portIn(cSd);
 	Etc::portOut(cSd, acknowledgement);
-    Etc::consoleOut("\nacknowledgement: " + acknowledgement + "\n");
+   // Etc::consoleOut("\nacknowledgement: " + acknowledgement + "\n");
     Etc::errChk(-1 + (cUsername == acknowledgement), "Something has gone terribly wrong! " + cUsername + " != " + acknowledgement);
 
     registered = false;
-    Etc::consoleOut("unregistration successful!\n");
+    Etc::consoleOut("\nunregistration successful!\n");
     Etc::consoleOut("press enter to continue\n");
     Etc::consoleIn();
 }
 
 int main(int argc, char const *argv[])
 {
-    Etc::consoleOut("enter the number you've been assigned: ");
+    Etc::consoleOut("[int 0-9] enter the number you've been assigned: ");
     sAddress = "uw1-320-0";
     sAddress += Etc::consoleIn();
 
@@ -164,8 +164,8 @@ int main(int argc, char const *argv[])
     while (true) {
         std::cout << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl;
         Etc::consoleOut("Welcome to Sea Battle, a game by Team Cookies\n");
-        if (registered) Etc::consoleOut("You are registered as " + cUsername + " on " + cAddress + ":" + std::to_string(cPort) + "\n");
-        Etc::consoleOut("\nPlease select the following options by typing in the number:\n");
+        if (registered) Etc::consoleOut("\nYou are registered as " + cUsername + " on " + cAddress + ":" + std::to_string(cPort) + "\n");
+        Etc::consoleOut("[int 1-6] select from the following options:\n");
 	    if (!registered) Etc::consoleOut("[1] Register User\n");
 	    if (registered) Etc::consoleOut("[2] List Games\n");
 	    if (registered) Etc::consoleOut("[3] Create Game\n");
@@ -174,12 +174,12 @@ int main(int argc, char const *argv[])
 	    if (registered) Etc::consoleOut("[6] Unregister User\n");
         if (registered) Etc::consoleOut("\n");
 
-        Etc::consoleOut("switchcase: ");
+        //Etc::consoleOut("switchcase: ");
         int switchcase = stoi(Etc::consoleIn());
 	    Etc::portOut(cSd, std::to_string(switchcase)); /// three-way handshake
 	    acknowledgement = Etc::portIn(cSd);
 	    Etc::portOut(cSd, acknowledgement);
-        Etc::consoleOut("acknowledgement: " + acknowledgement + "\n");
+        //Etc::consoleOut("acknowledgement: " + acknowledgement + "\n");
         Etc::errChk(-1 + (std::to_string(switchcase) == acknowledgement), "Something has gone terribly wrong! " + std::to_string(switchcase) + " != " + acknowledgement);
 
         switch(switchcase) {

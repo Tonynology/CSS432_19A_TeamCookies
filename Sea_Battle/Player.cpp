@@ -161,7 +161,7 @@ int Player::main( int argc, char *argv[] ) {
         std::string mapTargetCoords;
         std::string fieldTargetCoords;
 
-        Etc::consoleOut("launch an attack on coordinate: "); //cout-cin combo creates a GUI facade
+        Etc::consoleOut("[char a-f][int 1-6] launch an attack on coordinate: "); //cout-cin combo creates a GUI facade
         std::future<std::string> consoleIn = std::async(std::launch::async, Etc::consoleIn); // TODO: Redundant async initialization,
         std::future<std::string> fieldTargetCoordsIn = std::async(std::launch::async, Etc::portIn, newSd); // when updated in the loop?
         std::future<void> mapTargetcoordsOut = std::async(std::launch::async, Etc::portOut, clientSd, mapTargetCoords);

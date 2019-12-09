@@ -24,12 +24,11 @@
 int sPort = DEFAULT_SPORT;
 int serverSd = DEFAULT_SERVERSD;
 int newSd = DEFAULT_NEWSD;
-std::unordered_map<std::string, std::pair<int, std::string>> database; //contains players who have selected "join game" and have not recieved a partner.
+std::unordered_map<std::string, std::pair<int, std::string>> database; //contains players whom have selected "join game" and have not recieved a partner.
 std::string acknowledgement;
 
 void printDatabase(){
-    for(std::unordered_map<std::string, std::pair<int, std::string>>::const_iterator it = database.begin(); it != database.end(); ++it)
-    {
+    for(std::unordered_map<std::string, std::pair<int, std::string>>::const_iterator it = database.begin(); it != database.end(); ++it) {
         std::cout << it->first << " " << it->second.first << " " << it->second.second << "\n";
     }
 }
@@ -45,7 +44,7 @@ void listGames(int sd)
     std::string users;
     for(std::unordered_map<std::string, std::pair<int, std::string>>::const_iterator it = database.begin(); it != database.end(); ++it)
     {
-        users += it->first + " " + std::to_string(it->second.first) + " " + it->second.second + "\n";
+        users += it->first + " ";// + std::to_string(it->second.first) + " " + it->second.second + "\n";
     } // TODO: Stream the output to the user, don't concatenate it and make a single write.
 
     //Etc::consoleOut("users: ");
