@@ -54,7 +54,7 @@ void listGames(int sd)
 	acknowledgement = Etc::portIn(sd);
     Etc::portOut(sd, acknowledgement);
     Etc::consoleOut("users: \n" + users + "\nacknowledgement: \n" + acknowledgement + "\n");
-    Etc::errChk(-1 + (users == acknowledgement), "Something has gone terribly wrong!");
+    Etc::errChk(-1 + (users == acknowledgement), "Something has gone terribly wrong!" + users + " != " + acknowledgement);
 
     printDatabase();
 }
@@ -115,13 +115,13 @@ void joinGame(int sd)
 	acknowledgement = Etc::portIn(sd);
     Etc::portOut(sd, acknowledgement);
     Etc::consoleOut("pPort: \n" + std::to_string(database[pUsername].first) + "\nacknowledgement: \n" + acknowledgement + "\n");
-    Etc::errChk(-1 + (std::to_string(database[pUsername].first) == acknowledgement), "Something has gone terribly wrong!");
+    Etc::errChk(-1 + (std::to_string(database[pUsername].first) == acknowledgement), "Something has gone terribly wrong!" + std::to_string(database[pUsername].first) + " != " + acknowledgement);
 
 	Etc::portOut(sd, database[pUsername].second);
 	acknowledgement = Etc::portIn(sd);
     Etc::portOut(sd, acknowledgement);
     Etc::consoleOut("pAddress: \n" + database[pUsername].second + "\nacknowledgement: \n" + acknowledgement + "\n");
-    Etc::errChk(-1 + (database[pUsername].second == acknowledgement), "Something has gone terribly wrong!");
+    Etc::errChk(-1 + (database[pUsername].second == acknowledgement), "Something has gone terribly wrong!" + database[pUsername].second + " != " + acknowledgement);
 
     database.erase(pUsername);
     printDatabase();
@@ -136,7 +136,7 @@ void *server(void *)
 	    Etc::portOut(sd, std::to_string(switchcase));
 	    acknowledgement = Etc::portIn(sd);
         Etc::consoleOut(switchcase + "\nacknowledgement: " + acknowledgement + "\n");
-        Etc::errChk(-1 + (std::to_string(switchcase) == acknowledgement), "Something has gone terribly wrong!");
+        Etc::errChk(-1 + (std::to_string(switchcase) == acknowledgement), "Something has gone terribly wrong!" + std::to_string(switchcase) + " != " + acknowledgement);
 
         switch(switchcase) {
             case 1:
@@ -158,7 +158,7 @@ void *server(void *)
                 unregisterUser(sd);
                 break;
             default:
-                std::cout << "Not a valid option. Please reselect." << std::endl;
+                Etc::consoleOut("not a valid option...\n");
                 break;
         }
     }

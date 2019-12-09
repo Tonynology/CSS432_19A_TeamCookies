@@ -61,9 +61,9 @@ void LobbyServer::startMenu(int clientfd) {
         // case 5:
         //     exitGame();
         //     break;
-        // case 6:
-        //     unregisterUser();
-        //     break;
+         case 6:
+             unregisterUser();
+             break;
         default:
             std::cout << "Not a valid option. Please reselect." << std::endl;
             break;
@@ -89,8 +89,8 @@ void LobbyServer::registerUser() {
         // Receive port from client
         int portTemp;
         recv(clientfd, &portTemp, 4, 0);
-        this->temp = ntohl(portTemp);
-        std::cout << "port: " << this->temp << std::endl;
+        p.port = ntohl(portTemp);
+        std::cout << "port: " << p.port << std::endl;
 
         // Receive ipAdress from client
         memset(&msg, 0, sizeof(msg));
@@ -99,11 +99,13 @@ void LobbyServer::registerUser() {
         std::cout << "ipAddress: " << p.ipAddress << std::endl;
 
         // Add Player struct to database (unorderd_map)
-        userData[username] = p;
+        struct PlayerData p1;
+        userData.insert({username, p});
+        p1 = userData.at(username);
 
         std::cout << "map size: " << userData.size() << std::endl;
 
-        std::cout << "port from username: " << p.port << std::endl;
+        std::cout << "port from username: " << p1.port << std::endl;
 
         // Return to startMenu
         startMenu(clientfd);
@@ -119,13 +121,40 @@ void LobbyServer::registerUser() {
     }
 }
 
-// void Lobby::unregisterUser() {
-//     struct PlayerData p;
-//     std::string username;
+ void LobbyServer::unregisterUser() {
+     struct PlayerData p;
+	 int tosend, usernameBool;
 
-//     std::cout << "Please enter the username of the user you want to remove: " << std::endl;
-//     std::cin >> username;
-// }
+	 memset(&msg, 0, sizeof(msg));
+	 recv(clientfd, (char*)msg, sizeof(msg), 0);
+	 std::string username = msg;
+
+	 if (userData.find(username) != userData.end()) {
+		 usernameBool = 1;
+		 tosend = htonl(usernameBool);
+		 send(clientfd, (const char*)&tosend, sizeof(usernameBool), 0);
+
+		 std::cout << "username " << username << " found" << std::endl;
+
+		 userData.erase(username);
+
+		 // Return to startMenu
+		 startMenu(clientfd);
+
+		 std::cout << std::endl;
+	 }
+	 else {
+		 std::cout << "username not found" << std::endl;
+
+		 usernameBool = 0;
+		 tosend = htonl(usernameBool);
+		 send(clientfd, (const char*)&tosend, sizeof(usernameBool), 0);
+	 }
+
+	 std::cout << "username: " << username << " found" << std::endl;
+
+     std::cin >> username;
+ }
 
 // void Lobby::listGames() {
 //     std::cout << "running listGames" << std::endl;
@@ -142,9 +171,7 @@ void LobbyServer::createGame() {
     std::string username = msg;
     std::cout << "username: " << username << " found" << std::endl;
 
-    userData[username] = p;
-
-    std::cout << "port saved: " << p.port << std::endl;
+    //std::cout << "port saved: " << p.port << std::endl;
 
     if (userData.find(username) != userData.end()) {
         usernameBool = 1;
@@ -153,13 +180,24 @@ void LobbyServer::createGame() {
 
         std::cout << "username " << username <<  " found" << std::endl;
 
-        userData[username] = p;
-        // std::string s = "./player.out 1111 uw1-320-12";
-        std::cout << "p.port: " << this->temp << std::endl;
-        std::cout << "p.ipAddress" << p.ipAddress << std::endl;
-        std::string s = "./player.out " + std::to_string(p.port) + " " + p.ipAddress;
+        p = userData[username];
 
-        std::cout << "command line: " << s << std::endl;
+        // Send port to client
+        tosend = htonl(p.port);
+        send(clientfd, (const char*) &tosend, sizeof(p.port), 0);
+        std::cout << "sent port to server" << std::endl;
+
+        // Send ipAddress to client
+        memset(&msg, 0, sizeof(msg));
+        strcpy(msg, p.ipAddress.c_str());
+        send(clientfd, (char * ) msg, strlen(msg), 0);
+        std::cout << "ipAddress send to server" << std::endl;
+
+        // std::cout << "p.port: " << p.port << std::endl;
+        // std::cout << "p.ipAddress" << p.ipAddress << std::endl;
+        // std::string s = "./player.out " + std::to_string(p.port) + " " + p.ipAddress;
+
+        // std::cout << "command line: " << s << std::endl;
 
         // int ac;
         // char **av = Etc::parsedargs(s, &ac);

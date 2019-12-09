@@ -162,7 +162,7 @@ int main(int argc, char const *argv[])
         Etc::consoleOut("Welcome to Sea Battle, a game by Team Cookies\n");
         if (registered) Etc::consoleOut("You are registered as " + cUsername + " on " + cAddress + ":" + std::to_string(cPort) + "\n");
         Etc::consoleOut("\nPlease select the following options by typing in the number:\n");
-	    Etc::consoleOut("[1] Register User\n");
+	    if (!registered) Etc::consoleOut("[1] Register User\n");
 	    if (registered) Etc::consoleOut("[2] List Games\n");
 	    if (registered) Etc::consoleOut("[3] Create Game\n");
 	    if (registered) Etc::consoleOut("[4] Join Game\n");
@@ -180,7 +180,7 @@ int main(int argc, char const *argv[])
 
         switch(switchcase) {
             case 1:
-                registerUser();
+                if (!registered) registerUser();
                 break;
             case 2:
                 if (registered) listGames();
@@ -200,6 +200,7 @@ int main(int argc, char const *argv[])
             default:
                 Etc::consoleOut("not a valid option...\n");
                 Etc::consoleOut("press enter to continue\n");
+                Etc::consoleIn();
                 break;
         }
     }
