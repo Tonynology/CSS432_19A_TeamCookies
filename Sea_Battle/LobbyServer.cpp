@@ -61,9 +61,9 @@ void LobbyServer::startMenu(int clientfd) {
         // case 5:
         //     exitGame();
         //     break;
-        // case 6:
-        //     unregisterUser();
-        //     break;
+         case 6:
+             unregisterUser();
+             break;
         default:
             std::cout << "Not a valid option. Please reselect." << std::endl;
             break;
@@ -119,13 +119,40 @@ void LobbyServer::registerUser() {
     }
 }
 
-// void Lobby::unregisterUser() {
-//     struct PlayerData p;
-//     std::string username;
+ void LobbyServer::unregisterUser() {
+     struct PlayerData p;
+	 int tosend, usernameBool;
 
-//     std::cout << "Please enter the username of the user you want to remove: " << std::endl;
-//     std::cin >> username;
-// }
+	 memset(&msg, 0, sizeof(msg));
+	 recv(clientfd, (char*)msg, sizeof(msg), 0);
+	 std::string username = msg;
+
+	 if (userData.find(username) != userData.end()) {
+		 usernameBool = 1;
+		 tosend = htonl(usernameBool);
+		 send(clientfd, (const char*)&tosend, sizeof(usernameBool), 0);
+
+		 std::cout << "username " << username << " found" << std::endl;
+
+		 userData.erase(username);
+
+		 // Return to startMenu
+		 startMenu(clientfd);
+
+		 std::cout << std::endl;
+	 }
+	 else {
+		 std::cout << "username not found" << std::endl;
+
+		 usernameBool = 0;
+		 tosend = htonl(usernameBool);
+		 send(clientfd, (const char*)&tosend, sizeof(usernameBool), 0);
+	 }
+
+	 std::cout << "username: " << username << " found" << std::endl;
+
+     std::cin >> username;
+ }
 
 // void Lobby::listGames() {
 //     std::cout << "running listGames" << std::endl;

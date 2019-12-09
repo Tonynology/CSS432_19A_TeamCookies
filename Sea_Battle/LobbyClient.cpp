@@ -57,9 +57,9 @@ void LobbyClient::startMenu() {
         // case 5:
         //     exitGame();
         //     break;
-        // case 6:
-        //     unregisterUser();
-        //     break;
+         case 6:
+             unregisterUser();
+             break;
         default:
             std::cout << "Not a valid option. Please reselect." << std::endl;
             break;
@@ -141,6 +141,36 @@ void LobbyClient::createGame() {
 
         startMenu();
     }
+}
+
+void LobbyClient::unregisterUser() {
+	std::string username;
+	std::cout << "Please enter the username you want to remove: " << std::endl;
+	std::cin >> username;
+
+	// Send username to server
+	memset(&msg, 0, sizeof(msg));
+	strcpy(msg, username.c_str());
+	send(socket, (char*)msg, strlen(msg), 0);
+
+	// Server responds whether username has duplicates
+	int temp, usernameBool;
+	recv(socket, &temp, 90, 0);
+	usernameBool = ntohl(temp);
+
+	std::cout << "usernameBool: " << usernameBool << std::endl;
+
+	if (usernameBool == 1) {
+		std::cout << "username " << username << " found" << std::endl;
+		std::cout << "Remove the user name:" << username << std::endl;
+		startMenu();
+	}
+	else {
+		std::cout << "Username not found. Returning to start menu." << std::endl;
+		std::cout << std::endl;
+
+		startMenu();
+	}
 }
 
 int main (int argc, char* argv[])
