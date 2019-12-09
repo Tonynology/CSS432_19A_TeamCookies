@@ -8,13 +8,16 @@
 
 class LobbyClient {
     public:
-        void startGame();
+        void startGame(int sockfd);
         void startMenu();
 
         void registerUser();
         void listGames();
 
+        int socket;
+
     private:
+        char msg[1500];
 
 };
 

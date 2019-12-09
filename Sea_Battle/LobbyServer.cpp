@@ -27,74 +27,93 @@ int sockfd;
 
 void* LobbyServer::startGame (void* clientSocket) {
     std::cout << "Welcome to Sea Battle v1.4 beta, a game by Team Cookies.\n" << std::endl;
-    //return 1;
-    //startMenu();
+
+    int clientfd = *((int *) clientSocket);
+
+    LobbyServer ls;
+    ls.startMenu(clientfd);
 }
 
-// void Lobby::startMenu() {
-//     std::cout << "Please select the following options by typing in the number:" << std::endl;
-// 	std::cout << "[1] Register" << std::endl;
-// 	std::cout << "[2] List Games" << std::endl;
-// 	std::cout << "[3] Create Game" << std::endl;
-// 	std::cout << "[4] Join Game" << std::endl;
-// 	std::cout << "[5] Exit Game" << std::endl;
-// 	std::cout << "[6] Unregister" << std::endl;
+void LobbyServer::startMenu(int clientfd) {
+    this->clientfd = clientfd;
 
-//     std::cout << std::endl;
+    int userResponseTemp = 0;
+    int userResponse = 0;
+    std::string username;
 
-//     int userResponse = 0;
-//     std::cin >> userResponse;
+    recv(clientfd, &userResponseTemp, 4, 0);
+    userResponse = ntohl(userResponseTemp);
+    std::cout << "userResponse: " << userResponse << std::endl;
+    
+    switch(userResponse) {
+        case 1:
+            registerUser();
+            break;
+        // case 2:
+        //     listGames();
+        //     break;
+        // case 3:
+        //     createGame();
+        //     break;
+        // case 4:
+        //     joinGame();
+        //     break;
+        // case 5:
+        //     exitGame();
+        //     break;
+        // case 6:
+        //     unregisterUser();
+        //     break;
+        default:
+            std::cout << "Not a valid option. Please reselect." << std::endl;
+            break;
+    }
+}
 
-//     switch(userResponse) {
-//         case 1:
-//             registerUser();
-//             break;
-//         case 2:
-//             listGames();
-//             break;
-//         case 3:
-//             createGame();
-//             break;
-//         case 4:
-//             joinGame();
-//             break;
-//         case 5:
-//             exitGame();
-//             break;
-//         case 6:
-//             unregisterUser();
-//             break;
-//         default:
-//             std::cout << "Not a valid option. Please reselect." << std::endl;
-//             break;
-//     }
-// }
+void LobbyServer::registerUser() {
+    struct PlayerData p;
+    int tosend;
+    int duplicateBool;
 
-// void LobbyServer::registerUser() {
-//     struct PlayerData p;
-//     std::string username;
+    // Creating username
+    memset(&msg, 0, sizeof(msg));
+    recv(clientfd, (char*) msg, sizeof(msg), 0);
+    std::string username = msg;
+    std::cout << "username: " << username << std::endl;
 
-//     std::cout << "Please enter an username for this user: " << std::endl;
-//     std::cin >> username;
+    if (userData.find(username) == userData.end()) {
+        duplicateBool = 0;
+        tosend = htonl(duplicateBool);
+        send(clientfd, (const char*) &tosend, sizeof(duplicateBool), 0);
 
-//     if (userData.find(username) == userData.end()) {
-//         userData[username] = p;
-//         std::cout << "Please enter a port number between 2000 - 5000" << std::endl;
-//         std::cin >> p.port;
+        // Receive port from client
+        int portTemp;
+        recv(clientfd, &portTemp, 4, 0);
+        p.port = ntohl(portTemp);
+        std::cout << "port: " << p.port << std::endl;
 
-//         std::cout << "Please enter your IP address" << std::endl;
-//         std::cin >> p.ipAddress;
+        // Receive ipAdress from client
+        memset(&msg, 0, sizeof(msg));
+        recv(clientfd, (char*) msg, sizeof(msg), 0);
+        p.ipAddress = msg;
+        std::cout << "ipAddress: " << p.ipAddress << std::endl;
 
-//         std::cout << "User " << username << " registered." << std::endl;
-//         std::cout << "Returning to start menu" << std::endl;
-//         std::cout << std::endl;
-//         startMenu();
-//     } else {
-//         std::cout << "Username already taken. Please choose another one." << std::endl;
-//         std::cout << std::endl;
-//         registerUser();
-//     }
-// }
+        // Add Player struct to database (unorderd_map)
+        userData[username] = p;
+
+        // Return to startMenu
+        startMenu(clientfd);
+
+        std::cout << std::endl;
+
+    } else { // Duplicate username. Asks user to enter different username.
+        std::cout << "duplicate username " << std::endl;
+        duplicateBool = 1;
+        tosend = htonl(duplicateBool);
+        send(clientfd, (const char*) &tosend, sizeof(duplicateBool), 0);
+        registerUser();
+    }
+}
 
 // void Lobby::unregisterUser() {
 //     struct PlayerData p;
@@ -187,19 +206,12 @@ int main (int argc, char* argv[]) {
         {
             perror("error with newsockfd: ");
             exit(EXIT_FAILURE);
-        } 
-
-        int portTemp;
-        int portNum;
-
-        recv(newsockfd, &portTemp, sizeof(portNum), 0);
-        portNum = ntohl(portTemp);
-
-        std::cout << "portNum: " << portTemp << std::endl;
+        }
 
         pthread_t thread1;
-        int re = pthread_create(&thread1, NULL, LobbyServer::startGame, (void*)&newsockfd);
-    
+
+        int re = pthread_create(&thread1, NULL, (THREADFUNCPTR) &LobbyServer::startGame, (void*)&newsockfd);
+        //int re = pthread_create(&thread1, NULL, (THREADFUNCPTR) &LobbyServer::startGame, lsPtr);
     }
 
     close(sockfd);

@@ -12,7 +12,7 @@ class LobbyServer {
         // friend std::ostream& operator <<(std::ostream &os, const std::unordered_map <std::string, Player> &m);
 
         static void* startGame(void* clientSocket);
-        void startMenu();
+        void startMenu(int clientfd);
         void registerUser();
         void listGames();
         void createGame();
@@ -27,7 +27,8 @@ class LobbyServer {
             std::string ipAddress;
         };
 
-        int sockfd;
+        int clientfd;
+        char msg[1500];
 
         std::unordered_map<std::string, PlayerData> userData;
 };

@@ -8,16 +8,16 @@
 #include <unistd.h>       // read, write, close
 #include <strings.h>      // bzero
 #include <netinet/tcp.h>  // SO_REUSEADDR
-#include <sys/uio.h>      // writev
-#include <time.h>         // gettimeofday
-#include <sys/time.h>     // gettimeofday  
 
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 #include <string>
 #include <iostream>
+#include <cstring>
 
-void LobbyClient::startGame() {
+void LobbyClient::startGame(int sockfd) {
+    this->socket = sockfd;
     std::cout << "Welcome to Sea Battle v1.4 beta, a game by Team Cookies.\n" << std::endl;
     startMenu();
 }
@@ -36,13 +36,18 @@ void LobbyClient::startMenu() {
     int userResponse = 0;
     std::cin >> userResponse;
 
+    // Send userResponse to server
+    int tosend = htonl(userResponse);
+    send(socket, (const char*) &tosend, sizeof(userResponse), 0);
+    std::cout << "send response to server" << std::endl;
+
     switch(userResponse) {
         case 1:
             registerUser();
             break;
-        case 2:
-            listGames();
-            break;
+        // case 2:
+        //     listGames();
+        //     break;
         // case 3:
         //     createGame();
         //     break;
@@ -63,17 +68,53 @@ void LobbyClient::startMenu() {
 
 void LobbyClient::registerUser() {
 
-    char* username;
+    std::string username;
     std::cout << "Please enter an username for this user: " << std::endl;
     std::cin >> username;
 
-    // send(sockfd, username, strlen(username), 0);
+    // Send username to server
+    memset(&msg, 0, sizeof(msg));
+    strcpy(msg, username.c_str());
+    send(socket, (char *) msg, strlen(msg), 0);
 
+    // Server responds whether username has duplicates
+    int temp, duplicateBool;
+    recv(socket, &temp, 90, 0);
+    duplicateBool = ntohl(temp);
 
-}
+    // std::cout << "is there duplicates: " << duplicateBool << std::endl;
 
-void LobbyClient::listGames() {
-    std::cout << "multi-client works :)" << std::endl;
+    if (duplicateBool == 0) {
+        // User enters port number
+        int port = 0;
+        std::cout << "Please enter the last 4 digits of your ID number as your port number unless it is < 1024, in which case, add 1024 to your ID number." << std::endl;
+        std::cin >> port;
+
+        // Client sends port to server
+        int tosend = htonl(port);
+        send(socket, (const char*) &tosend, sizeof(port), 0);
+        std::cout << "send port to server" << std::endl;
+
+        // User enters ipAddress
+        std::string ipAddress;
+        std::cout << "Please enter an UWB network address. They are named uw1-320-01 to uw1-320-15. Example of an ipAddress would be 'uw1-320-08'." << std::endl;
+        std::cin >> ipAddress;
+
+        // Client sends ipAddress to server
+        memset(&msg, 0, sizeof(msg));
+        strcpy(msg, ipAddress.c_str());
+        send(socket, (char * ) msg, strlen(msg), 0);
+        std::cout << "ipAddress send to server" << std::endl;
+
+        std::cout << "User created. Returning to start menu." << std::endl;
+        std::cout << std::endl;
+
+        startMenu();
+    } else {
+        std::cout << std::endl;
+        std::cout << "Username already taken. Please enter a different username." << std::endl;
+        registerUser();
+    }
 }
 
 int main (int argc, char* argv[])
@@ -106,7 +147,12 @@ int main (int argc, char* argv[])
     }
 
     LobbyClient lc;
-    lc.startGame();
+    lc.startGame(sockfd);
+
+    // char* hello = "hello from client";
+    // send(sockfd, "Hello, world!\n", 13, 0);
+
+    //std::cout << "msg sent to server" << std::endl;
 
     // std::cout << "client port: " << port << std::endl;
     // int portChar = htonl(port);
