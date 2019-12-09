@@ -1,0 +1,205 @@
+[
+7:54 AM
+]
+【=◈︿◈=】
+:
+okay
+[
+7:58 AM
+]
+【=◈︿◈=】
+:
+i have a lobby that stores one userdata for all players
+[
+7:58 AM
+]
+【=◈︿◈=】
+:
+im too tired to write details on it buy i probably should anyway
+[
+7:59 AM
+]
+【=◈︿◈=】
+:
+so there's a big catch and it's that if anyone connected to ./server.out exits the server, the server crashes
+[
+7:59 AM
+]
+【=◈︿◈=】
+:
+idfk why
+[
+8:00 AM
+]
+【=◈︿◈=】
+:
+that includes if they crash, if they run into a stoi casting error, if they do ctrl c. even when they're in a game, if they do ctrl c, it'll crash the server
+[
+8:06 AM
+]
+【=◈︿◈=】
+:
+if anyone wants to try and fix it, the issue propagates from here: https://github.com/kpeng09/CSS432_19A_TeamCookies/commit/4f42fa59fcf573ecde6254b349d241d4b3ba63b9
+[
+8:07 AM
+]
+【=◈︿◈=】
+:
+super simple code, but if a pthread on the server exits, the whole thing crashes. idk why...
+[
+8:08 AM
+]
+【=◈︿◈=】
+:
+anyway, how mine works is that when a client registers, c++ will grab their username hostname and generate a port number and store it locally
+[
+8:09 AM
+]
+【=◈︿◈=】
+:
+when they start a game, it'll connect to the server and make unordered_map<string username, pair<int port, string hostname>, and then launch ./player.out port hostname locally
+[
+8:09 AM
+]
+【=◈︿◈=】
+:
+when someone joins a game, they'll fetch a list of usernames from the server
+[
+8:10 AM
+]
+【=◈︿◈=】
+:
+so basically everyone who is waiting on the "waiting for connections" screen
+[
+8:10 AM
+]
+【=◈︿◈=】
+:
+(provided that nobody crashes the thing)
+[
+8:10 AM
+]
+【=◈︿◈=】
+:
+after they see this list, they pick a username, the server gives them the ip and hostname of that user. and then they run locally ./player.out port hostname otherport otherhostname
+[
+8:11 AM
+]
+【=◈︿◈=】
+:
+and its all set
+[
+8:11 AM
+]
+【=◈︿◈=】
+:
+uhh listgames just prints out that database to the user
+[
+8:12 AM
+]
+【=◈︿◈=】
+:
+unregisteruser just wipes the local cached username
+[
+8:12 AM
+]
+【=◈︿◈=】
+:
+and exitgame isn't implemented because it exits the entire thing
+[
+8:14 AM
+]
+【=◈︿◈=】
+:
+regardless of whether we use this one or kaya's, it would probably be nice to implement some error handling in this game because it crashes left and right on any incorrect input
+[
+8:14 AM
+]
+【=◈︿◈=】
+:
+like if a user enters b8 as a coordinate
+[
+8:15 AM
+]
+【=◈︿◈=】
+:
+or hello as a port
+[
+8:15 AM
+]
+【=◈︿◈=】
+:
+or presses enter too many times, idk
+[
+8:18 AM
+]
+【=◈︿◈=】
+:
+text file is also a good idea but i'm worried bc two people writing to a text file at the same time might not go well
+[
+8:21 AM
+]
+【=◈︿◈=】
+:
+anyway yeah, it would be nice if this thing didnt crash, but oh well
+[
+8:22 AM
+]
+【=◈︿◈=】
+:
+i'm gonna see if i can get some sleep before going to school since i have another presentation at 7
+[
+8:22 AM
+]
+【=◈︿◈=】
+:
+@TonyMoon if u can test the code and fix edge cases it would be helpful
+[
+8:23 AM
+]
+【=◈︿◈=】
+:
+the server is hard coded to run only on uw1-320-01
+[
+8:23 AM
+]
+【=◈︿◈=】
+:
+so ssh uw1-320-01
+[
+8:23 AM
+]
+【=◈︿◈=】
+:
+./server.out
+[
+8:23 AM
+]
+【=◈︿◈=】
+:
+then on whatever other computer, ./client.out
+[
+8:25 AM
+]
+【=◈︿◈=】
+:
+player can also be run standalone but line 51 needs to be changed
+[
+8:26 AM
+]
+【=◈︿◈=】
+:
+from int Player::main( int argc, char *argv[] ) {
+ to int main( int argc, char *argv[]){
+[
+8:26 AM
+]
+【=◈︿◈=】
+:
+then it will compile, first player to create the game does ./player [p1port][p1hostname]
+[
+8:27 AM
+]
+【=◈︿◈=】
+:
+second player does ./player [p2port ][p2hostname][p1port][p1hostname]
