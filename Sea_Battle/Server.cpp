@@ -87,19 +87,6 @@ void createGame(int sd)
     printDatabase();
 }
 
-void unregisterUser(int sd)
-{
-    Etc::consoleOut("cUsername: ");
-	std::string cUsername = Etc::portIn(sd); /// three-way handshake
-	Etc::portOut(sd, cUsername);
-	acknowledgement = Etc::portIn(sd);
-    Etc::consoleOut(cUsername + "\nacknowledgement: " + acknowledgement + "\n");
-    Etc::errChk(-1 + (cUsername == acknowledgement), "Something has gone terribly wrong! " + cUsername + " != " + acknowledgement);
-
-    database.erase(cUsername);
-    printDatabase();
-}
-
 void joinGame(int sd)
 {
     listGames(sd);
@@ -124,6 +111,19 @@ void joinGame(int sd)
     Etc::errChk(-1 + (database[pUsername].second == acknowledgement), "Something has gone terribly wrong!" + database[pUsername].second + " != " + acknowledgement);
 
     database.erase(pUsername);
+    printDatabase();
+}
+
+void unregisterUser(int sd)
+{
+    Etc::consoleOut("cUsername: ");
+	std::string cUsername = Etc::portIn(sd); /// three-way handshake
+	Etc::portOut(sd, cUsername);
+	acknowledgement = Etc::portIn(sd);
+    Etc::consoleOut(cUsername + "\nacknowledgement: " + acknowledgement + "\n");
+    Etc::errChk(-1 + (cUsername == acknowledgement), "Something has gone terribly wrong! " + cUsername + " != " + acknowledgement);
+
+    database.erase(cUsername);
     printDatabase();
 }
 

@@ -154,6 +154,10 @@ void unregisterUser()
 
 int main(int argc, char const *argv[])
 {
+    Etc::consoleOut("enter the number you've been assigned: ");
+    sAddress = "uw1-320-0";
+    sAddress += Etc::consoleIn();
+
     Etc::clientSetup(sPort, sAddress, cSd, sendSockAddr);
     Etc::portConnect(cSd, sendSockAddr);
 
