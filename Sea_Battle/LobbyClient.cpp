@@ -1,4 +1,5 @@
 #include "LobbyClient.h"
+#include "Player.cpp"
 
 #include <sys/types.h>    // socket, bind
 #include <sys/socket.h>   // socket, bind, listen, inet_ntoa
@@ -17,7 +18,7 @@
 #include <cstring>
 
 void LobbyClient::startGame(int sockfd) {
-    this->socket = sockfd;
+    this->clientfd = sockfd;
     std::cout << "Welcome to Sea Battle v1.4 beta, a game by Team Cookies.\n" << std::endl;
     startMenu();
 }
@@ -38,7 +39,7 @@ void LobbyClient::startMenu() {
 
     // Send userResponse to server
     int tosend = htonl(userResponse);
-    send(socket, (const char*) &tosend, sizeof(userResponse), 0);
+    send(clientfd, (const char*) &tosend, sizeof(userResponse), 0);
     std::cout << "send response to server" << std::endl;
 
     switch(userResponse) {
@@ -75,11 +76,11 @@ void LobbyClient::registerUser() {
     // Send username to server
     memset(&msg, 0, sizeof(msg));
     strcpy(msg, username.c_str());
-    send(socket, (char *) msg, strlen(msg), 0);
+    send(clientfd, (char *) msg, strlen(msg), 0);
 
     // Server responds whether username has duplicates
     int temp, duplicateBool;
-    recv(socket, &temp, 90, 0);
+    recv(clientfd, &temp, 90, 0);
     duplicateBool = ntohl(temp);
 
     // std::cout << "is there duplicates: " << duplicateBool << std::endl;
@@ -92,7 +93,7 @@ void LobbyClient::registerUser() {
 
         // Client sends port to server
         int tosend = htonl(port);
-        send(socket, (const char*) &tosend, sizeof(port), 0);
+        send(clientfd, (const char*) &tosend, sizeof(port), 0);
         std::cout << "send port to server" << std::endl;
 
         // User enters ipAddress
@@ -103,7 +104,7 @@ void LobbyClient::registerUser() {
         // Client sends ipAddress to server
         memset(&msg, 0, sizeof(msg));
         strcpy(msg, ipAddress.c_str());
-        send(socket, (char * ) msg, strlen(msg), 0);
+        send(clientfd, (char * ) msg, strlen(msg), 0);
         std::cout << "ipAddress send to server" << std::endl;
 
         std::cout << "User created. Returning to start menu." << std::endl;
@@ -125,16 +126,37 @@ void LobbyClient::createGame() {
     // Send username to server
     memset(&msg, 0, sizeof(msg));
     strcpy(msg, username.c_str());
-    send(socket, (char *) msg, strlen(msg), 0);
+    send(clientfd, (char *) msg, strlen(msg), 0);
 
     int temp, usernameBool;
-    recv(socket, &temp, 90, 0);
+    recv(clientfd, &temp, 90, 0);
     usernameBool = ntohl(temp);
 
     std::cout << "usernameBool: " << usernameBool << std::endl;
 
     if (usernameBool == 1) {
-        
+        // Receive port from client
+        int port, portTemp;
+        recv(clientfd, &portTemp, 4, 0);
+        port = ntohl(portTemp);
+        std::cout << "port: " << port << std::endl;
+
+        // Receive ipAdress from client
+        std::string ipAddress;
+        memset(&msg, 0, sizeof(msg));
+        recv(clientfd, (char*) msg, sizeof(msg), 0);
+        ipAddress = msg;
+
+        std::cout << "p.port: " << port << std::endl;
+        std::cout << "ipAddress: " << ipAddress << std::endl;
+        std::string s = "./player.out " + std::to_string(port) + " " + ipAddress;
+        std::cout << "command line: " << s << std::endl;
+
+        int ac;
+        char **av = Etc::parsedargs(s, &ac);
+        Player::main(ac, av);
+
+        Etc::freeparsedargs(av);
     } else {
         std::cout << "Username not found. Returning to start menu." << std::endl;
         std::cout << std::endl;

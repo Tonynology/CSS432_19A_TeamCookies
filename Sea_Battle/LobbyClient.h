@@ -15,7 +15,7 @@ class LobbyClient {
         void createGame();
         void listGames();
 
-        int socket;
+        int clientfd;
 
     private:
         char msg[1500];
