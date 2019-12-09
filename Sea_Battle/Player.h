@@ -7,17 +7,17 @@ class Player {
         static std::string getIAddress( );
         static int getUPort( );
         static std::string getUAddress( );
-
-        static void setIPort( int iPort );
-        static void setIAddress( std::string iAddress );
-        static void setUPort( int uPort );
-        static void setUAddress( std::string uAddress );
-
-        static void playerConnect( int clientSd, sockaddr_in sendSockAddr ); // attempt connection at socket clientSd
-        static int playerAccept( int serverSd, sockaddr_in newSockAddr ); // listen for connection at socket serverSd
-        static std::string playerCin( ); // listen to standard input stream
-        static std::string playerRead( int newSd ); // listen to input at socket newSd
-        static void playerWrite( int clientSd, std::string requestString ); // write request to socket clientSd
+        static int getServerSd( );
+        static int getNewSd( );
+        static int getClientSd( );
+        
+        static void setIPort( int i );
+        static void setIAddress( std::string i );
+        static void setUPort( int u );
+        static void setUAddress( std::string u );
+        static void setServerSd( int s );
+        static void setNewSd( int n );
+        static void setClientSd( int c );
 };
 
 #endif
