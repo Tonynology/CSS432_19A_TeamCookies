@@ -94,7 +94,7 @@ int Player::main( int argc, char *argv[] ) {
 		Etc::portOut(newSd, Player::getUAddress());
 		std::string sAddress = Etc::portIn(newSd);
 		
-		Etc::errChk(-1 + (sPort == std::to_string(Player::getUPort()) && sAddress == Player::getUAddress()), "Something has gone terribly wrong!");
+		Etc::errChk(-1 + (sPort == std::to_string(Player::getUPort()) && sAddress == Player::getUAddress()), "Something has gone terribly wrong! " + sPort + " != " + std::to_string(Player::getUPort()) + " || " + sAddress + " != " + Player::getUAddress());
         
         Etc::stopDots(t);
 	}
@@ -113,7 +113,7 @@ int Player::main( int argc, char *argv[] ) {
 		std::string sAddress = Etc::portIn(clientSd);
 		Etc::portOut(clientSd, sAddress);
 		
-		Etc::errChk(-1 + (sPort == std::to_string(Player::getIPort()) && sAddress == Player::getIAddress()), "Something has gone terribly wrong!");
+		Etc::errChk(-1 + (sPort == std::to_string(Player::getIPort()) && sAddress == Player::getIAddress()), "Something has gone terribly wrong! " + sPort + " != " + std::to_string(Player::getIPort()) + " || " + sAddress + " != " + Player::getIAddress());
 	}
 	
 	/* Credit to GitHub user vmrob for simple nonblocking read from std::cin
@@ -225,7 +225,7 @@ int Player::main( int argc, char *argv[] ) {
         map.printBoard();
 
         //std::cout << std::flush << std::endl; // Program hangs right here and I have no idea what is wrong with it. Bth players mst press enter to proceed.
-        std::cout << "PRESS ENTER TO CONTINUE TO NEXT TURN" << std::endl; //I htink it may have to do with the lingering Etc::consoleIn async function.
+        Etc::consoleOut("press enter to continue\n"); //I htink it may have to do with the lingering Etc::consoleIn async function.
         //Symptoms so far: Sometimes the "turn sequence" will begin immediately upon pressing enter. It does this for each player, individually.
         //Other times, it will only begin , and for both players at the same time, when BOTH players have pressed enter.
         //Again, this happens imediately, without waiting for 1 second. (perhaps the peers are actuall sending a write??)

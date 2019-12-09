@@ -83,14 +83,14 @@ std::string Etc::consoleIn() {
 
 void Etc::consoleOut(std::string request) {
 	for (char c : request) {
-		std::this_thread::sleep_for(std::chrono::milliseconds(10));
+		std::this_thread::sleep_for(std::chrono::milliseconds(5));
 		std::cout << c << std::flush;
 	}
 }
 
 void Etc::consoleErr(std::string request) {
 	for (char c : request) {
-		std::this_thread::sleep_for(std::chrono::milliseconds(10));
+		std::this_thread::sleep_for(std::chrono::milliseconds(5));
 		std::cerr << c << std::flush;
 	}
 }
