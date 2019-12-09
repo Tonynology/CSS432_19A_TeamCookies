@@ -16,6 +16,7 @@
 #include <string>
 #include <iostream>
 #include <cstring>
+#include <fstream>        // writing to file
 
 void LobbyClient::startGame(int sockfd) {
     this->clientfd = sockfd;
@@ -46,9 +47,9 @@ void LobbyClient::startMenu() {
         case 1:
             registerUser();
             break;
-        // case 2:
-        //     listGames();
-        //     break;
+        case 2:
+            listGames();
+            break;
         case 3:
             createGame();
             break;
@@ -118,6 +119,21 @@ void LobbyClient::registerUser() {
     }
 }
 
+// void LobbyClient::listGames() {
+//     std::fstream file;
+
+//     std::string username, port, fileName, word, line;
+
+//     fileName = "games.txt";
+
+//     file.open(fileName);
+
+
+//     while (getline(file, line)) {
+//         for (int )
+//     }
+// }
+
 void LobbyClient::createGame() {
     std::string username;
     std::cout << "Please enter the username you want to join the game with." << std::endl;
@@ -152,11 +168,21 @@ void LobbyClient::createGame() {
         std::string s = "./player.out " + std::to_string(port) + " " + ipAddress;
         std::cout << "command line: " << s << std::endl;
 
+        std::ofstream myfile;
+        myfile.open("games.txt", std::fstream::app);
+        myfile << username;
+        myfile << " ";
+        myfile << port;
+        myfile << " ,";
+        myfile << ipAddress;
+        myfile << "\n";
+        myfile.close();
+
         int ac;
         char **av = Etc::parsedargs(s, &ac);
         Player::main(ac, av);
-
         Etc::freeparsedargs(av);
+
     } else {
         std::cout << "Username not found. Returning to start menu." << std::endl;
         std::cout << std::endl;
@@ -173,11 +199,11 @@ void LobbyClient::unregisterUser() {
 	// Send username to server
 	memset(&msg, 0, sizeof(msg));
 	strcpy(msg, username.c_str());
-	send(socket, (char*)msg, strlen(msg), 0);
+	send(clientfd, (char*)msg, strlen(msg), 0);
 
 	// Server responds whether username has duplicates
 	int temp, usernameBool;
-	recv(socket, &temp, 90, 0);
+	recv(clientfd, &temp, 90, 0);
 	usernameBool = ntohl(temp);
 
 	std::cout << "usernameBool: " << usernameBool << std::endl;
