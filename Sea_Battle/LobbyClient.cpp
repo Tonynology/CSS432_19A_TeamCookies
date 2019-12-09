@@ -48,9 +48,9 @@ void LobbyClient::startMenu() {
         // case 2:
         //     listGames();
         //     break;
-        // case 3:
-        //     createGame();
-        //     break;
+        case 3:
+            createGame();
+            break;
         // case 4:
         //     joinGame();
         //     break;
@@ -114,6 +114,32 @@ void LobbyClient::registerUser() {
         std::cout << std::endl;
         std::cout << "Username already taken. Please enter a different username." << std::endl;
         registerUser();
+    }
+}
+
+void LobbyClient::createGame() {
+    std::string username;
+    std::cout << "Please enter the username you want to join the game with." << std::endl;
+    std::cin >> username;
+
+    // Send username to server
+    memset(&msg, 0, sizeof(msg));
+    strcpy(msg, username.c_str());
+    send(socket, (char *) msg, strlen(msg), 0);
+
+    int temp, usernameBool;
+    recv(socket, &temp, 90, 0);
+    usernameBool = ntohl(temp);
+
+    std::cout << "usernameBool: " << usernameBool << std::endl;
+
+    if (usernameBool == 1) {
+        
+    } else {
+        std::cout << "Username not found. Returning to start menu." << std::endl;
+        std::cout << std::endl;
+
+        startMenu();
     }
 }
 

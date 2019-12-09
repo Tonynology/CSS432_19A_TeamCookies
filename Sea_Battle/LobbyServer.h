@@ -22,11 +22,13 @@ class LobbyServer {
 
     private:
         struct PlayerData {
-            // std::string username;
             int port;
             std::string ipAddress;
         };
 
+        int temp;
+
+        int username;
         int clientfd;
         char msg[1500];
 

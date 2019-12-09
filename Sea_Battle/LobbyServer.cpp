@@ -1,5 +1,5 @@
 #include "LobbyServer.h"
-// #include "Player.cpp"
+#include "Player.cpp"
 
 #include <iostream>
 #include <iterator> 
@@ -52,9 +52,9 @@ void LobbyServer::startMenu(int clientfd) {
         // case 2:
         //     listGames();
         //     break;
-        // case 3:
-        //     createGame();
-        //     break;
+        case 3:
+            createGame();
+            break;
         // case 4:
         //     joinGame();
         //     break;
@@ -89,8 +89,8 @@ void LobbyServer::registerUser() {
         // Receive port from client
         int portTemp;
         recv(clientfd, &portTemp, 4, 0);
-        p.port = ntohl(portTemp);
-        std::cout << "port: " << p.port << std::endl;
+        this->temp = ntohl(portTemp);
+        std::cout << "port: " << this->temp << std::endl;
 
         // Receive ipAdress from client
         memset(&msg, 0, sizeof(msg));
@@ -100,6 +100,10 @@ void LobbyServer::registerUser() {
 
         // Add Player struct to database (unorderd_map)
         userData[username] = p;
+
+        std::cout << "map size: " << userData.size() << std::endl;
+
+        std::cout << "port from username: " << p.port << std::endl;
 
         // Return to startMenu
         startMenu(clientfd);
@@ -127,9 +131,49 @@ void LobbyServer::registerUser() {
 //     std::cout << "running listGames" << std::endl;
 // }
 
-// void Lobby::createGame() {
-//     std::cout << "running createGame" << std::endl;
-// }
+void LobbyServer::createGame() {
+    struct PlayerData p;
+    int tosend, usernameBool;
+
+    std::cout << "map size: " << userData.size() << std::endl;
+
+    memset(&msg, 0, sizeof(msg));
+    recv(clientfd, (char*) msg, sizeof(msg), 0);
+    std::string username = msg;
+    std::cout << "username: " << username << " found" << std::endl;
+
+    userData[username] = p;
+
+    std::cout << "port saved: " << p.port << std::endl;
+
+    if (userData.find(username) != userData.end()) {
+        usernameBool = 1;
+        tosend = htonl(usernameBool);
+        send(clientfd, (const char*) &tosend, sizeof(usernameBool), 0);
+
+        std::cout << "username " << username <<  " found" << std::endl;
+
+        userData[username] = p;
+        // std::string s = "./player.out 1111 uw1-320-12";
+        std::cout << "p.port: " << this->temp << std::endl;
+        std::cout << "p.ipAddress" << p.ipAddress << std::endl;
+        std::string s = "./player.out " + std::to_string(p.port) + " " + p.ipAddress;
+
+        std::cout << "command line: " << s << std::endl;
+
+        // int ac;
+        // char **av = Etc::parsedargs(s, &ac);
+        // Player::main(ac, av);
+
+        // Etc::freeparsedargs(av);
+    } else {
+        std::cout << "username not found" << std::endl;
+
+        usernameBool = 0;
+        tosend = htonl(usernameBool);
+        send(clientfd, (const char*) &tosend, sizeof(usernameBool), 0);
+    }
+}
 
 // void Lobby::joinGame() {
 //     std::cout << "running joinGame" << std::endl;

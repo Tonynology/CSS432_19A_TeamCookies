@@ -12,6 +12,7 @@ class LobbyClient {
         void startMenu();
 
         void registerUser();
+        void createGame();
         void listGames();
 
         int socket;
