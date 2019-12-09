@@ -48,7 +48,7 @@ void Player::setServerSd( int s ) { serverSd = s; }
 void Player::setNewSd( int n ) { newSd = n; }
 void Player::setClientSd( int c ) { clientSd = c; }
 
-int main( int argc, char *argv[] ) {
+int Player::main( int argc, char *argv[] ) {
 	Etc::consoleOut("\nPreparing local resources...");
 	
 	if (argc == 0){

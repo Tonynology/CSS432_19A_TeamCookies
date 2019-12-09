@@ -18,6 +18,8 @@ class Player {
         static void setServerSd( int s );
         static void setNewSd( int n );
         static void setClientSd( int c );
+        
+        static int main( int argc, char *argv[] );
 };
 
 #endif
