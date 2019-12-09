@@ -1,11 +1,61 @@
+#include <string.h>
+
 #define TODO 1024
 
+/* Credit to stackOverflow user Remo.D for Parse string into argv/argc
+https://stackoverflow.com/questions/1706551/parse-string-into-argv-argc */
 int Etc::errChk(int errVal, std::string errMsg){
 	if (errVal < 0){
 		Etc::consoleErr(errMsg);
 		exit(errVal);
 	}
 	return errVal;
+}
+
+static int setargs(char *args, char **argv)
+{
+   int count = 0;
+
+   while (isspace(*args)) ++args;
+   while (*args) {
+     if (argv) argv[count] = args;
+     while (*args && !isspace(*args)) ++args;
+     if (argv && *args) *args++ = '\0';
+     while (isspace(*args)) ++args;
+     count++;
+   }
+   return count;
+}
+
+char **Etc::parsedargs(std::string s, int *argc)
+{
+   /* Credit to stackOverflow user Tony Delroy for  Getting a `char *` or `const char*` from a `string`
+   https://stackoverflow.com/questions/347949/how-to-convert-a-stdstring-to-const-char-or-char*/
+   char *args = &s[0];
+
+   char **argv = NULL;
+   int    argn = 0;
+
+   if (args && *args
+    && (args = strdup(args))
+    && (argn = setargs(args,NULL))
+    && (argv = (char **) malloc((argn+1) * sizeof(char *)))) {
+      *argv++ = args;
+      argn = setargs(args,argv);
+   }
+
+   if (args && !argv) free(args);
+
+   *argc = argn;
+   return argv;
+}
+
+void Etc::freeparsedargs(char **argv)
+{
+  if (argv) {
+    free(argv[-1]);
+    free(argv-1);
+  } 
 }
 
 void *Etc::dots(void *){

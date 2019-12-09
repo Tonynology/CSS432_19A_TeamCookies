@@ -4,6 +4,8 @@
 class Etc {
 	public:
 		static int errChk(int errVal, std::string errMsg); // Call with int errVal and string errMsg. If errVal is under 0, cerr errMsg and exit with errVal under 0. Else, return errVal at or over 0.
+		static char **parsedargs(std::string s, int *argc); // Converts string (argument) to argv (return value) and argc (passed by reference)
+		static void freeparsedargs(char **argv); // frees parsed args
 		static void *dots(void *); // Prints out one dot (.) every second
 		static void startDots(pthread_t &t); // Start printing dots
 		static void stopDots(pthread_t &t); // Stop printing dots

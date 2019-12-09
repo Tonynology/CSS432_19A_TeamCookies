@@ -10,7 +10,7 @@ class Player {
         static int getServerSd( );
         static int getNewSd( );
         static int getClientSd( );
-        
+
         static void setIPort( int i );
         static void setIAddress( std::string i );
         static void setUPort( int u );
@@ -18,6 +18,8 @@ class Player {
         static void setServerSd( int s );
         static void setNewSd( int n );
         static void setClientSd( int c );
+
+        static int main( int argc, char *argv[] );
 };
 
 #endif
