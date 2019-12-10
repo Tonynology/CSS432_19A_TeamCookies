@@ -48,17 +48,8 @@ void Player::setServerSd( int s ) { serverSd = s; }
 void Player::setNewSd( int n ) { newSd = n; }
 void Player::setClientSd( int c ) { clientSd = c; }
 
-void validateCoord(std::string &coord){
-    if (coord.size() != 2){
-        Etc::consoleOut("coordinate must be two characters.\n");
-    }
-
-    Etc::consoleOut("[char a-f][int 1-6] launch an attack on coordinate: "); //cout-cin combo creates a GUI facade
-    coord = Etc::consoleIn();
-}
-
-int Player::main( int argc, char *argv[] ) {
-	Etc::consoleOut("\nPreparing local resources...");
+int main( int argc, char *argv[] ) {
+	Etc::consoleOut("\npreparing local resources...");
 	
 	if (argc == 0){
 		Etc::errChk(-1, "Usage: ./player.out [iport] [uport] [uaddress]");
@@ -79,13 +70,13 @@ int Player::main( int argc, char *argv[] ) {
 		Player::setUAddress(argv[4]);
 	}
 	else {
-		Etc::errChk(-1, "Usage: ./player.out [iport] [uport] [uaddress]");
+		Etc::errChk(-1, "usage: ./player.out [iport] [uport] [uaddress]");
 	}
 
 	std::this_thread::sleep_for(std::chrono::milliseconds(100));
-	Etc::consoleOut("\nLocal resources prepared!");
+	Etc::consoleOut("\nlocal resources prepared!");
 	std::this_thread::sleep_for(std::chrono::milliseconds(500));
-	Etc::consoleOut("\nEstablishing remote connection...");
+	Etc::consoleOut("\nestablishing remote connection...");
 	
 	sockaddr_in newSockAddr;
     Etc::serverSetup(Player::getIPort(), serverSd);
@@ -150,15 +141,15 @@ int Player::main( int argc, char *argv[] ) {
 	std::cout << "uport: " << Player::getUPort() << " uaddress: " << Player::getUAddress() << std::endl;
     std::cout << "clientSd: " << Player::getClientSd() << " serverSd: " << Player::getServerSd() << " newSd: " << Player::getNewSd() << std::endl;
     std::cout << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl;
-	Etc::consoleOut("Welcome to Sea Battle, a game by Team Cookies\n");
+	Etc::consoleOut("welcome to Sea Battle, a game by Team Cookies\n");
 
-    Etc::consoleOut("Field: \n");
+    Etc::consoleOut("field: \n");
 	Board field; // Player's board
 	field.initBoardSea();
 	field.initBoardShips(); // Field knows player ship locations
 	field.printBoard();
 
-    Etc::consoleOut("Map: \n");
+    Etc::consoleOut("map: \n");
 	Board map; // Enemy's board
 	map.initBoardSea();
 	//map.initBoardShips(); // Map does not know enemy ship locations
@@ -195,7 +186,7 @@ int Player::main( int argc, char *argv[] ) {
 
             if (consoleIn.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
                 mapTargetCoords = consoleIn.get();
-                validateCoord(mapTargetCoords);
+                Etc::validateCoord(mapTargetCoords);
                 consoleIn = std::async(std::launch::async, Etc::consoleIn);
                 mapTargetcoordsOut = std::async(std::launch::async, Etc::portOut, clientSd, mapTargetCoords); // Is using future on this line necessary if not blocking program?
             }
@@ -229,13 +220,14 @@ int Player::main( int argc, char *argv[] ) {
         Etc::consoleOut(fieldTargetCoords + " is being attacked... " + fieldTargetStatus);
         Etc::consoleOut("launching attack on " + mapTargetCoords + "... " + mapTargetStatus + "\n");
 	    map.setBoard(map.requestTranslator(mapTargetCoords[0]), map.requestTranslator(mapTargetCoords[1]), map.responseTranslator(mapTargetStatus[0])); // Assumes coords and status are at pos 0 and 1
+        Etc::consoleOut("key: -sea     Oship     +miss     Xhit\n\n");
         Etc::consoleOut("Field: \n");
         field.printBoard(); // TODO merge printBoard statements to print side by side
         Etc::consoleOut("Map: \n");
         map.printBoard();
 
         //std::cout << std::flush << std::endl; // Program hangs right here and I have no idea what is wrong with it. Bth players mst press enter to proceed.
-        Etc::consoleOut("press enter to continue\n"); //I htink it may have to do with the lingering Etc::consoleIn async function.
+        Etc::consoleOut("press enter to continue"); //I htink it may have to do with the lingering Etc::consoleIn async function.
         //Symptoms so far: Sometimes the "turn sequence" will begin immediately upon pressing enter. It does this for each player, individually.
         //Other times, it will only begin , and for both players at the same time, when BOTH players have pressed enter.
         //Again, this happens imediately, without waiting for 1 second. (perhaps the peers are actuall sending a write??)

@@ -35,47 +35,43 @@ void printDatabase(){
 
 void registerUser(int sd)
 {
-    // client-side
+    // client-side function
     printDatabase();
 }
 
 void listGames(int sd)
 {
-    std::string users;
+    std::string games;
     for(std::unordered_map<std::string, std::pair<int, std::string>>::const_iterator it = database.begin(); it != database.end(); ++it)
     {
-        users += it->first + " ";// + std::to_string(it->second.first) + " " + it->second.second + "\n";
+        games += it->first + " ";// + std::to_string(it->second.first) + " " + it->second.second + "\n";
     } // TODO: Stream the output to the user, don't concatenate it and make a single write.
 
-    //Etc::consoleOut("users: ");
-    //std::string users = Etc::portIn(sd); /// three-way handshake
-	Etc::portOut(sd, users);
+	Etc::portOut(sd, games);
 	acknowledgement = Etc::portIn(sd);
     Etc::portOut(sd, acknowledgement);
-    Etc::consoleOut("users: \n" + users + "\nacknowledgement: \n" + acknowledgement + "\n");
-    Etc::errChk(-1 + (users == acknowledgement), "Something has gone terribly wrong!" + users + " != " + acknowledgement);
+    Etc::consoleOut("games: \n" + games + "\nacknowledgement: \n" + acknowledgement + "\n");
+    Etc::errChk(-1 + (games == acknowledgement), "Something has gone terribly wrong!" + games + " != " + acknowledgement);
 
     printDatabase();
 }
 
 void createGame(int sd)
 {
-    Etc::consoleOut("cUsername: ");
 	std::string cUsername = Etc::portIn(sd); /// three-way handshake
 	Etc::portOut(sd, cUsername);
 	acknowledgement = Etc::portIn(sd);
-    Etc::consoleOut(cUsername + "\nacknowledgement: " + acknowledgement + "\n");
+    Etc::consoleOut("cUsername: " + cUsername + "\nacknowledgement: " + acknowledgement + "\n");
     Etc::errChk(-1 + (cUsername == acknowledgement), "Something has gone terribly wrong! " + cUsername + " != " + acknowledgement);
 
-    Etc::consoleOut("cPort: ");
-    int cPort = std::stoi(Etc::portIn(sd)); /// three-way handshake
+    int cPort = std::stoi(Etc::portIn(sd));
 	Etc::portOut(sd, std::to_string(cPort));
 	acknowledgement = Etc::portIn(sd);
-    Etc::consoleOut(std::to_string(cPort) + "\nacknowledgement: " + acknowledgement + "\n");
+    Etc::consoleOut("cPort: " + std::to_string(cPort) + "\nacknowledgement: " + acknowledgement + "\n");
     Etc::errChk(-1 + (std::to_string(cPort) == acknowledgement), "Something has gone terribly wrong! " + std::to_string(cPort) + " != " + acknowledgement);
 
     Etc::consoleOut("cAddress: ");
-    std::string cAddress = Etc::portIn(sd); /// three-way handshake
+    std::string cAddress = Etc::portIn(sd);
 	Etc::portOut(sd, cAddress);
 	acknowledgement = Etc::portIn(sd);
     Etc::consoleOut(cAddress + "\nacknowledgement: " + acknowledgement + "\n");
@@ -90,11 +86,10 @@ void joinGame(int sd)
 {
     listGames(sd);
 
-    Etc::consoleOut("pUsername: ");
 	std::string pUsername = Etc::portIn(sd); /// three-way handshake
 	Etc::portOut(sd, pUsername);
 	acknowledgement = Etc::portIn(sd);
-    Etc::consoleOut(pUsername + "\nacknowledgement: " + acknowledgement + "\n");
+    Etc::consoleOut("pUsername: " + pUsername + "\nacknowledgement: " + acknowledgement + "\n");
     Etc::errChk(-1 + (pUsername == acknowledgement), "Something has gone terribly wrong! " + pUsername + " != " + acknowledgement);
 
     Etc::portOut(sd, std::to_string(database[pUsername].first));
@@ -115,11 +110,10 @@ void joinGame(int sd)
 
 void unregisterUser(int sd)
 {
-    Etc::consoleOut("cUsername: ");
 	std::string cUsername = Etc::portIn(sd); /// three-way handshake
 	Etc::portOut(sd, cUsername);
 	acknowledgement = Etc::portIn(sd);
-    Etc::consoleOut(cUsername + "\nacknowledgement: " + acknowledgement + "\n");
+    Etc::consoleOut("cUsername: " + cUsername + "\nacknowledgement: " + acknowledgement + "\n");
     Etc::errChk(-1 + (cUsername == acknowledgement), "Something has gone terribly wrong! " + cUsername + " != " + acknowledgement);
 
     database.erase(cUsername);
@@ -129,40 +123,30 @@ void unregisterUser(int sd)
 void *server(void *)
 {
     int sd = newSd;
+    Etc::consoleOut("sd: " + sd);
     while (true) {
-        Etc::consoleOut("switchcase: ");
-        int switchcase = std::stoi(Etc::portIn(sd)); /// three-way handshake
-	    Etc::portOut(sd, std::to_string(switchcase));
+        std::string sselection = Etc::portIn(sd); /// three-way handshake
+        int selection = stoi(sselection); // safety is guaranteed through handshake, not through validation
+	    Etc::portOut(sd, std::to_string(selection));
 	    acknowledgement = Etc::portIn(sd);
-        Etc::consoleOut(switchcase + "\nacknowledgement: " + acknowledgement + "\n");
-        Etc::errChk(-1 + (std::to_string(switchcase) == acknowledgement), "Something has gone terribly wrong!" + std::to_string(switchcase) + " != " + acknowledgement);
+        Etc::consoleOut("selection: " + std::to_string(selection) + "\nacknowledgement: " + acknowledgement + "\n");
+        Etc::errChk(-1 + (std::to_string(selection) == acknowledgement), "Something has gone terribly wrong!" + std::to_string(selection) + " != " + acknowledgement);
 
-        switch(switchcase) {
-            case 1:
-                registerUser(sd);
-                break;
-            case 2:
-                listGames(sd);
-                break;
-            case 3:
-                createGame(sd);
-                break;
-            case 4:
-                joinGame(sd);
-                break;
-            //case 5:
-            //    exitGame(sd);
-            //    break;
-            case 6:
-                unregisterUser(sd);
-                break;
-            default:
-                Etc::consoleOut("not a valid option...\n");
-                break;
+        if (selection == 1) registerUser(sd);
+        else if (selection == 2) listGames(sd);
+        else if (selection == 3) createGame(sd);
+        else if (selection == 4) joinGame(sd);
+        //else if (selection == 5) exitGame(sd);
+        else if (selection == 6) unregisterUser(sd);
+        else {
+            Etc::consoleOut("not a valid option...\n");
         }
     }
-    close(serverSd);
-	close(sd);
+	close(serverSd);
+    close(sd);
+	exit(0);
+    return 0;
+
 }
 
 int main(int argc, char const *argv[])

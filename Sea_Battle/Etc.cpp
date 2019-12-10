@@ -10,6 +10,37 @@ int Etc::errChk(int errVal, std::string errMsg){
 	return errVal;
 }
 
+void Etc::validateSelection(std::string &selection, bool registered, std::string cUsername, std::string cAddress, int cPort){
+    if (selection.size() != 1 || (selection[0] != '1' && selection[0] != '2' && selection[0] != '3' && selection[0] != '4' && selection[0] != '5' && selection[0] != '6'))
+    {
+		Etc::consoleOut("invalid selection...\n");
+
+        if (registered) Etc::consoleOut("\nyou are registered as " + cUsername + " on " + cAddress + ":" + std::to_string(cPort) + "\n");
+        if (!registered) Etc::consoleOut("[int 1] select from the following options:\n");
+        if (registered) Etc::consoleOut("[int 2-6] select from the following options:\n");
+	    if (!registered) Etc::consoleOut("[1] register user\n");
+	    if (registered) Etc::consoleOut("[2] list games\n");
+	    if (registered) Etc::consoleOut("[3] create game\n");
+	    if (registered) Etc::consoleOut("[4] join game\n");
+	    if (registered) Etc::consoleOut("[5] exit game\n");
+	    if (registered) Etc::consoleOut("[6] unregister user\n");
+        if (registered) Etc::consoleOut("\n");
+
+        selection = Etc::consoleIn();
+        validateSelection(selection, registered, cUsername, cAddress, cPort);
+    }
+}
+
+void Etc::validateCoord(std::string &coord){
+    if (coord.size() != 2 || (coord[0] != 'a' && coord[0] != 'b' && coord[0] != 'c' && coord[0] != 'd' && coord[0] != 'e' && coord[0] != 'f') || (coord[1] != '1' && coord[1] != '2' && coord[1] != '3' && coord[1] != '4' && coord[1] != '5' && coord[1] != '6'))
+    {
+        Etc::consoleOut("invalid coordinates...\n");
+        Etc::consoleOut("[char a-f][int 1-6] launch an attack on coordinate: ");
+        coord = Etc::consoleIn();
+        validateCoord(coord);
+    }
+}
+
 /* Credit to stackOverflow user Remo.D for Parse string into argv/argc
 https://stackoverflow.com/questions/1706551/parse-string-into-argv-argc */
 static int setargs(char *args, char **argv)
@@ -58,7 +89,7 @@ void Etc::freeparsedargs(char **argv)
   } 
 }
 
-void *Etc::dots(void *){
+void *dots(void *){
 	while (true){
 		std::this_thread::sleep_for(std::chrono::seconds(1));
 		std::cout << "." << std::flush;
@@ -66,7 +97,7 @@ void *Etc::dots(void *){
 }
 
 void Etc::startDots(pthread_t &t){
-	Etc::errChk(pthread_create(&t, NULL, Etc::dots, NULL), "Error: Thread failed to create.");
+	Etc::errChk(pthread_create(&t, NULL, dots, NULL), "Error: Thread failed to create.");
 	Etc::errChk(pthread_detach(t), "Error: Thread failed to detach.");
 	Etc::errChk(pthread_join(t, NULL), "Error: Thread failed to join.");
 }

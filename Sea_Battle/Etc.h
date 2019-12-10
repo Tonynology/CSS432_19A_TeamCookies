@@ -4,10 +4,11 @@
 class Etc {
 	public:
 		static int errChk(int errVal, std::string errMsg); // Call with int errVal and string errMsg. If errVal is under 0, cerr errMsg and exit with errVal under 0. Else, return errVal at or over 0.
+		static void validateSelection(std::string &selection, bool registered, std::string cUsername, std::string cAddress, int cPort); //  Ensure that referenced string selection meets protocol standard.
+		void validateCoord(std::string &coord); // Ensure that referenced string coord meets protocol standard.
 		static char **parsedargs(std::string s, int *argc); // Converts string (argument) to argv (return value) and argc (passed by reference)
 		static void freeparsedargs(char **argv); // frees parsed args
-		static void *dots(void *); // Prints out one dot (.) every second
-		static void startDots(pthread_t &t); // Start printing dots
+		static void startDots(pthread_t &t); // Start printing 1 dot(.) every second
 		static void stopDots(pthread_t &t); // Stop printing dots
 		static std::string consoleIn(); // Pause and wait for a line of console input and return it.
 		static void consoleOut(std::string request); // Prints out request char by char, waiting 10msec between each char.
