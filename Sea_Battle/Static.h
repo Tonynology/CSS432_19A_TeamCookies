@@ -1,11 +1,12 @@
-#ifndef ETC_H
+#ifndef Static_H
 #define ETC_H
 
-class Etc {
+class Static {
 	public:
 		static int errChk(int errVal, std::string errMsg); // Call with int errVal and string errMsg. If errVal is under 0, cerr errMsg and exit with errVal under 0. Else, return errVal at or over 0.
+		static int to_int(std::string s); // stoi wrapper with error checking.
 		static void validateSelection(std::string &selection, bool registered, std::string cUsername, std::string cAddress, int cPort); //  Ensure that referenced string selection meets protocol standard.
-		void validateCoord(std::string &coord); // Ensure that referenced string coord meets protocol standard.
+		static void validateCoord(std::string &coord); // Ensure that referenced string coord meets protocol standard.
 		static char **parsedargs(std::string s, int *argc); // Converts string (argument) to argv (return value) and argc (passed by reference)
 		static void freeparsedargs(char **argv); // frees parsed args
 		static void startDots(pthread_t &t); // Start printing 1 dot(.) every second
@@ -22,4 +23,4 @@ class Etc {
 };
 
 #endif
-#include "Etc.cpp"
+#include "Static.cpp"

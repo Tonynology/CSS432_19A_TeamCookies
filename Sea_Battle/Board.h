@@ -7,7 +7,6 @@ class Board {
 	public:
 		//Board();
 		//~Board();
-		int errChk(int errVal, std::string errMsg); //TODO: Make errChk module
 		char getBoard(int x, int y);
 		void setBoard(int x, int y, char c);
 		void printBoard();

@@ -2,41 +2,62 @@
 
 #define TODO 1024
 
-int Etc::errChk(int errVal, std::string errMsg){
+int Static::errChk(int errVal, std::string errMsg){
 	if (errVal < 0){
-		Etc::consoleErr(errMsg);
+		Static::consoleErr(errMsg);
 		exit(errVal);
 	}
 	return errVal;
 }
 
-void Etc::validateSelection(std::string &selection, bool registered, std::string cUsername, std::string cAddress, int cPort){
+int Static::to_int(std::string s){
+  int i;
+  try{
+    i = std::stoi(s);
+    return i;
+  }
+  catch (const std::invalid_argument& ia){
+    std::cerr << "Invalid argument: " << ia.what() << std::endl;
+    return -1;
+  }
+  catch (const std::out_of_range& oor) {
+    std::cerr << "Out of Range error: " << oor.what() << std::endl;
+    return -2;
+  }
+  catch (const std::exception& e)
+  {
+    std::cerr << "Undefined error: " << e.what() << std::endl;
+    return -3;
+  }
+}
+
+void Static::validateSelection(std::string &selection, bool registered, std::string cUsername, std::string cAddress, int cPort){
     if (selection.size() != 1 || (selection[0] != '1' && selection[0] != '2' && selection[0] != '3' && selection[0] != '4' && selection[0] != '5' && selection[0] != '6'))
     {
-		Etc::consoleOut("invalid selection...\n");
+		Static::consoleOut("invalid selection...\n");
 
-        if (registered) Etc::consoleOut("\nyou are registered as " + cUsername + " on " + cAddress + ":" + std::to_string(cPort) + "\n");
-        if (!registered) Etc::consoleOut("[int 1] select from the following options:\n");
-        if (registered) Etc::consoleOut("[int 2-6] select from the following options:\n");
-	    if (!registered) Etc::consoleOut("[1] register user\n");
-	    if (registered) Etc::consoleOut("[2] list games\n");
-	    if (registered) Etc::consoleOut("[3] create game\n");
-	    if (registered) Etc::consoleOut("[4] join game\n");
-	    if (registered) Etc::consoleOut("[5] exit game\n");
-	    if (registered) Etc::consoleOut("[6] unregister user\n");
-        if (registered) Etc::consoleOut("\n");
+      if (registered) Static::consoleOut("\nyou are registered as " + cUsername + " on " + cAddress + ":" + std::to_string(cPort) + "\n");
+      if (!registered) Static::consoleOut("[int 1] select from the following options:\n");
+      if (registered) Static::consoleOut("[int 2-6] select from the following options:\n");
+	    if (!registered) Static::consoleOut("[1] register user\n");
+	    if (registered) Static::consoleOut("[2] list games\n");
+	    if (registered) Static::consoleOut("[3] create game\n");
+	    if (registered) Static::consoleOut("[4] join game\n");
+	    if (registered) Static::consoleOut("[5] exit game\n");
+	    if (registered) Static::consoleOut("[6] unregister user\n");
+      if (registered) Static::consoleOut("\n");
 
-        selection = Etc::consoleIn();
-        validateSelection(selection, registered, cUsername, cAddress, cPort);
+      selection = Static::consoleIn();
+      validateSelection(selection, registered, cUsername, cAddress, cPort);
     }
 }
 
-void Etc::validateCoord(std::string &coord){
+void Static::validateCoord(std::string &coord){
     if (coord.size() != 2 || (coord[0] != 'a' && coord[0] != 'b' && coord[0] != 'c' && coord[0] != 'd' && coord[0] != 'e' && coord[0] != 'f') || (coord[1] != '1' && coord[1] != '2' && coord[1] != '3' && coord[1] != '4' && coord[1] != '5' && coord[1] != '6'))
     {
-        Etc::consoleOut("invalid coordinates...\n");
-        Etc::consoleOut("[char a-f][int 1-6] launch an attack on coordinate: ");
-        coord = Etc::consoleIn();
+        Static::consoleOut("invalid coordinates...\n");
+        Static::consoleOut("[char a-f][int 1-6] launch an attack on coordinate: ");
+        coord = Static::consoleIn();
         validateCoord(coord);
     }
 }
@@ -58,7 +79,7 @@ static int setargs(char *args, char **argv)
    return count;
 }
 
-char **Etc::parsedargs(std::string s, int *argc)
+char **Static::parsedargs(std::string s, int *argc)
 {
    /* Credit to stackOverflow user Tony Delroy for  Getting a `char *` or `const char*` from a `string`
    https://stackoverflow.com/questions/347949/how-to-convert-a-stdstring-to-const-char-or-char*/
@@ -81,7 +102,7 @@ char **Etc::parsedargs(std::string s, int *argc)
    return argv;
 }
 
-void Etc::freeparsedargs(char **argv)
+void Static::freeparsedargs(char **argv)
 {
   if (argv) {
     free(argv[-1]);
@@ -96,71 +117,72 @@ void *dots(void *){
 	}
 }
 
-void Etc::startDots(pthread_t &t){
-	Etc::errChk(pthread_create(&t, NULL, dots, NULL), "Error: Thread failed to create.");
-	Etc::errChk(pthread_detach(t), "Error: Thread failed to detach.");
-	Etc::errChk(pthread_join(t, NULL), "Error: Thread failed to join.");
+void Static::startDots(pthread_t &t){
+	Static::errChk(pthread_create(&t, NULL, dots, NULL), "Error: Thread failed to create.");
+	Static::errChk(pthread_detach(t), "Error: Thread failed to detach.");
+	Static::errChk(pthread_join(t, NULL), "Error: Thread failed to join.");
 }
 
-void Etc::stopDots(pthread_t &t){
+void Static::stopDots(pthread_t &t){
 	pthread_cancel(t);
 }
 
-std::string Etc::consoleIn() {
+std::string Static::consoleIn() {
     std::string response;
     std::getline(std::cin, response);
     return response;
 }
 
-void Etc::consoleOut(std::string request) {
+void Static::consoleOut(std::string request) {
 	for (char c : request) {
-		std::this_thread::sleep_for(std::chrono::milliseconds(5));
+    if (c == '\n') std::this_thread::sleep_for(std::chrono::milliseconds(64));
+		else std::this_thread::sleep_for(std::chrono::milliseconds(8));
 		std::cout << c << std::flush;
 	}
 }
 
-void Etc::consoleErr(std::string request) {
+void Static::consoleErr(std::string request) {
 	for (char c : request) {
 		std::this_thread::sleep_for(std::chrono::milliseconds(5));
 		std::cerr << c << std::flush;
 	}
 }
 
-void Etc::serverSetup(int port, int &serverSd){
+void Static::serverSetup(int port, int &serverSd){
     sockaddr_in acceptSockAddr;
     bzero( (char*)&acceptSockAddr, sizeof( acceptSockAddr ) );
     acceptSockAddr.sin_family      = AF_INET;
     acceptSockAddr.sin_addr.s_addr = htonl( INADDR_ANY );
     acceptSockAddr.sin_port        = htons( port );
-    serverSd = Etc::errChk(socket( AF_INET, SOCK_STREAM, 0 ), "Error: Stream-oriented socket failed to open.");
+    serverSd = Static::errChk(socket( AF_INET, SOCK_STREAM, 0 ), "Error: Stream-oriented socket failed to open.");
     const int on = 1;
-    Etc::errChk(setsockopt( serverSd, SOL_SOCKET, SO_REUSEADDR, (char *)&on, 
+    Static::errChk(setsockopt( serverSd, SOL_SOCKET, SO_REUSEADDR, (char *)&on, 
                 sizeof( int ) ), "Error: SO_REUSEADDR failed to set.");
-    Etc::errChk(bind( serverSd, ( sockaddr* )&acceptSockAddr, sizeof( acceptSockAddr ) ), "Error: Socket failed to bind.");
-    Etc::errChk(listen( serverSd, 5 ), "Error: Operating system failed to listen.");
+    Static::errChk(bind( serverSd, ( sockaddr* )&acceptSockAddr, sizeof( acceptSockAddr ) ), "Error: Socket failed to bind.");
+    Static::errChk(listen( serverSd, 5 ), "Error: Operating system failed to listen.");
 }
 
-void Etc::clientSetup(int port, std::string address, int &clientSd, sockaddr_in &sendSockAddr){
+void Static::clientSetup(int port, std::string address, int &clientSd, sockaddr_in &sendSockAddr){
 	struct hostent* host = gethostbyname( address.c_str() );
     bzero( (char*)&sendSockAddr, sizeof( sendSockAddr ) );
     sendSockAddr.sin_family      = AF_INET;
     sendSockAddr.sin_addr.s_addr =
       inet_addr( inet_ntoa( *(struct in_addr*)*host->h_addr_list ) );
     sendSockAddr.sin_port        = htons( port );
-	clientSd = Etc::errChk(socket( AF_INET, SOCK_STREAM, 0 ), "Error: Opening stream socket");
+	clientSd = Static::errChk(socket( AF_INET, SOCK_STREAM, 0 ), "Error: Opening stream socket");
 }
 
-void Etc::portConnect( int clientSd, sockaddr_in sendSockAddr ) {
+void Static::portConnect( int clientSd, sockaddr_in sendSockAddr ) {
 	connect( clientSd, ( sockaddr* )&sendSockAddr, sizeof( sendSockAddr ) );
 }
 
-int Etc::portAccept( int serverSd, sockaddr_in newSockAddr ) {
+int Static::portAccept( int serverSd, sockaddr_in newSockAddr ) {
     socklen_t newSockAddrSize = sizeof(newSockAddr);
 	int newSd = accept( serverSd, ( sockaddr *)&newSockAddr, &newSockAddrSize );
 	return newSd;
 }
 
-std::string Etc::portIn(int newSd) {
+std::string Static::portIn(int newSd) {
 	/** TODO: sizeof sets to 8 upon compiling. strlen causes futures to hang upon initialization. 
 	This code attempts to do a dynamically sized read by reading one character at a time,
 	adding it into a string, and terminating when the string no longer lengthens.
@@ -182,7 +204,7 @@ std::string Etc::portIn(int newSd) {
     return std::string(response);
 }
 
-void Etc::portOut( int clientSd, std::string request ) {
+void Static::portOut( int clientSd, std::string request ) {
 	//send(clientSd, &request[0], request.size(), 0); //sizeof(request) //strlen(request)
 	write(clientSd, request.c_str(), TODO); //single write
 }

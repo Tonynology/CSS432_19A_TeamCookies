@@ -16,7 +16,7 @@
 #include <iostream>
 #include <future>
 
-#include "Etc.h"
+#include "Static.h"
 
 #define DEFAULT_CUSERNAME "lllloyd"
 #define DEFAULT_SPORT 6932
@@ -40,164 +40,175 @@ void registerUser()
     char loginname[LOGIN_NAME_MAX];
     getlogin_r(loginname, LOGIN_NAME_MAX); // user info from computer
     cUsername = std::string(loginname);
-    //cUsername = Etc::consoleIn(); // user info from console, prone to errors
-    //Etc::consoleOut("cUsername: " + cUsername + "\n");
+    //cUsername = Static::consoleIn(); // user info from console, prone to errors
+    //Static::consoleOut("cUsername: " + cUsername + "\n");
 
     srand(time(NULL));
     cPort = 1023 + rand() % (65535 - 1023);
-    //cPort = stoi(Etc::consoleIn());
-    //Etc::consoleOut("cPort: " + std::to_string(cPort) + "\n");
+    //cPort = stoi(Static::consoleIn());
+    //Static::consoleOut("cPort: " + std::to_string(cPort) + "\n");
 
     char hostname[HOST_NAME_MAX];
     gethostname(hostname, HOST_NAME_MAX);
     cAddress = std::string(hostname);
-    //cAddress = Etc::consoleIn();
-    //Etc::consoleOut("cAddress: " + cAddress + "\n");
+    //cAddress = Static::consoleIn();
+    //Static::consoleOut("cAddress: " + cAddress + "\n");
 
     registered = true;
-    Etc::consoleOut("\nregistration successful!\n");
-    Etc::consoleOut("press enter to continue\n");
-    Etc::consoleIn();
+    Static::consoleOut("\nregistration successful!\n");
+    Static::consoleOut("press enter to continue\n");
+    Static::consoleIn();
 }
 
 void listGames()
 {
-    std::string games = Etc::portIn(cSd);
-	Etc::portOut(cSd, games); /// three-way handshake
-	acknowledgement = Etc::portIn(cSd);
-    Etc::consoleOut("\ngames: \n" + games + "\n");// + "\nacknowledgement: \n" + acknowledgement + "\n");
-    Etc::errChk(-1 + (games == acknowledgement), "Something has gone terribly wrong! " + games + " != " + acknowledgement);
+    std::string games = Static::portIn(cSd);
+	Static::portOut(cSd, games); /// three-way handshake
+	acknowledgement = Static::portIn(cSd);
+    Static::consoleOut("\ngames: \n" + games + "\n");// + "\nacknowledgement: \n" + acknowledgement + "\n");
+    Static::errChk(-1 + (games == acknowledgement), "Something has gone terribly wrong! " + games + " != " + acknowledgement);
 
-    Etc::consoleOut("press enter to continue\n");
-    Etc::consoleIn();
+    //Static::consoleOut("press enter to continue\n");
+    //Static::consoleIn();
 }
 
 void createGame()
 {
-	Etc::portOut(cSd, cUsername); /// three-way handshake
-	acknowledgement = Etc::portIn(cSd);
-	Etc::portOut(cSd, acknowledgement);
-    //Etc::consoleOut("cUsername: " + cUsername + "\nacknowledgement: " + acknowledgement + "\n");
-    Etc::errChk(-1 + (cUsername == acknowledgement), "Something has gone terribly wrong! " + cUsername + " != " + acknowledgement);
+	Static::portOut(cSd, cUsername); /// three-way handshake
+	acknowledgement = Static::portIn(cSd);
+	Static::portOut(cSd, acknowledgement);
+    //Static::consoleOut("cUsername: " + cUsername + "\nacknowledgement: " + acknowledgement + "\n");
+    Static::errChk(-1 + (cUsername == acknowledgement), "Something has gone terribly wrong! " + cUsername + " != " + acknowledgement);
 
-	Etc::portOut(cSd, std::to_string(cPort));
-	acknowledgement = Etc::portIn(cSd);
-	Etc::portOut(cSd, acknowledgement);
-    //Etc::consoleOut("cPort: " + std::to_string(cPort) + "\nacknowledgement: " + acknowledgement + "\n");
-    Etc::errChk(-1 + (std::to_string(cPort) == acknowledgement), "Something has gone terribly wrong! " + std::to_string(cPort) + " != " + acknowledgement);
+	Static::portOut(cSd, std::to_string(cPort));
+	acknowledgement = Static::portIn(cSd);
+	Static::portOut(cSd, acknowledgement);
+    //Static::consoleOut("cPort: " + std::to_string(cPort) + "\nacknowledgement: " + acknowledgement + "\n");
+    Static::errChk(-1 + (std::to_string(cPort) == acknowledgement), "Something has gone terribly wrong! " + std::to_string(cPort) + " != " + acknowledgement);
 
-	Etc::portOut(cSd, cAddress);
-	acknowledgement = Etc::portIn(cSd);
-	Etc::portOut(cSd, acknowledgement);
-    //Etc::consoleOut("cAddress: " + cAddress + "\nacknowledgement: " + acknowledgement + "\n");
-    Etc::errChk(-1 + (cAddress == acknowledgement), "Something has gone terribly wrong! " + cAddress + " != " + acknowledgement);
+	Static::portOut(cSd, cAddress);
+	acknowledgement = Static::portIn(cSd);
+	Static::portOut(cSd, acknowledgement);
+    //Static::consoleOut("cAddress: " + cAddress + "\nacknowledgement: " + acknowledgement + "\n");
+    Static::errChk(-1 + (cAddress == acknowledgement), "Something has gone terribly wrong! " + cAddress + " != " + acknowledgement);
 
-    std::string s = "./player.out " + std::to_string(cPort) + " " + cAddress;
-    Etc::consoleOut("\n" + s + "\n");
-    Etc::consoleOut("press enter to continue\n");
-    Etc::consoleIn();
+    std::string s = "./peer.out " + std::to_string(cPort) + " " + cAddress;
+    Static::consoleOut("\nrunning: " + s + "\n");
+    //Static::consoleOut("press enter to continue\n");
+    //Static::consoleIn();
 
     //int ac; // call Player::main(s)
-    //char **av = Etc::parsedargs(s, &ac);
+    //char **av = Static::parsedargs(s, &ac);
     //Player::main(ac, av);
-    //Etc::freeparsedargs(av);
+    //Static::freeparsedargs(av);
     system(s.c_str()); // run (s)
 }
 
 void joinGame()
 {
     listGames();
-    Etc::consoleOut("type a username to enter a sea battle with: ");
-    std::string pUsername = Etc::consoleIn();
+    Static::consoleOut("type a username to enter a sea battle with: ");
+    std::string pUsername = Static::consoleIn();
 
-	Etc::portOut(cSd, pUsername); /// three-way handshake
-	acknowledgement = Etc::portIn(cSd);
-	Etc::portOut(cSd, acknowledgement);
-    //Etc::consoleOut("pUsername: " + pUsername + "\nacknowledgement: " + acknowledgement + "\n");
-    Etc::errChk(-1 + (pUsername == acknowledgement), "Something has gone terribly wrong! " + pUsername + " != " + acknowledgement);
+	Static::portOut(cSd, pUsername); /// three-way handshake
+	acknowledgement = Static::portIn(cSd);
+	Static::portOut(cSd, acknowledgement);
+    //Static::consoleOut("pUsername: " + pUsername + "\nacknowledgement: " + acknowledgement + "\n");
+    Static::errChk(-1 + (pUsername == acknowledgement), "Something has gone terribly wrong! " + pUsername + " != " + acknowledgement);
     
-    int pPort = stoi(Etc::portIn(cSd));
-	Etc::portOut(cSd, std::to_string(pPort));
-	acknowledgement = Etc::portIn(cSd);
-    //Etc::consoleOut("pPort: \n" + std::to_string(pPort) + "\nacknowledgement: \n" + acknowledgement + "\n");
-    Etc::errChk(-1 + (std::to_string(pPort) == acknowledgement), "Something has gone terribly wrong! " + std::to_string(pPort) + " != " + acknowledgement);
+    int pPort = stoi(Static::portIn(cSd));
+	Static::portOut(cSd, std::to_string(pPort));
+	acknowledgement = Static::portIn(cSd);
+    //Static::consoleOut("pPort: \n" + std::to_string(pPort) + "\nacknowledgement: \n" + acknowledgement + "\n");
+    Static::errChk(-1 + (std::to_string(pPort) == acknowledgement), "Something has gone terribly wrong! " + std::to_string(pPort) + " != " + acknowledgement);
 
-    std::string pAddress = Etc::portIn(cSd);
-	Etc::portOut(cSd, pAddress);
-	acknowledgement = Etc::portIn(cSd);
-    //Etc::consoleOut("pAddress: \n" + pAddress + "\nacknowledgement: \n" + acknowledgement + "\n");
-    Etc::errChk(-1 + (pAddress == acknowledgement), "Something has gone terribly wrong! " + pAddress + " != " + acknowledgement);
+    std::string pAddress = Static::portIn(cSd);
+	Static::portOut(cSd, pAddress);
+	acknowledgement = Static::portIn(cSd);
+    //Static::consoleOut("pAddress: \n" + pAddress + "\nacknowledgement: \n" + acknowledgement + "\n");
+    Static::errChk(-1 + (pAddress == acknowledgement), "Something has gone terribly wrong! " + pAddress + " != " + acknowledgement);
 
-    std::string s = "./player.out " + std::to_string(cPort) + " " + cAddress + " " + std::to_string(pPort) + " " + pAddress;
-    Etc::consoleOut("\n" + s + "\n");
-    Etc::consoleOut("press enter to continue\n");
-    Etc::consoleIn();
+    std::string s = "./peer.out " + std::to_string(cPort) + " " + cAddress + " " + std::to_string(pPort) + " " + pAddress;
+    Static::consoleOut("\nrunning: " + s + "\n");
+    //Static::consoleOut("press enter to continue\n");
+    //Static::consoleIn();
 
     //int ac; // call Player::main(s)
-    //char **av = Etc::parsedargs(s, &ac);
+    //char **av = Static::parsedargs(s, &ac);
     //Player::main(ac, av);
-    //Etc::freeparsedargs(av);
+    //Static::freeparsedargs(av);
     system(s.c_str()); // run (s)
+}
+
+void exitGame(){
 }
 
 void unregisterUser()
 {
-    Etc::consoleOut("cUsername: " + cUsername);
-	Etc::portOut(cSd, cUsername); /// three-way handshake
-	acknowledgement = Etc::portIn(cSd);
-	Etc::portOut(cSd, acknowledgement);
-   // Etc::consoleOut("\nacknowledgement: " + acknowledgement + "\n");
-    Etc::errChk(-1 + (cUsername == acknowledgement), "Something has gone terribly wrong! " + cUsername + " != " + acknowledgement);
+    Static::consoleOut("cUsername: " + cUsername);
+	Static::portOut(cSd, cUsername); /// three-way handshake
+	acknowledgement = Static::portIn(cSd);
+	Static::portOut(cSd, acknowledgement);
+   // Static::consoleOut("\nacknowledgement: " + acknowledgement + "\n");
+    Static::errChk(-1 + (cUsername == acknowledgement), "Something has gone terribly wrong! " + cUsername + " != " + acknowledgement);
 
     registered = false;
-    Etc::consoleOut("\nunregistration successful!\n");
-    Etc::consoleOut("press enter to continue\n");
-    Etc::consoleIn();
+    Static::consoleOut("\nunregistration successful!\n");
+    Static::consoleOut("press enter to continue\n");
+    Static::consoleIn();
 }
 
 int main(int argc, char const *argv[])
 {
-    //Etc::consoleOut("[int 0-9] enter the number you've been assigned: "); // hostname input
+    if (argc == 2) sAddress = argv[1]; // accepts argument for hostname input
+    //Static::consoleOut("[int 0-9] enter the number you've been assigned: "); // prompts for hostname input
     //sAddress = "uw1-320-0";
-    //sAddress += Etc::consoleIn();
+    //sAddress += Static::consoleIn();
 
-    Etc::clientSetup(sPort, sAddress, cSd, sendSockAddr);
-    Etc::portConnect(cSd, sendSockAddr);
+    Static::clientSetup(sPort, sAddress, cSd, sendSockAddr);
+    Static::portConnect(cSd, sendSockAddr);
 
     while (true) {
         std::cout << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl;
-        Etc::consoleOut("welcome to Sea Battle, a game by Team Cookies\n");
-        if (registered) Etc::consoleOut("\nyou are registered as " + cUsername + " on " + cAddress + ":" + std::to_string(cPort) + "\n");
-        if (!registered) Etc::consoleOut("[int 1] select from the following options:\n");
-        if (registered) Etc::consoleOut("[int 2-6] select from the following options:\n");
-	    if (!registered) Etc::consoleOut("[1] register user\n");
-	    if (registered) Etc::consoleOut("[2] list games\n");
-	    if (registered) Etc::consoleOut("[3] create game\n");
-	    if (registered) Etc::consoleOut("[4] join game\n");
-	    //if (registered) Etc::consoleOut("[5] exit game\n");
-	    if (registered) Etc::consoleOut("[6] unregister user\n");
-        if (registered) Etc::consoleOut("\n");
+        Static::consoleOut("welcome to Sea Battle, a game by Team Cookies\n");
+        if (registered) Static::consoleOut("\nyou are registered as " + cUsername + " on " + cAddress + ":" + std::to_string(cPort) + "\n");
+        if (!registered) Static::consoleOut("[int 1] select from the following options:\n");
+        if (registered) Static::consoleOut("[int 2-6] select from the following options:\n");
+	    if (!registered) Static::consoleOut("[1] register user\n");
+	    if (registered) Static::consoleOut("[2] list games\n");
+	    if (registered) Static::consoleOut("[3] create game\n");
+	    if (registered) Static::consoleOut("[4] join game\n");
+	    //if (registered) Static::consoleOut("[5] exit game\n");
+	    if (registered) Static::consoleOut("[6] unregister user\n");
+        if (registered) Static::consoleOut("\n");
 
-        //Etc::consoleOut("sselection: ");
-        std::string sselection = Etc::consoleIn();
-        Etc::validateSelection(sselection, registered, cUsername, cAddress, cPort);
+        //Static::consoleOut("sselection: ");
+        std::string sselection = Static::consoleIn();
+        Static::validateSelection(sselection, registered, cUsername, cAddress, cPort);
         int selection = stoi(sselection);
-	    Etc::portOut(cSd, std::to_string(selection)); /// three-way handshake
-	    acknowledgement = Etc::portIn(cSd);
-	    Etc::portOut(cSd, acknowledgement);
-        //Etc::consoleOut("acknowledgement: " + acknowledgement + "\n");
-        Etc::errChk(-1 + (std::to_string(selection) == acknowledgement), "Something has gone terribly wrong! " + std::to_string(selection) + " != " + acknowledgement);
+	    Static::portOut(cSd, std::to_string(selection)); /// three-way handshake
+	    acknowledgement = Static::portIn(cSd);
+	    Static::portOut(cSd, acknowledgement);
+        //Static::consoleOut("acknowledgement: " + acknowledgement + "\n");
+        Static::errChk(-1 + (std::to_string(selection) == acknowledgement), "Something has gone terribly wrong! " + std::to_string(selection) + " != " + acknowledgement);
 
         if (selection == 1 && !registered) registerUser();
-        else if (selection == 2 && registered) listGames();
+        else if (selection == 2 && registered){
+            listGames();
+            Static::consoleOut("press enter to continue\n");
+            Static::consoleIn();
+        }
         else if (selection == 3 && registered) createGame();
         else if (selection == 4 && registered) joinGame();
-        //else if (selection == 5 && registered) exitGame();
+        //else if (selection == 5 && registered){
+        //    Static::consoleOut("thanks for playing Sea Battle, a game by Team Cookies")
+        //    return 0; //exitGame();
+        //}
         else if (selection == 6 && registered) unregisterUser();
         else {
-            Etc::consoleOut("not a valid option...\n");
-            Etc::consoleOut("press enter to continue\n");
-            Etc::consoleIn();
+            Static::consoleOut("not a valid option...\n");
+            Static::consoleOut("press enter to continue\n");
+            Static::consoleIn();
         }
     }
 	close(cSd);

@@ -8,19 +8,13 @@
 #define RANDOM true
 #define SHIPCOUNT 10
 
+//#include "Static.h" // included in Peer.cpp
+
 //Board::Board(){
 //}
 
 //Board::~Board(){
 //}
-
-int Board::errChk(int errVal, std::string errMsg){ // TODO: Make this it's own class, since it's copied over from server and client.
-	if (errVal < 0) { // errVals under 0 will print errMsg and then exit the program with errVal.
-		std::cerr << errMsg << std::endl;
-		exit(errVal);
-	}
-	return errVal; // errVals over 0 will return the errVal without printing or exiting.
-}
 
 char Board::getBoard(int x, int y){
 	return board[x][y];
@@ -95,7 +89,7 @@ int Board::requestTranslator(char c){ // Translates human-readable text into com
 	else if (c == '7'){
 		return 6;
 	}
-	else return errChk(-1, "invalid input: " + std::to_string(c));
+	else return Static::errChk(-1, "invalid input: " + std::to_string(c));
 }
 
 char Board::responseTranslator(char c){ // Translates human-readable text into computer-readable code
@@ -106,7 +100,7 @@ char Board::responseTranslator(char c){ // Translates human-readable text into c
 	else if (c == 'm'){
 		return MISS;
 	}
-	else return errChk(-1, "invalid input: " + std::to_string(c));
+	else return Static::errChk(-1, "invalid input: " + std::to_string(c));
 }
 
 std::string Board::attackBoard(int x, int y){
@@ -127,7 +121,7 @@ std::string Board::attackBoard(int x, int y){
 		setBoard(x, y, MISS);
 		return "my, you already missed this spot...\n";
 	}
-	else return std::to_string(errChk(-1, "invalid input: " + std::to_string(x) + std::to_string(y)));
+	else return std::to_string(Static::errChk(-1, "invalid input: " + std::to_string(x) + std::to_string(y)));
 }
 
 void Board::initBoardSea(){

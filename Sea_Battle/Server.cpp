@@ -15,7 +15,7 @@
 #include <future>
 #include <unordered_map>
 
-#include "Etc.h"
+#include "Static.h"
 
 #define DEFAULT_SPORT 6932
 #define DEFAULT_SERVERSD -1
@@ -24,146 +24,151 @@
 int sPort = DEFAULT_SPORT;
 int serverSd = DEFAULT_SERVERSD;
 int newSd = DEFAULT_NEWSD;
-std::unordered_map<std::string, std::pair<int, std::string>> database; //contains players whom have selected "join game" and have not recieved a partner.
+std::unordered_map<std::string, std::pair<int, std::string>> games; //contains peers whom have selected "join game" and have not recieved a partner.
 std::string acknowledgement;
 
-void printDatabase(){
-    for(std::unordered_map<std::string, std::pair<int, std::string>>::const_iterator it = database.begin(); it != database.end(); ++it) {
-        std::cout << it->first << " " << it->second.first << " " << it->second.second << "\n";
+void printgames(){
+    for(std::unordered_map<std::string, std::pair<int, std::string>>::const_iterator it = games.begin(); it != games.end(); ++it) {
+        std::cout << "username: " + it->first << " port: " << it->second.first << " address: " << it->second.second << "\n";
     }
 }
 
 void registerUser(int sd)
 {
     // client-side function
-    printDatabase();
+    printgames();
 }
 
 void listGames(int sd)
 {
-    std::string games;
-    for(std::unordered_map<std::string, std::pair<int, std::string>>::const_iterator it = database.begin(); it != database.end(); ++it)
+    std::string sgames = "          ";
+    for(std::unordered_map<std::string, std::pair<int, std::string>>::const_iterator it = games.begin(); it != games.end(); ++it)
     {
-        games += it->first + " ";// + std::to_string(it->second.first) + " " + it->second.second + "\n";
+        sgames += it->first + " ";
+        //sgames += "username: " + it->first + " port: " + std::to_string(it->second.first) + " address: " + it->second.second + "\n";
     } // TODO: Stream the output to the user, don't concatenate it and make a single write.
 
-	Etc::portOut(sd, games);
-	acknowledgement = Etc::portIn(sd);
-    Etc::portOut(sd, acknowledgement);
-    Etc::consoleOut("games: \n" + games + "\nacknowledgement: \n" + acknowledgement + "\n");
-    Etc::errChk(-1 + (games == acknowledgement), "Something has gone terribly wrong!" + games + " != " + acknowledgement);
+	Static::portOut(sd, sgames);
+	acknowledgement = Static::portIn(sd);
+    Static::portOut(sd, acknowledgement);
+    Static::consoleOut("sgames: \n" + sgames + "\nacknowledgement: \n" + acknowledgement + "\n");
+    Static::errChk(-1 + (sgames == acknowledgement), "Something has gone terribly wrong!" + sgames + " != " + acknowledgement);
 
-    printDatabase();
+    printgames();
 }
 
 void createGame(int sd)
 {
-	std::string cUsername = Etc::portIn(sd); /// three-way handshake
-	Etc::portOut(sd, cUsername);
-	acknowledgement = Etc::portIn(sd);
-    Etc::consoleOut("cUsername: " + cUsername + "\nacknowledgement: " + acknowledgement + "\n");
-    Etc::errChk(-1 + (cUsername == acknowledgement), "Something has gone terribly wrong! " + cUsername + " != " + acknowledgement);
+	std::string cUsername = Static::portIn(sd); /// three-way handshake
+	Static::portOut(sd, cUsername);
+	acknowledgement = Static::portIn(sd);
+    Static::consoleOut("cUsername: " + cUsername + "\nacknowledgement: " + acknowledgement + "\n");
+    Static::errChk(-1 + (cUsername == acknowledgement), "Something has gone terribly wrong! " + cUsername + " != " + acknowledgement);
 
-    int cPort = std::stoi(Etc::portIn(sd));
-	Etc::portOut(sd, std::to_string(cPort));
-	acknowledgement = Etc::portIn(sd);
-    Etc::consoleOut("cPort: " + std::to_string(cPort) + "\nacknowledgement: " + acknowledgement + "\n");
-    Etc::errChk(-1 + (std::to_string(cPort) == acknowledgement), "Something has gone terribly wrong! " + std::to_string(cPort) + " != " + acknowledgement);
+    int cPort = std::stoi(Static::portIn(sd));
+	Static::portOut(sd, std::to_string(cPort));
+	acknowledgement = Static::portIn(sd);
+    Static::consoleOut("cPort: " + std::to_string(cPort) + "\nacknowledgement: " + acknowledgement + "\n");
+    Static::errChk(-1 + (std::to_string(cPort) == acknowledgement), "Something has gone terribly wrong! " + std::to_string(cPort) + " != " + acknowledgement);
 
-    Etc::consoleOut("cAddress: ");
-    std::string cAddress = Etc::portIn(sd);
-	Etc::portOut(sd, cAddress);
-	acknowledgement = Etc::portIn(sd);
-    Etc::consoleOut(cAddress + "\nacknowledgement: " + acknowledgement + "\n");
-    Etc::errChk(-1 + (cAddress == acknowledgement), "Something has gone terribly wrong! " + cAddress + " != " + acknowledgement);
+    Static::consoleOut("cAddress: ");
+    std::string cAddress = Static::portIn(sd);
+	Static::portOut(sd, cAddress);
+	acknowledgement = Static::portIn(sd);
+    Static::consoleOut(cAddress + "\nacknowledgement: " + acknowledgement + "\n");
+    Static::errChk(-1 + (cAddress == acknowledgement), "Something has gone terribly wrong! " + cAddress + " != " + acknowledgement);
 
-    //database.insert(make_pair(cUsername, make_pair(cPort, cAddress))); // does not overwrite duplicates
-    database[cUsername] = make_pair(cPort,cAddress); // overwrites duplicates
-    printDatabase();
+    //games.insert(make_pair(cUsername, make_pair(cPort, cAddress))); // does not overwrite duplicates
+    games[cUsername] = make_pair(cPort,cAddress); // overwrites duplicates
+    printgames();
 }
 
 void joinGame(int sd)
 {
     listGames(sd);
 
-	std::string pUsername = Etc::portIn(sd); /// three-way handshake
-	Etc::portOut(sd, pUsername);
-	acknowledgement = Etc::portIn(sd);
-    Etc::consoleOut("pUsername: " + pUsername + "\nacknowledgement: " + acknowledgement + "\n");
-    Etc::errChk(-1 + (pUsername == acknowledgement), "Something has gone terribly wrong! " + pUsername + " != " + acknowledgement);
+	std::string pUsername = Static::portIn(sd); /// three-way handshake
+	Static::portOut(sd, pUsername);
+	acknowledgement = Static::portIn(sd);
+    Static::consoleOut("pUsername: " + pUsername + "\nacknowledgement: " + acknowledgement + "\n");
+    Static::errChk(-1 + (pUsername == acknowledgement), "Something has gone terribly wrong! " + pUsername + " != " + acknowledgement);
 
-    Etc::portOut(sd, std::to_string(database[pUsername].first));
-	acknowledgement = Etc::portIn(sd);
-    Etc::portOut(sd, acknowledgement);
-    Etc::consoleOut("pPort: \n" + std::to_string(database[pUsername].first) + "\nacknowledgement: \n" + acknowledgement + "\n");
-    Etc::errChk(-1 + (std::to_string(database[pUsername].first) == acknowledgement), "Something has gone terribly wrong!" + std::to_string(database[pUsername].first) + " != " + acknowledgement);
+    Static::portOut(sd, std::to_string(games[pUsername].first));
+	acknowledgement = Static::portIn(sd);
+    Static::portOut(sd, acknowledgement);
+    Static::consoleOut("pPort: \n" + std::to_string(games[pUsername].first) + "\nacknowledgement: \n" + acknowledgement + "\n");
+    Static::errChk(-1 + (std::to_string(games[pUsername].first) == acknowledgement), "Something has gone terribly wrong!" + std::to_string(games[pUsername].first) + " != " + acknowledgement);
 
-	Etc::portOut(sd, database[pUsername].second);
-	acknowledgement = Etc::portIn(sd);
-    Etc::portOut(sd, acknowledgement);
-    Etc::consoleOut("pAddress: \n" + database[pUsername].second + "\nacknowledgement: \n" + acknowledgement + "\n");
-    Etc::errChk(-1 + (database[pUsername].second == acknowledgement), "Something has gone terribly wrong!" + database[pUsername].second + " != " + acknowledgement);
+	Static::portOut(sd, games[pUsername].second);
+	acknowledgement = Static::portIn(sd);
+    Static::portOut(sd, acknowledgement);
+    Static::consoleOut("pAddress: \n" + games[pUsername].second + "\nacknowledgement: \n" + acknowledgement + "\n");
+    Static::errChk(-1 + (games[pUsername].second == acknowledgement), "Something has gone terribly wrong!" + games[pUsername].second + " != " + acknowledgement);
 
-    database.erase(pUsername);
-    printDatabase();
+    games.erase(pUsername);
+    printgames();
+}
+
+void exitGame(int sd){
+    Static::consoleOut("exit signal recieved from: " + sd);
 }
 
 void unregisterUser(int sd)
 {
-	std::string cUsername = Etc::portIn(sd); /// three-way handshake
-	Etc::portOut(sd, cUsername);
-	acknowledgement = Etc::portIn(sd);
-    Etc::consoleOut("cUsername: " + cUsername + "\nacknowledgement: " + acknowledgement + "\n");
-    Etc::errChk(-1 + (cUsername == acknowledgement), "Something has gone terribly wrong! " + cUsername + " != " + acknowledgement);
+	std::string cUsername = Static::portIn(sd); /// three-way handshake
+	Static::portOut(sd, cUsername);
+	acknowledgement = Static::portIn(sd);
+    Static::consoleOut("cUsername: " + cUsername + "\nacknowledgement: " + acknowledgement + "\n");
+    Static::errChk(-1 + (cUsername == acknowledgement), "Something has gone terribly wrong! " + cUsername + " != " + acknowledgement);
 
-    database.erase(cUsername);
-    printDatabase();
+    games.erase(cUsername);
+    printgames();
 }
 
 void *server(void *)
 {
     int sd = newSd;
-    Etc::consoleOut("sd: " + sd);
+    Static::consoleOut("sd: " + sd);
     while (true) {
-        std::string sselection = Etc::portIn(sd); /// three-way handshake
-        int selection = stoi(sselection); // safety is guaranteed through handshake, not through validation
-	    Etc::portOut(sd, std::to_string(selection));
-	    acknowledgement = Etc::portIn(sd);
-        Etc::consoleOut("selection: " + std::to_string(selection) + "\nacknowledgement: " + acknowledgement + "\n");
-        Etc::errChk(-1 + (std::to_string(selection) == acknowledgement), "Something has gone terribly wrong!" + std::to_string(selection) + " != " + acknowledgement);
+        std::string sselection = Static::portIn(sd); /// three-way handshake
+        int selection = stoi(sselection); // safety is guaranteed through integrity of client validation, not server validation
+	    Static::portOut(sd, std::to_string(selection));
+	    acknowledgement = Static::portIn(sd);
+        Static::consoleOut("selection: " + std::to_string(selection) + "\nacknowledgement: " + acknowledgement + "\n");
+        Static::errChk(-1 + (std::to_string(selection) == acknowledgement), "Something has gone terribly wrong!" + std::to_string(selection) + " != " + acknowledgement);
 
         if (selection == 1) registerUser(sd);
         else if (selection == 2) listGames(sd);
         else if (selection == 3) createGame(sd);
         else if (selection == 4) joinGame(sd);
-        //else if (selection == 5) exitGame(sd);
+        //else if (selection == 5) std::this_thread::sleep_for(std::chrono::hours(1));//exitGame(sd); // stall thread termination for an hour, thereby preventing server crash, lol.
         else if (selection == 6) unregisterUser(sd);
         else {
-            Etc::consoleOut("not a valid option...\n");
+            Static::consoleOut("not a valid option...\n");
         }
     }
+
 	close(serverSd);
     close(sd);
 	exit(0);
     return 0;
-
 }
 
 int main(int argc, char const *argv[])
 {
-    Etc::serverSetup(sPort, serverSd);
-    Etc::consoleOut("Welcome to Sea Battle, a game by Team Cookies\n");
+    Static::serverSetup(sPort, serverSd);
+    Static::consoleOut("Welcome to Sea Battle, a game by Team Cookies\n");
     while (true) {
         sockaddr_in newSockAddr;
-        newSd = Etc::portAccept(serverSd, newSockAddr);
+        newSd = Static::portAccept(serverSd, newSockAddr);
         
 	    pthread_t t;
         //pthread_attr_t attr;
         //pthread_attr_init(&attr);
         
-	    Etc::errChk(pthread_create(&t, NULL, server, NULL ), "Error: Thread failed to create.");
-	    Etc::errChk(pthread_detach(t), "Error: Thread failed to detach.");
-        //Etc::errChk(pthread_join(t, NULL), "Error: Thread failed to join.");
+	    Static::errChk(pthread_create(&t, NULL, server, NULL ), "Error: Thread failed to create.");
+	    Static::errChk(pthread_detach(t), "Error: Thread failed to detach.");
+        //Static::errChk(pthread_join(t, NULL), "Error: Thread failed to join.");
         //pthread_cancel(t);
         //pthread_exit(NULL)
     }
