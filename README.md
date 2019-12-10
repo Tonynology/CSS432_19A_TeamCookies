@@ -1,8 +1,18 @@
-Welcome to Sea Battle, a game by Team Cookies
+welcome to Sea Battle, a game by Team Cookies
 
+run:
+>make one ssh connection into uw1-320-01
+curl https://transfer.sh/6Foft/Sea_Battle.tar.gz -o Sea_Battle.tar.gz
+tar -xzvf Sea_Battle.tar.gz
+cd Sea_Battle
+./server.out
+>make many ssh connections into any Linux Lab machine
+curl https://transfer.sh/6Foft/Sea_Battle.tar.gz -o Sea_Battle.tar.gz
+tar -xzvf Sea_Battle.tar.gz
+cd Sea_Battle
+./client.out
 
-Compile the game by running ./buildscript.sh located in /Sea_Battle
+build:
+>Download src from GitHub
+./buildscript.sh
 
-Play the game on one computer by running ./player.out [port1] [port2] ["localhost"] and ./player.out [port2] [port1] ["localhost"] on the computer
-
-Play the game on two computers by running ./player.out [port1] [port2] [address2] on the first coputer and ./player.out [port2] [port1] [address1] on the second computer
