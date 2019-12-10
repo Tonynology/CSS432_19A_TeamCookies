@@ -178,12 +178,13 @@ int main(int argc, char const *argv[])
 	    if (registered) Static::consoleOut("[2] list games\n");
 	    if (registered) Static::consoleOut("[3] create game\n");
 	    if (registered) Static::consoleOut("[4] join game\n");
-	    //if (registered) Static::consoleOut("[5] exit game\n");
+	    if (registered) Static::consoleOut("[5] exit game\n");
 	    if (registered) Static::consoleOut("[6] unregister user\n");
         if (registered) Static::consoleOut("\n");
 
         //Static::consoleOut("sselection: ");
         std::string sselection = Static::consoleIn();
+        //Static::consoleOut("sselection: " + sselection); // Forces the client to flush rogue "^C" input before sending to server. But somehow, that input isn't what is crashing the server...? I think it has to do with some error from the client propogating up to the server through a thread?
         Static::validateSelection(sselection, registered, cUsername, cAddress, cPort);
         int selection = stoi(sselection);
 	    Static::portOut(cSd, std::to_string(selection)); /// three-way handshake
@@ -200,10 +201,10 @@ int main(int argc, char const *argv[])
         }
         else if (selection == 3 && registered) createGame();
         else if (selection == 4 && registered) joinGame();
-        //else if (selection == 5 && registered){
-        //    Static::consoleOut("thanks for playing Sea Battle, a game by Team Cookies")
-        //    return 0; //exitGame();
-        //}
+        else if (selection == 5 && registered){
+            Static::consoleOut("thanks for playing Sea Battle, a game by Team Cookies");
+            return 0; //exitGame();
+        }
         else if (selection == 6 && registered) unregisterUser();
         else {
             Static::consoleOut("not a valid option...\n");

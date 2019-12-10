@@ -27,7 +27,11 @@ int newSd = DEFAULT_NEWSD;
 std::unordered_map<std::string, std::pair<int, std::string>> games; //contains peers whom have selected "join game" and have not recieved a partner.
 std::string acknowledgement;
 
-void printgames(){
+void blackHole(){
+    while (true) std::this_thread::sleep_for(std::chrono::hours(1));// stall thread termination for an hour, thereby preventing server crash, lol.
+}
+
+void printGames(){
     for(std::unordered_map<std::string, std::pair<int, std::string>>::const_iterator it = games.begin(); it != games.end(); ++it) {
         std::cout << "username: " + it->first << " port: " << it->second.first << " address: " << it->second.second << "\n";
     }
@@ -36,7 +40,7 @@ void printgames(){
 void registerUser(int sd)
 {
     // client-side function
-    printgames();
+    printGames();
 }
 
 void listGames(int sd)
@@ -54,7 +58,7 @@ void listGames(int sd)
     Static::consoleOut("sgames: \n" + sgames + "\nacknowledgement: \n" + acknowledgement + "\n");
     Static::errChk(-1 + (sgames == acknowledgement), "Something has gone terribly wrong!" + sgames + " != " + acknowledgement);
 
-    printgames();
+    printGames();
 }
 
 void createGame(int sd)
@@ -80,7 +84,7 @@ void createGame(int sd)
 
     //games.insert(make_pair(cUsername, make_pair(cPort, cAddress))); // does not overwrite duplicates
     games[cUsername] = make_pair(cPort,cAddress); // overwrites duplicates
-    printgames();
+    printGames();
 }
 
 void joinGame(int sd)
@@ -106,7 +110,7 @@ void joinGame(int sd)
     Static::errChk(-1 + (games[pUsername].second == acknowledgement), "Something has gone terribly wrong!" + games[pUsername].second + " != " + acknowledgement);
 
     games.erase(pUsername);
-    printgames();
+    printGames();
 }
 
 void exitGame(int sd){
@@ -122,7 +126,7 @@ void unregisterUser(int sd)
     Static::errChk(-1 + (cUsername == acknowledgement), "Something has gone terribly wrong! " + cUsername + " != " + acknowledgement);
 
     games.erase(cUsername);
-    printgames();
+    printGames();
 }
 
 void *server(void *)
@@ -130,6 +134,7 @@ void *server(void *)
     int sd = newSd;
     Static::consoleOut("sd: " + sd);
     while (true) {
+        try{
         std::string sselection = Static::portIn(sd); /// three-way handshake
         int selection = stoi(sselection); // safety is guaranteed through integrity of client validation, not server validation
 	    Static::portOut(sd, std::to_string(selection));
@@ -141,10 +146,15 @@ void *server(void *)
         else if (selection == 2) listGames(sd);
         else if (selection == 3) createGame(sd);
         else if (selection == 4) joinGame(sd);
-        //else if (selection == 5) std::this_thread::sleep_for(std::chrono::hours(1));//exitGame(sd); // stall thread termination for an hour, thereby preventing server crash, lol.
+        else if (selection == 5) blackHole();
         else if (selection == 6) unregisterUser(sd);
         else {
             Static::consoleOut("not a valid option...\n");
+        }
+        }
+        catch(const std::invalid_argument& ia){
+            std::cerr << "Panic!" << ia.what();
+            blackHole();
         }
     }
 
