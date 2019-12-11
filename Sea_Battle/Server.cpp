@@ -14,7 +14,15 @@
 #include <iostream>
 #include <future>
 #include <unordered_map>
+#include <signal.h>
+#include <stdlib.h>
+#include <stdio.h>
 
+void my_handler(int s){
+           printf("Caught signal %d\n",s);
+           exit(1); 
+
+}
 #include "Static.h"
 
 #define DEFAULT_SPORT 6932
@@ -25,6 +33,17 @@ int sPort = DEFAULT_SPORT;
 int serverSd = DEFAULT_SERVERSD;
 int newSd = DEFAULT_NEWSD;
 std::unordered_map<std::string, std::pair<int, std::string>> games; //contains peers whom have selected "join game" and have not recieved a partner.
+
+int debug = 0;
+
+void debugger(){
+    debug++;
+    std::cerr << debug;
+}
+
+int getSPort( ) { return sPort; }
+
+void setSPort( int s ) { Static::validatePort(s); sPort = s; }
 
 void blackHole(){
     while (true) std::this_thread::sleep_for(std::chrono::hours(1));// stall thread termination for an hour, thereby preventing server crash, lol.
@@ -67,25 +86,36 @@ void createGame(int sd)
 	Static::portOut(sd, sgames);
     Static::consoleOut("sgames: \n" + sgames + "\n");
 
-	std::string cUsername = Static::portIn(sd); /// three-way handshake
+	std::string cUsername = Static::portIn(sd);
     Static::consoleOut("cUsername: " + cUsername + "\n");
 
-    int cPort = std::stoi(Static::portIn(sd));
+    int cPort = Static::to_int(Static::portIn(sd));
     Static::consoleOut("cPort: " + std::to_string(cPort) + "\n");
 
     std::string cAddress = Static::portIn(sd);
     Static::consoleOut("cAddress: " + cAddress + "\n");
 
-    //games.insert(make_pair(cUsername, make_pair(cPort, cAddress))); // does not overwrite duplicates
-    games[cUsername] = make_pair(cPort,cAddress); // overwrites duplicates
+    games.insert(make_pair(cUsername, make_pair(cPort, cAddress))); // does not overwrite duplicates
+    //games[cUsername] = make_pair(cPort,cAddress); // overwrites duplicates
     printGames();
 }
 
 void joinGame(int sd)
 {
-    listGames(sd);
+    std::string sgames = "          ";
+    for(std::unordered_map<std::string, std::pair<int, std::string>>::const_iterator it = games.begin(); it != games.end(); ++it)
+    {
+        sgames += it->first + " ";
+        //sgames += "username: " + it->first + " port: " + std::to_string(it->second.first) + " address: " + it->second.second + "\n";
+    } // TODO: Stream the output to the user, don't concatenate it and make a single write.
 
-	std::string pUsername = Static::portIn(sd); /// three-way handshake
+	Static::portOut(sd, sgames);
+    Static::consoleOut("sgames: \n" + sgames + "\n");
+
+	std::string pUsername = Static::portIn(sd);
+    if (pUsername.empty()) pthread_exit(NULL);
+    else if (games.find(pUsername) == games.end()) Static::portOut(sd, "-1");
+    else {
     Static::consoleOut("pUsername: " + pUsername + "\n");
 
     Static::portOut(sd, std::to_string(games[pUsername].first));
@@ -96,6 +126,7 @@ void joinGame(int sd)
 
     games.erase(pUsername);
     printGames();
+    }
 }
 
 void exitGame(int sd){
@@ -116,27 +147,22 @@ void *server(void *)
     int sd = newSd;
     Static::consoleOut("sd: " + sd);
     while (true) {
-        try{
-            std::string sselection = Static::portIn(sd);
-            int selection = stoi(sselection); // safety is guaranteed through integrity of client validation, not server validation
-            Static::consoleOut("selection: " + std::to_string(selection) + "\n");
+        int selection = Static::to_int(Static::portIn(sd)); // safety through client validation, client integrity, and server validation
+        //Static::validateSelection(selection);
 
-            if (selection == 1) registerUser(sd);
-            else if (selection == 2) listGames(sd);
-            else if (selection == 3) createGame(sd);
-            else if (selection == 4) joinGame(sd);
-            else if (selection == 5) blackHole();
-            else if (selection == 6) unregisterUser(sd);
-            else {
-                Static::consoleOut("not a valid option...\n");
-            }
-        }
-        catch(const std::invalid_argument& ia){
-            std::cerr << "panic!" << ia.what();
-            blackHole();
+        Static::consoleOut("selection: " + std::to_string(selection) + "\n");
+
+        if (selection == 1) registerUser(sd);
+        else if (selection == 2) listGames(sd);
+        else if (selection == 3) createGame(sd);
+        else if (selection == 4) joinGame(sd);
+        else if (selection == 5) pthread_exit(NULL);
+        else if (selection == 6) unregisterUser(sd);
+        else {
+            Static::consoleOut("not a valid option...\n");
+            pthread_exit(NULL);
         }
     }
-
 	close(serverSd);
     close(sd);
 	exit(0);
@@ -150,7 +176,7 @@ int main(int argc, char const *argv[])
     //    sPort = Static::consoleIn();
     }
     else if (argc == 2){ // argument for port
-        sPort = std::stoi(argv[1]);
+        setSPort(Static::to_int(argv[1]));
     }
     else{
 		Static::errChk(-1, "usage: ./server.out [server port]");
@@ -158,7 +184,9 @@ int main(int argc, char const *argv[])
 
     Static::serverSetup(sPort, serverSd);
     Static::consoleOut("Welcome to Sea Battle, a game by Team Cookies\n");
+    here:
     while (true) {
+        there:
         sockaddr_in newSockAddr;
         newSd = Static::portAccept(serverSd, newSockAddr);
         
@@ -171,7 +199,9 @@ int main(int argc, char const *argv[])
         //Static::errChk(pthread_join(t, NULL), "Error: Thread failed to join.");
         //pthread_cancel(t);
         //pthread_exit(NULL)
+        goto here;
     }
+    goto there;
     exit(0);
     return 0;
 }

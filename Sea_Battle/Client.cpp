@@ -9,8 +9,10 @@
 #include <sys/uio.h>      // writev
 
 #include <stdio.h>
-#include <stdlib.h>
+#include <cstdlib>
 #include <limits.h>
+#define PORT_NUMBER_MAX 65535
+#define PORT_NUMBER_MIN 1023
 
 #include <string>
 #include <iostream>
@@ -41,8 +43,8 @@ void registerUser()
     //cUsername = Static::consoleIn(); // user info from console, prone to errors
     //Static::consoleOut("cUsername: " + cUsername + "\n");
     srand(time(NULL));
-    cPort = 1023 + rand() % (65535 - 1023);
-    //cPort = stoi(Static::consoleIn());
+    cPort = PORT_NUMBER_MIN + rand() % (PORT_NUMBER_MAX - PORT_NUMBER_MIN);
+    //cPort = Static::to_int(Static::consoleIn());
     //Static::consoleOut("cPort: " + std::to_string(cPort) + "\n");
     char hostname[HOST_NAME_MAX];
     gethostname(hostname, HOST_NAME_MAX);
@@ -90,11 +92,22 @@ void joinGame()
 
     Static::consoleOut("type a username to enter a sea battle with: ");
     std::string pUsername = Static::consoleIn();
-
+    if (pUsername.empty()) {
+        Static::consoleOut("come on now, that user wasn't listed...");
+        Static::consoleOut("press enter to return to menu\n");
+        Static::consoleIn();
+    }
+    else{
 	Static::portOut(cSd, pUsername);
-    int pPort = stoi(Static::portIn(cSd));
+    int pPort = Static::to_int(Static::portIn(cSd));
+    if (pPort == -1){
+        Static::consoleOut("come on now, that user wasn't listed...");
+        Static::consoleOut("press enter to return to menu\n");
+        Static::consoleIn();
+    }
+    else{
+    Static::validatePort(pPort);
     std::string pAddress = Static::portIn(cSd);
-
     std::string s = "./peer.out " + std::to_string(cPort) + " " + cAddress + " " + std::to_string(pPort) + " " + pAddress;
     Static::consoleOut("\nrunning: " + s + "\n");
     Static::consoleOut("press enter to launch the game\n");
@@ -104,6 +117,8 @@ void joinGame()
     //Player::main(ac, av);
     //Static::freeparsedargs(av);
     system(s.c_str()); // run (s)
+    }
+    }
 }
 
 int exitGame()
@@ -116,12 +131,12 @@ void unregisterUser()
 {
 	Static::portOut(cSd, cUsername);
 
-    std::string cUsername = DEFAULT_CUSERNAME;
-    int sPort = DEFAULT_SPORT;
-    int cPort = DEFAULT_CPORT;
-    std::string sAddress = DEFAULT_SADDRESS;
-    std::string cAddress = DEFAULT_CADDRESS;
-    int cSd = DEFAULT_CSD;
+    cUsername = DEFAULT_CUSERNAME;
+    sPort = DEFAULT_SPORT;
+    cPort = DEFAULT_CPORT;
+    sAddress = DEFAULT_SADDRESS;
+    cAddress = DEFAULT_CADDRESS;
+    cSd = DEFAULT_CSD;
 
     Static::consoleOut("\nunregistration successful!\n");
     Static::consoleOut("press enter to return to menu\n");
@@ -141,7 +156,7 @@ int main(int argc, char const *argv[])
     }
     else if (argc == 3){ // argument for hostname and port
         sAddress = argv[1];
-        sPort = std::stoi(argv[2]);
+        sPort = Static::to_int(argv[2]);
     }
     else{
 		Static::errChk(-1, "usage: ./client.out [server hostname] [server port]");
@@ -165,9 +180,9 @@ int main(int argc, char const *argv[])
         if (!cUsername.empty()) Static::consoleOut("\n");
 
         Static::consoleOut("-> ");
-        std::string sselection = Static::consoleIn();
-        // TODO: Static::validateSelection(sselection, registered, cUsername, cAddress, cPort);
-        int selection = stoi(sselection); // lol, no integrity here...
+        int selection = Static::to_int(Static::consoleIn());
+        //Static::validateSelection(selection); //handled below
+
 	    Static::portOut(cSd, std::to_string(selection));
 
         if (selection == 1 && cUsername.empty()) registerUser();

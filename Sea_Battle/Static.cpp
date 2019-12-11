@@ -1,4 +1,7 @@
 #include <string.h>
+#include <limits.h>
+#define PORT_NUMBER_MAX 65535
+#define PORT_NUMBER_MIN 1023
 
 #define TODO 1024
 
@@ -11,45 +14,28 @@ int Static::errChk(int errVal, std::string errMsg){
 }
 
 int Static::to_int(std::string s){
-  int i;
   try{
-    i = std::stoi(s);
-    return i;
+    return std::stoi(s);
   }
-  catch (const std::invalid_argument& ia){
-    std::cerr << "Invalid argument: " << ia.what() << std::endl;
+  catch (const std::exception& ia){
     return -1;
-  }
-  catch (const std::out_of_range& oor) {
-    std::cerr << "Out of Range error: " << oor.what() << std::endl;
-    return -2;
-  }
-  catch (const std::exception& e)
-  {
-    std::cerr << "Undefined error: " << e.what() << std::endl;
-    return -3;
   }
 }
 
-void Static::validateSelection(std::string &selection, bool registered, std::string cUsername, std::string cAddress, int cPort){
-    if (selection.size() != 1 || (selection[0] != '1' && selection[0] != '2' && selection[0] != '3' && selection[0] != '4' && selection[0] != '5' && selection[0] != '6'))
-    {
-		Static::consoleOut("invalid selection...\n");
-
-      if (registered) Static::consoleOut("\nyou are registered as " + cUsername + " on " + cAddress + ":" + std::to_string(cPort) + "\n");
-      if (!registered) Static::consoleOut("[int 1] select from the following options:\n");
-      if (registered) Static::consoleOut("[int 2-6] select from the following options:\n");
-	    if (!registered) Static::consoleOut("[1] register user\n");
-	    if (registered) Static::consoleOut("[2] list games\n");
-	    if (registered) Static::consoleOut("[3] create game\n");
-	    if (registered) Static::consoleOut("[4] join game\n");
-	    if (registered) Static::consoleOut("[5] exit game\n");
-	    if (registered) Static::consoleOut("[6] unregister user\n");
-      if (registered) Static::consoleOut("\n");
-
-      selection = Static::consoleIn();
-      validateSelection(selection, registered, cUsername, cAddress, cPort);
+void Static::validatePort(int &port){
+    if (port < PORT_NUMBER_MIN || port > PORT_NUMBER_MAX){
+        Static::consoleErr("port must be a number between " + std::string(std::to_string(PORT_NUMBER_MIN)) + " and " + std::string(std::to_string(PORT_NUMBER_MAX)) + ". try again: ");
+        port = Static::to_int(Static::consoleIn());
+        validatePort(port);
     }
+}
+
+void Static::validateSelection(int &selection){
+  if (selection < 1 || selection > 6){
+    Static::consoleErr("selection must be a number between " + std::string(std::to_string(1)) + " and " + std::string(std::to_string(6)) + ". try again: ");
+    selection = Static::to_int(Static::consoleIn());
+    validateSelection(selection);
+  }
 }
 
 void Static::validateCoord(std::string &coord){
