@@ -1,18 +1,18 @@
 welcome to Sea Battle, a game by Team Cookies
 
-run:
->make one ssh connection into uw1-320-01
-curl https://transfer.sh/6Foft/Sea_Battle.tar.gz -o Sea_Battle.tar.gz
-tar -xzvf Sea_Battle.tar.gz
-cd Sea_Battle
-./server.out
->make many ssh connections into any Linux Lab machine
-curl https://transfer.sh/6Foft/Sea_Battle.tar.gz -o Sea_Battle.tar.gz
-tar -xzvf Sea_Battle.tar.gz
-cd Sea_Battle
-./client.out
+upload:
+tar -czvf src.tar.gz src
+curl --upload-file ./src.tar.gz https://transfer.sh/src.tar.gz
 
-build:
->Download src from GitHub
+download:
+curl htts://transfer.sh/ThEXh/src.tar.gz -o src.tar.gz
+tar -xzvf src.tar.gz
+cd src
+
+compile:
 ./buildscript.sh
 
+run:
+./server.out
+./client.out
+./peer.out
