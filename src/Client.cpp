@@ -164,13 +164,22 @@ int main(int argc, char const *argv[])
 
     Static::clientSetup(sPort, sAddress, cSd, sendSockAddr);
     Static::portConnect(cSd, sendSockAddr);
-
     while (true) {
         std::cout << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl;
         Static::consoleOut("welcome to Sea Battle, a game by Team Cookies\n");
+        /* Credit to artist jgs for ASCII art
+	    https://www.oocities.org/spunk1111/transp.htm?201911 */
+        std::cout << R"(
+
+                   ,:',:`,:'
+                __||_||_||_||_||__
+           ____[""""""""""""""""""]____
+           \ " ''''''''''''''''''''''' \
+    ~~jgs~^~^~^^~^~^~^~^~^~^~^~~^~^~~^~^~^^~~^~^
+        )" << '\n';
+
         if (!cUsername.empty()) Static::consoleOut("\nyou are registered as " + cUsername + "@" + cAddress + ":" + std::to_string(cPort) + "\n");
-        if (cUsername.empty()) Static::consoleOut("[int 1] select from the following options:\n");
-        if (!cUsername.empty()) Static::consoleOut("[int 2-6] select from the following options:\n");
+        Static::consoleOut("select from the following options:\n");
 	    if (cUsername.empty()) Static::consoleOut("[1] register user\n");
 	    if (!cUsername.empty()) Static::consoleOut("[2] list games\n");
 	    if (!cUsername.empty()) Static::consoleOut("[3] create game\n");
@@ -179,7 +188,7 @@ int main(int argc, char const *argv[])
 	    if (!cUsername.empty()) Static::consoleOut("[6] unregister user\n");
         if (!cUsername.empty()) Static::consoleOut("\n");
 
-        Static::consoleOut("-> ");
+        Static::consoleOut("→ ");
         int selection = Static::to_int(Static::consoleIn());
         //Static::validateSelection(selection); //handled below
 

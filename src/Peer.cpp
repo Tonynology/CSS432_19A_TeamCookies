@@ -48,8 +48,6 @@ void setNewSd( int n ) { newSd = n; }
 void setClientSd( int c ) { clientSd = c; }
 
 int main( int argc, char *argv[] ) {
-	Static::consoleOut("\npreparing local resources...");
-	
 	if (argc == 0){
 		Static::errChk(-1, "usage: ./player.out [iport] [uport] [uaddress]"); // TODO: allow localhost game by port swap detecting upon busy port
     }
@@ -71,15 +69,11 @@ int main( int argc, char *argv[] ) {
 	else {
 		Static::errChk(-1, "usage: ./player.out [iport] [uport] [uaddress]");
 	}
-
-	std::this_thread::sleep_for(std::chrono::milliseconds(100));
-	Static::consoleOut("\nlocal resources prepared!");
-	std::this_thread::sleep_for(std::chrono::milliseconds(500));
-	Static::consoleOut("\nestablishing remote connection...");
 	
 	sockaddr_in newSockAddr;
     Static::serverSetup(getIPort(), serverSd);
 	if (argc == 3) {
+        Static::consoleOut("waiting for opponent...");
         pthread_t t;
         Static::startDots(t);
         
@@ -100,11 +94,11 @@ int main( int argc, char *argv[] ) {
 	
     sockaddr_in sendSockAddr;
     Static::clientSetup(getUPort(), getUAddress(), clientSd, sendSockAddr);
-	if (argc == 5) { /// send iPort iAddress
+	if (argc == 5) {
     //TODO: If the port connection fails (ex. desired other player is not running), this should fail gracefully.
 		Static::portConnect(getClientSd(), sendSockAddr);
 		
-		Static::portOut(getClientSd(), std::to_string(getIPort())); /// three-way handshake
+		Static::portOut(getClientSd(), std::to_string(getIPort()));
 		std::string sPort = Static::portIn(getClientSd());
 		Static::portOut(getClientSd(), sPort);
 		
@@ -134,7 +128,7 @@ int main( int argc, char *argv[] ) {
 		}
 	}
 
-	Static::consoleOut("\nRemote connection established!\n");
+	Static::consoleOut("opponent found!\n");
 	std::this_thread::sleep_for(std::chrono::milliseconds(500));
 	std::cout << "iport: " << getIPort() << " iaddress: " << getIAddress() << std::endl;
 	std::cout << "uport: " << getUPort() << " uaddress: " << getUAddress() << std::endl;
@@ -225,9 +219,7 @@ int main( int argc, char *argv[] ) {
         Static::consoleOut("Map: \n");
         map.printBoard();
         bool lose = field.checkLose();
-        if (lose == true){
-            
-        }
+        if (lose == true) goto lose;
         //std::cout << std::flush << std::endl; // Program hangs right here and I have no idea what is wrong with it. Bth players mst press enter to proceed.
         Static::consoleOut("press enter to continue"); //I htink it may have to do with the lingering Static::consoleIn async function.
         //Symptoms so far: Sometimes the "turn sequence" will begin immediately upon pressing enter. It does this for each player, individually.

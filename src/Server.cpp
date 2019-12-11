@@ -18,11 +18,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-void my_handler(int s){
-           printf("Caught signal %d\n",s);
-           exit(1); 
-
-}
 #include "Static.h"
 
 #define DEFAULT_SPORT 6932
@@ -44,10 +39,6 @@ void debugger(){
 int getSPort( ) { return sPort; }
 
 void setSPort( int s ) { Static::validatePort(s); sPort = s; }
-
-void blackHole(){
-    while (true) std::this_thread::sleep_for(std::chrono::hours(1));// stall thread termination for an hour, thereby preventing server crash, lol.
-}
 
 void printGames(){    
     for(std::unordered_map<std::string, std::pair<int, std::string>>::const_iterator it = games.begin(); it != games.end(); ++it) {
@@ -186,11 +177,25 @@ int main(int argc, char const *argv[])
 
     char hostname[HOST_NAME_MAX];
     gethostname(hostname, HOST_NAME_MAX);
-    Static::consoleOut("your hostname is: " + std::string(hostname) + " and your port is: " + std::to_string(sPort) + "\n");
+    /* Credit to artist jgs for ASCII art
+    https://www.oocities.org/spunk1111/food.htm?201911 */
+    std::cout << R"(
+                               .-'''''-.
+                               |'-----'|
+                               |-.....-|
+                               |       |
+                               |       |
+              _,._             |       |
+         __.o`   o`"-.         |       |
+      .-O o `"-.o   O )_,._    |       |
+     ( o   O  o )--.-"`O   o"-.`'-----'`
+  jgs '--------'  (   o  O    o)  
+                   `----------`    
+    )" << '\n';
     Static::consoleOut("welcome to Sea Battle, a game by Team Cookies\n");
-    here:
+    Static::consoleOut("your hostname is: " + std::string(hostname) + " and your port is: " + std::to_string(sPort) + "\n");
+
     while (true) {
-        there:
         sockaddr_in newSockAddr;
         newSd = Static::portAccept(serverSd, newSockAddr);
         
@@ -203,9 +208,7 @@ int main(int argc, char const *argv[])
         //Static::errChk(pthread_join(t, NULL), "Error: Thread failed to join.");
         //pthread_cancel(t);
         //pthread_exit(NULL)
-        goto here;
     }
-    goto there;
     exit(0);
     return 0;
 }

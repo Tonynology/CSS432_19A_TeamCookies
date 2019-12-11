@@ -5,7 +5,7 @@
 #define SEA '-' // □
 #define MISS '+' // ■
 #define ALPHABET "abcdefghijklmnopqrstuvwxyz"
-#define RANDOM true
+#define RANDOM false
 #define SHIPCOUNT 10
 
 //#include "Static.h" // included in Peer.cpp
@@ -35,7 +35,19 @@ void Board::printBoard(){
 	for (int x = 0; x < BOARD_WIDTH; x++) {
 		std::cout << ALPHABET[x % BOARD_WIDTH] << " ";
 		for (int y = 0; y < BOARD_HEIGHT; y++) {
-			std::cout << getBoard(x, y) << " ";
+			//std::cout << getBoard(x, y) << " ";
+			if (getBoard(x, y) == 'O'){
+				std::cout << "○ ";
+			}
+			else if (getBoard(x, y) == 'X'){
+				std::cout << "● ";
+			}
+			else if (getBoard(x, y) == '-'){
+				std::cout << "□ ";
+			}
+			else if (getBoard(x, y) == '+'){
+				std::cout << "■ ";
+			}
 		}
 		std::cout << std::endl;
 	}
@@ -149,16 +161,16 @@ void Board::initBoardShips(){//TODO: FLESH OUT ship implementation before improv
 		}
 	}
 	else{
-		setBoard(1, 0, SHIP);
-		setBoard(1, 1, SHIP);
-		setBoard(1, 2, SHIP);
-		setBoard(1, 3, SHIP);
-		setBoard(3, 4, SHIP);
-		setBoard(4, 0, SHIP);
-		setBoard(4, 1, SHIP);
-		setBoard(4, 4, SHIP);
-		setBoard(5, 0, SHIP);
-		setBoard(5, 1, SHIP);
-		setBoard(5, 4, SHIP);
+		setBoard(0, 0, SHIP);
+		//setBoard(1, 1, SHIP);
+		//setBoard(1, 2, SHIP);
+		//setBoard(1, 3, SHIP);
+		//setBoard(3, 4, SHIP);
+		//setBoard(4, 0, SHIP);
+		//setBoard(4, 1, SHIP);
+		//setBoard(4, 4, SHIP);
+		//setBoard(5, 0, SHIP);
+		//setBoard(5, 1, SHIP);
+		//setBoard(5, 4, SHIP);
 	}
 }

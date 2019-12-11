@@ -8,7 +8,7 @@
 int Static::errChk(int errVal, std::string errMsg){
 	if (errVal < 0){
 		Static::consoleErr(errMsg);
-		//exit(errVal);
+		exit(errVal);
 	}
 	return errVal;
 }
