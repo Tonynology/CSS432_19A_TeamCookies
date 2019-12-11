@@ -182,8 +182,9 @@ int Static::portAccept( int serverSd, sockaddr_in newSockAddr ) {
 	return newSd;
 }
 
-std::string Static::portIn(int newSd) {
-	/** TODO: sizeof sets to 8 upon compiling. strlen causes futures to hang upon initialization. 
+std::string Static::portIn(int sd){
+  	/** Test replacement for the read read function.
+    TODO: sizeof sets to 8 upon compiling. strlen causes futures to hang upon initialization. 
 	This code attempts to do a dynamically sized read by reading one character at a time,
 	adding it into a string, and terminating when the string no longer lengthens.
 	std::string response;
@@ -197,14 +198,43 @@ std::string Static::portIn(int newSd) {
 		if (test == response) break;
 	}**/
 
-    char response[TODO];
-    bzero(response, TODO); // memset(response, 0, sizeof(response));
-	//recv(newSd, &response[0], response.size(), 0); //sizeof (response) //strlen(response)
-    read(newSd, response, TODO);
-    return std::string(response);
+  char c[TODO];
+  bzero(c, TODO); // memset(c, 0, sizeof(c));
+	//recv(newSd, &c[0], c.size(), 0); //sizeof (c) //strlen(c)
+  read(sd, c, TODO);
+  write(sd, c, TODO); //single write
+  char ac[TODO];
+  bzero(ac, TODO); // memset(c, 0, sizeof(c));
+	//recv(newSd, &c[0], c.size(), 0); //sizeof (c) //strlen(c)
+  read(sd, ac, TODO);
+  std::string s = std::string(c);
+  std::string as = std::string(ac);
+  Static::errChk(-1 + (s == as), "port in acknowledgement failed! " + s + " DNE " + as);
+  return as;
 }
 
-void Static::portOut( int clientSd, std::string request ) {
-	//send(clientSd, &request[0], request.size(), 0); //sizeof(request) //strlen(request)
-	write(clientSd, request.c_str(), TODO); //single write
+//std::string Static::portIn(int newSd) {
+//
+//    char response[TODO];
+//    bzero(response, TODO); // memset(response, 0, sizeof(response));
+//	//recv(newSd, &response[0], response.size(), 0); //sizeof (response) //strlen(response)
+//    read(newSd, response, TODO);
+//    return std::string(response);
+//}
+
+void Static::portOut( int sd, std::string s) {
+  //send(sd, &s[0], s.size(), 0); //sizeof(s) //strlen(s)
+	write(sd, s.c_str(), TODO); //single write
+  char ac[TODO];
+  bzero(ac, TODO); // memset(c, 0, sizeof(c));
+	//recv(sd, &c[0], c.size(), 0); //sizeof (c) //strlen(c)
+  read(sd, ac, TODO);
+  write(sd, ac, TODO);
+  std::string as = std::string(ac);
+  Static::errChk(-1 + (s == as), "port out acknowledgement failed! " + s + " DNE " + as);
 }
+
+//void Static::portOut( int clientSd, std::string request ) {
+//	//send(clientSd, &request[0], request.size(), 0); //sizeof(request) //strlen(request)
+//	write(clientSd, request.c_str(), TODO); //single write
+//}

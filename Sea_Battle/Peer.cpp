@@ -51,7 +51,7 @@ int main( int argc, char *argv[] ) {
 	Static::consoleOut("\npreparing local resources...");
 	
 	if (argc == 0){
-		Static::errChk(-1, "Usage: ./player.out [iport] [uport] [uaddress]");
+		Static::errChk(-1, "usage: ./player.out [iport] [uport] [uaddress]"); // TODO: allow localhost game by port swap detecting upon busy port
     }
 	else if (argc == 3){ // two args: first player waits for a challenger
 		setIPort(std::stoi(argv[1]));
@@ -219,7 +219,7 @@ int main( int argc, char *argv[] ) {
         Static::consoleOut(fieldTargetCoords + " is being attacked... " + fieldTargetStatus);
         Static::consoleOut("launching attack on " + mapTargetCoords + "... " + mapTargetStatus + "\n");
 	    map.setBoard(map.requestTranslator(mapTargetCoords[0]), map.requestTranslator(mapTargetCoords[1]), map.responseTranslator(mapTargetStatus[0])); // Assumes coords and status are at pos 0 and 1
-        Static::consoleOut("key: -sea     Oship     +miss     Xhit\n\n");
+        Static::consoleOut("key: -sea     ○ship     +miss     Xhit\n\n");
         Static::consoleOut("Field: \n");
         field.printBoard(); // TODO merge printBoard statements to print side by side
         Static::consoleOut("Map: \n");

@@ -18,8 +18,8 @@ class Static {
 		static void clientSetup(int port, std::string address, int &clientSd, sockaddr_in &sendSockAddr); // Local resource setup for client
 		static void portConnect( int clientSd, sockaddr_in sendSockAddr ); // Remote connection to clientSd for server
 		static int portAccept( int serverSd, sockaddr_in newSockAddr ); // Remote connection to serverSd for client
-		static std::string portIn(int newSd); // Pause and wait for a line of port input and return it.
-		static void portOut( int clientSd, std::string request ); // Sends request to port.
+		static std::string portIn(int sd); // Pause and wait for a line of port input and return it.
+		static void portOut( int sd, std::string s ); // Sends request to port.
 };
 
 #endif
