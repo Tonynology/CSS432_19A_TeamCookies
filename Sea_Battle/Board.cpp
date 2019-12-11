@@ -42,11 +42,7 @@ void Board::printBoard(){
 	std::cout << std::endl;
 }
 
-int Board::requestTranslator(char c){ // Translates human-readable text into computer-readable code
-	//TODO: Must be a better way of doing this.
-	//Maybe switch statement? Maybe key-value dict map?
-	//Also, should support different board sizes, right now only supports up to 6.
-	
+int Board::requestTranslator(char c){ // Translates human-readable text into computer-readable code	
 	if (c == 'a'){
 		return 0;
 	}
@@ -104,7 +100,6 @@ char Board::responseTranslator(char c){ // Translates human-readable text into c
 }
 
 std::string Board::attackBoard(int x, int y){
-	//TODO: error handling for chars as input, 3 ints etc.
 	if (getBoard(x, y) == SHIP){
 		setBoard(x, y, HIT);
 		return "hit!\n";
@@ -122,6 +117,16 @@ std::string Board::attackBoard(int x, int y){
 		return "my, you already missed this spot...\n";
 	}
 	else return std::to_string(Static::errChk(-1, "invalid input: " + std::to_string(x) + std::to_string(y)));
+}
+
+bool Board::checkLose(){
+	bool lose = true;
+	for (int x = 0; x < BOARD_WIDTH; x++) {
+		for (int y = 0; y < BOARD_HEIGHT; y++) {
+			if (getBoard(x, y) == SHIP) lose = false;
+		}
+	}
+	return lose;
 }
 
 void Board::initBoardSea(){

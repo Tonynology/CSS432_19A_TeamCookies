@@ -3,12 +3,12 @@
 #define PORT_NUMBER_MAX 65535
 #define PORT_NUMBER_MIN 1023
 
-#define TODO 1024
+#define DATABUF_MAX 1024
 
 int Static::errChk(int errVal, std::string errMsg){
 	if (errVal < 0){
 		Static::consoleErr(errMsg);
-		exit(errVal);
+		//exit(errVal);
 	}
 	return errVal;
 }
@@ -184,15 +184,15 @@ std::string Static::portIn(int sd){
 		if (test == response) break;
 	}**/
 
-  char c[TODO];
-  bzero(c, TODO); // memset(c, 0, sizeof(c));
+  char c[DATABUF_MAX];
+  bzero(c, DATABUF_MAX); // memset(c, 0, sizeof(c));
 	//recv(newSd, &c[0], c.size(), 0); //sizeof (c) //strlen(c)
-  read(sd, c, TODO);
-  write(sd, c, TODO); //single write
-  char ac[TODO];
-  bzero(ac, TODO); // memset(c, 0, sizeof(c));
+  read(sd, c, DATABUF_MAX);
+  write(sd, c, DATABUF_MAX); //single write
+  char ac[DATABUF_MAX];
+  bzero(ac, DATABUF_MAX); // memset(c, 0, sizeof(c));
 	//recv(newSd, &c[0], c.size(), 0); //sizeof (c) //strlen(c)
-  read(sd, ac, TODO);
+  read(sd, ac, DATABUF_MAX);
   std::string s = std::string(c);
   std::string as = std::string(ac);
   Static::errChk(-1 + (s == as), "port in acknowledgement failed! " + s + " DNE " + as);
@@ -201,26 +201,26 @@ std::string Static::portIn(int sd){
 
 //std::string Static::portIn(int newSd) {
 //
-//    char response[TODO];
-//    bzero(response, TODO); // memset(response, 0, sizeof(response));
+//    char response[DATABUF_MAX];
+//    bzero(response, DATABUF_MAX); // memset(response, 0, sizeof(response));
 //	//recv(newSd, &response[0], response.size(), 0); //sizeof (response) //strlen(response)
-//    read(newSd, response, TODO);
+//    read(newSd, response, DATABUF_MAX);
 //    return std::string(response);
 //}
 
 void Static::portOut( int sd, std::string s) {
   //send(sd, &s[0], s.size(), 0); //sizeof(s) //strlen(s)
-	write(sd, s.c_str(), TODO); //single write
-  char ac[TODO];
-  bzero(ac, TODO); // memset(c, 0, sizeof(c));
+	write(sd, s.c_str(), DATABUF_MAX); //single write
+  char ac[DATABUF_MAX];
+  bzero(ac, DATABUF_MAX); // memset(c, 0, sizeof(c));
 	//recv(sd, &c[0], c.size(), 0); //sizeof (c) //strlen(c)
-  read(sd, ac, TODO);
-  write(sd, ac, TODO);
+  read(sd, ac, DATABUF_MAX);
+  write(sd, ac, DATABUF_MAX);
   std::string as = std::string(ac);
   Static::errChk(-1 + (s == as), "port out acknowledgement failed! " + s + " DNE " + as);
 }
 
 //void Static::portOut( int clientSd, std::string request ) {
 //	//send(clientSd, &request[0], request.size(), 0); //sizeof(request) //strlen(request)
-//	write(clientSd, request.c_str(), TODO); //single write
+//	write(clientSd, request.c_str(), DATABUF_MAX); //single write
 //}

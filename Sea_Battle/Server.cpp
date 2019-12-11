@@ -183,7 +183,11 @@ int main(int argc, char const *argv[])
     }
 
     Static::serverSetup(sPort, serverSd);
-    Static::consoleOut("Welcome to Sea Battle, a game by Team Cookies\n");
+
+    char hostname[HOST_NAME_MAX];
+    gethostname(hostname, HOST_NAME_MAX);
+    Static::consoleOut("your hostname is: " + std::string(hostname) + " and your port is: " + std::to_string(sPort) + "\n");
+    Static::consoleOut("welcome to Sea Battle, a game by Team Cookies\n");
     here:
     while (true) {
         there:

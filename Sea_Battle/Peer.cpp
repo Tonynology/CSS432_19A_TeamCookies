@@ -140,7 +140,7 @@ int main( int argc, char *argv[] ) {
 	std::cout << "uport: " << getUPort() << " uaddress: " << getUAddress() << std::endl;
     std::cout << "clientSd: " << getClientSd() << " serverSd: " << getServerSd() << " newSd: " << getNewSd() << std::endl;
     std::cout << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl << std::endl;
-	Static::consoleOut("welcome to Sea Battle, a game by Team Cookies\n");
+	Static::consoleOut("welcome to Sea Battle, a game by Team Cookies. Ctrl+C at any time to exit.\n");
 
     Static::consoleOut("field: \n");
 	Board field; // Player's board
@@ -185,6 +185,7 @@ int main( int argc, char *argv[] ) {
 
             if (consoleIn.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
                 mapTargetCoords = consoleIn.get();
+                if (mapTargetCoords == "gg") goto win;
                 Static::validateCoord(mapTargetCoords);
                 consoleIn = std::async(std::launch::async, Static::consoleIn);
                 mapTargetcoordsOut = std::async(std::launch::async, Static::portOut, getClientSd(), mapTargetCoords); // Is using future on this line necessary if not blocking program?
@@ -203,7 +204,6 @@ int main( int argc, char *argv[] ) {
         std::future<std::string> mapTargetStatusOut = std::async(std::launch::async, Static::portIn, getNewSd());
         
         while (mapTargetStatus.empty()) {
-            //Alternatively to threading, we could implement style of Aloha which waits for a random amount of time to send, and listen for the rest of the time.
             std::this_thread::sleep_for(std::chrono::seconds(1)); // One move allowed per second
             //std::cout << "send: " << send << "recieve: " << recieve << std::endl;
             
@@ -219,21 +219,35 @@ int main( int argc, char *argv[] ) {
         Static::consoleOut(fieldTargetCoords + " is being attacked... " + fieldTargetStatus);
         Static::consoleOut("launching attack on " + mapTargetCoords + "... " + mapTargetStatus + "\n");
 	    map.setBoard(map.requestTranslator(mapTargetCoords[0]), map.requestTranslator(mapTargetCoords[1]), map.responseTranslator(mapTargetStatus[0])); // Assumes coords and status are at pos 0 and 1
-        Static::consoleOut("key: -sea     ○ship     +miss     Xhit\n\n");
+        Static::consoleOut("key: -sea     Oship     +miss     Xhit\n\n");
         Static::consoleOut("Field: \n");
         field.printBoard(); // TODO merge printBoard statements to print side by side
         Static::consoleOut("Map: \n");
         map.printBoard();
-
+        bool lose = field.checkLose();
+        if (lose == true){
+            
+        }
         //std::cout << std::flush << std::endl; // Program hangs right here and I have no idea what is wrong with it. Bth players mst press enter to proceed.
         Static::consoleOut("press enter to continue"); //I htink it may have to do with the lingering Static::consoleIn async function.
         //Symptoms so far: Sometimes the "turn sequence" will begin immediately upon pressing enter. It does this for each player, individually.
         //Other times, it will only begin , and for both players at the same time, when BOTH players have pressed enter.
         //Again, this happens imediately, without waiting for 1 second. (perhaps the peers are actuall sending a write??)
     }
-    // TODO: win conditions
-    std::cerr << "Until updated, this program should never reach here.";
 
+    win:
+    Static::consoleOut("you've sunk all the enemy ships and won the game!! type exit to exit.");
+    Static::consoleIn();
+    close(getServerSd());
+    close(getNewSd());
+    close(getClientSd());
+    exit(0);
+    return 0;
+
+    lose:
+    Static::consoleOut("oh, the enemy has sunk all your ships, and you lose. type exit to exit.");
+    Static::portOut(uPort, "gg");
+    Static::consoleIn();
     close(getServerSd());
     close(getNewSd());
     close(getClientSd());

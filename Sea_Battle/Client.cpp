@@ -93,7 +93,7 @@ void joinGame()
     Static::consoleOut("type a username to enter a sea battle with: ");
     std::string pUsername = Static::consoleIn();
     if (pUsername.empty()) {
-        Static::consoleOut("come on now, that user wasn't listed...");
+        Static::consoleOut("come on now, that user wasn't listed...\n");
         Static::consoleOut("press enter to return to menu\n");
         Static::consoleIn();
     }
@@ -101,7 +101,7 @@ void joinGame()
 	Static::portOut(cSd, pUsername);
     int pPort = Static::to_int(Static::portIn(cSd));
     if (pPort == -1){
-        Static::consoleOut("come on now, that user wasn't listed...");
+        Static::consoleOut("come on now, that user wasn't listed...\n");
         Static::consoleOut("press enter to return to menu\n");
         Static::consoleIn();
     }
@@ -183,14 +183,30 @@ int main(int argc, char const *argv[])
         int selection = Static::to_int(Static::consoleIn());
         //Static::validateSelection(selection); //handled below
 
-	    Static::portOut(cSd, std::to_string(selection));
-
-        if (selection == 1 && cUsername.empty()) registerUser();
-        else if (selection == 2 && !cUsername.empty()) listGames();
-        else if (selection == 3 && !cUsername.empty()) createGame();
-        else if (selection == 4 && !cUsername.empty()) joinGame();
-        else if (selection == 5 && !cUsername.empty()) return exitGame();
-        else if (selection == 6 && !cUsername.empty()) unregisterUser();
+        if (selection == 1 && cUsername.empty()){
+            Static::portOut(cSd, std::to_string(selection));
+            registerUser();
+        }
+        else if (selection == 2 && !cUsername.empty()){
+            Static::portOut(cSd, std::to_string(selection));
+            listGames();
+        }
+        else if (selection == 3 && !cUsername.empty()){
+            Static::portOut(cSd, std::to_string(selection));
+            createGame();
+        }
+        else if (selection == 4 && !cUsername.empty()){
+            Static::portOut(cSd, std::to_string(selection));
+            joinGame();
+        }
+        else if (selection == 5 && !cUsername.empty()){
+            Static::portOut(cSd, std::to_string(selection));
+            return exitGame();
+        }
+        else if (selection == 6 && !cUsername.empty()){
+            Static::portOut(cSd, std::to_string(selection));
+            unregisterUser();
+        }
         else {
             Static::consoleOut("not a valid option...\n");
             Static::consoleOut("press enter to return to menu\n");
