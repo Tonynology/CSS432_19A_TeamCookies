@@ -69,11 +69,12 @@ int main( int argc, char *argv[] ) {
 	else {
 		Static::errChk(-1, "usage: ./player.out [iport] [uport] [uaddress]");
 	}
-	
+
+	Static::consoleOut("waiting for opponent...");
+
 	sockaddr_in newSockAddr;
     Static::serverSetup(getIPort(), serverSd);
 	if (argc == 3) {
-        Static::consoleOut("waiting for opponent...");
         pthread_t t;
         Static::startDots(t);
         
@@ -179,13 +180,14 @@ int main( int argc, char *argv[] ) {
 
             if (consoleIn.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
                 mapTargetCoords = consoleIn.get();
-                if (mapTargetCoords == "gg") goto win;
+		if (mapTargetCoords == "exit") goto lose;
                 Static::validateCoord(mapTargetCoords);
                 consoleIn = std::async(std::launch::async, Static::consoleIn);
                 mapTargetcoordsOut = std::async(std::launch::async, Static::portOut, getClientSd(), mapTargetCoords); // Is using future on this line necessary if not blocking program?
             }
             if (fieldTargetCoordsIn.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
                 fieldTargetCoords = fieldTargetCoordsIn.get();
+                if (fieldTargetCoords == "gg") goto win;
                 fieldTargetCoordsIn = std::async(std::launch::async, Static::portIn, getNewSd());
             }
         }
@@ -195,7 +197,7 @@ int main( int argc, char *argv[] ) {
         std::string fieldTargetStatus = field.attackBoard(field.requestTranslator(fieldTargetCoords[0]), field.requestTranslator(fieldTargetCoords[1])); // Assumes coords are at pos 0 and 1
         std::string mapTargetStatus;
         std::future<void> fieldTargetStatusOut = std::async(std::launch::async, Static::portOut, getClientSd(), fieldTargetStatus); // TODO: Redundant initialization if updated in loop?
-        std::future<std::string> mapTargetStatusOut = std::async(std::launch::async, Static::portIn, getNewSd());
+        std::future<std::string> mapTargetStatusIn = std::async(std::launch::async, Static::portIn, getNewSd());
         
         while (mapTargetStatus.empty()) {
             std::this_thread::sleep_for(std::chrono::seconds(1)); // One move allowed per second
@@ -204,9 +206,9 @@ int main( int argc, char *argv[] ) {
             if (fieldTargetStatusOut.wait_for(std::chrono::seconds(0)) == std::future_status::ready) { // TODO: is this necessary, since write does not block the program?
                 fieldTargetStatusOut = std::async(std::launch::async, Static::portOut, getClientSd(), fieldTargetStatus);
             }
-            if (mapTargetStatusOut.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
-                mapTargetStatus = mapTargetStatusOut.get();
-                mapTargetStatusOut = std::async(std::launch::async, Static::portIn, getNewSd());
+            if (mapTargetStatusIn.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
+                mapTargetStatus = mapTargetStatusIn.get();
+                mapTargetStatusIn = std::async(std::launch::async, Static::portIn, getNewSd());
             }
         }
 
@@ -230,6 +232,7 @@ int main( int argc, char *argv[] ) {
     win:
     Static::consoleOut("you've sunk all the enemy ships and won the game!! type exit to exit.");
     Static::consoleIn();
+    Static::consoleIn();
     close(getServerSd());
     close(getNewSd());
     close(getClientSd());
@@ -239,6 +242,7 @@ int main( int argc, char *argv[] ) {
     lose:
     Static::consoleOut("oh, the enemy has sunk all your ships, and you lose. type exit to exit.");
     Static::portOut(uPort, "gg");
+    Static::consoleIn();
     Static::consoleIn();
     close(getServerSd());
     close(getNewSd());

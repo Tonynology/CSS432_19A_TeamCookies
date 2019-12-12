@@ -6,7 +6,7 @@
 tar -czvf src.tar.gz src && url=$(curl --upload-file ./src.tar.gz https://transfer.sh/src.tar.gz) && rm src.tar.gz && echo $url
 
 # download:
-echo $url && curl $url -o src.tar.gz && tar -xzvf src.tar.gz && rm src.tar.gz && cd src
+curl $url -o src.tar.gz && tar -xzvf src.tar.gz && rm src.tar.gz && cd src && echo $url
 
 # compile:
 ./buildscript.sh
