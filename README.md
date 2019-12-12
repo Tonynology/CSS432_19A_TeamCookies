@@ -1,18 +1,17 @@
-welcome to Sea Battle, a game by Team Cookies
+#!/bin/bash
 
-upload:
-tar -czvf src.tar.gz src
-curl --upload-file ./src.tar.gz https://transfer.sh/src.tar.gz
+#welcome to Sea Battle, a game by Team Cookies
 
-download:
-curl htts://transfer.sh/ThEXh/src.tar.gz -o src.tar.gz
-tar -xzvf src.tar.gz
-cd src
+# upload:
+tar -czvf src.tar.gz src && url=$(curl --upload-file ./src.tar.gz https://transfer.sh/src.tar.gz) && rm src.tar.gz && echo $url
 
-compile:
+# download:
+echo $url && curl $url -o src.tar.gz && tar -xzvf src.tar.gz && rm src.tar.gz && cd src
+
+# compile:
 ./buildscript.sh
 
-run:
+# run:
 ./server.out
 ./client.out
 ./peer.out
