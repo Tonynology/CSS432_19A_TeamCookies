@@ -141,10 +141,10 @@ void *server(void *)
         else if (selection == 4) joinGame(sd);
         else if (selection == 5) pthread_exit(NULL);
         else if (selection == 6) unregisterUser(sd);
-        else {
-            Static::consoleOut("not a valid option...\n");
-            pthread_exit(NULL);
-        }
+        // else { // Client cannot send a different selection.
+        //     Static::consoleOut("not a valid option...\n");
+        //     pthread_exit(NULL);
+        // }
     }
 	close(serverSd);
     close(sd);

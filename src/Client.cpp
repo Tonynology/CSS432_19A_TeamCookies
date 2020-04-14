@@ -37,6 +37,7 @@ sockaddr_in sendSockAddr;
 
 void registerUser()
 {
+    Static::portOut(cSd, std::to_string(1));
     //char loginname[LOGIN_NAME_MAX];
     //getlogin_r(loginname, LOGIN_NAME_MAX); // Does not work on WSL
     //cUsername = std::string(loginname); // user info from computer
@@ -60,6 +61,7 @@ void registerUser()
 
 void listGames()
 {
+    Static::portOut(cSd, std::to_string(2));
     std::string games = Static::portIn(cSd);
     Static::consoleOut("\ngames: " + games + "\n");
     Static::consoleOut("press enter to return to menu\n");
@@ -68,6 +70,7 @@ void listGames()
 
 void createGame()
 {
+    Static::portOut(cSd, std::to_string(3));
     std::string games = Static::portIn(cSd);
     Static::consoleOut("\ngames: " + games + "\n");
 
@@ -88,6 +91,7 @@ void createGame()
 
 void joinGame()
 {
+    Static::portOut(cSd, std::to_string(4));
     std::string games = Static::portIn(cSd);
     Static::consoleOut("\ngames: " + games + "\n");
 
@@ -98,38 +102,40 @@ void joinGame()
         Static::consoleOut("press enter to return to menu\n");
         Static::consoleIn();
     }
-    else{
-	Static::portOut(cSd, pUsername);
-    int pPort = Static::to_int(Static::portIn(cSd));
-    if (pPort == -1){
-        Static::consoleOut("come on now, that user wasn't listed...\n");
-        Static::consoleOut("press enter to return to menu\n");
+    else {
+	    Static::portOut(cSd, pUsername);
+        int pPort = Static::to_int(Static::portIn(cSd));
+        if (pPort == -1){
+            Static::consoleOut("come on now, that user wasn't listed...\n");
+            Static::consoleOut("press enter to return to menu\n");
+            Static::consoleIn();
+    }
+    else {
+        Static::validatePort(pPort);
+        std::string pAddress = Static::portIn(cSd);
+        std::string s = "./peer.out " + std::to_string(cPort) + " " + cAddress + " " + std::to_string(pPort) + " " + pAddress;
+        Static::consoleOut("\nrunning: " + s + "\n");
+        Static::consoleOut("press enter to launch the game\n");
         Static::consoleIn();
-    }
-    else{
-    Static::validatePort(pPort);
-    std::string pAddress = Static::portIn(cSd);
-    std::string s = "./peer.out " + std::to_string(cPort) + " " + cAddress + " " + std::to_string(pPort) + " " + pAddress;
-    Static::consoleOut("\nrunning: " + s + "\n");
-    Static::consoleOut("press enter to launch the game\n");
-    Static::consoleIn();
-    //int ac; // call Player::main(s)
-    //char **av = Static::parsedargs(s, &ac);
-    //Player::main(ac, av);
-    //Static::freeparsedargs(av);
-    system(s.c_str()); // run (s)
-    }
+        //int ac; // call Player::main(s)
+        //char **av = Static::parsedargs(s, &ac);
+        //Player::main(ac, av);
+        //Static::freeparsedargs(av);
+        system(s.c_str()); // run (s)
+        }
     }
 }
 
 int exitGame()
 {
+    Static::portOut(cSd, std::to_string(5));
     Static::consoleOut("thanks for playing Sea Battle, a game by Team Cookies");
     return 0;
 }
 
 void unregisterUser()
 {
+    Static::portOut(cSd, std::to_string(6));
 	Static::portOut(cSd, cUsername);
 
     cUsername = DEFAULT_CUSERNAME;
@@ -178,6 +184,7 @@ int main(int argc, char const *argv[])
            \ " ''''''''''''''''''''''' \
     ~~jgs~^~^~^^~^~^~^~^~^~^~^~~^~^~~^~^~^^~~^~^
         )" << '\n';
+        
         if (!cUsername.empty()) Static::consoleOut("\nyou are registered as " + cUsername + "@" + cAddress + ":" + std::to_string(cPort) + "\n");
         Static::consoleOut("select from the following options:\n");
 	    if (cUsername.empty()) Static::consoleOut("[1] register user\n");
@@ -190,32 +197,15 @@ int main(int argc, char const *argv[])
 
         Static::consoleOut("→ ");
         int selection = Static::to_int(Static::consoleIn());
-        //Static::validateSelection(selection); //handled below
+        //Static::portOut(cSd, std::to_string(selection)); // prone to user error
+        //Static::validateSelection(selection); // handled by else below
 
-        if (selection == 1 && cUsername.empty()){
-            Static::portOut(cSd, std::to_string(selection));
-            registerUser();
-        }
-        else if (selection == 2 && !cUsername.empty()){
-            Static::portOut(cSd, std::to_string(selection));
-            listGames();
-        }
-        else if (selection == 3 && !cUsername.empty()){
-            Static::portOut(cSd, std::to_string(selection));
-            createGame();
-        }
-        else if (selection == 4 && !cUsername.empty()){
-            Static::portOut(cSd, std::to_string(selection));
-            joinGame();
-        }
-        else if (selection == 5 && !cUsername.empty()){
-            Static::portOut(cSd, std::to_string(selection));
-            return exitGame();
-        }
-        else if (selection == 6 && !cUsername.empty()){
-            Static::portOut(cSd, std::to_string(selection));
-            unregisterUser();
-        }
+        if (selection == 1 && cUsername.empty()) registerUser();
+        else if (selection == 2 && !cUsername.empty()) listGames();
+        else if (selection == 3 && !cUsername.empty()) createGame();
+        else if (selection == 4 && !cUsername.empty()) joinGame();
+        else if (selection == 5 && !cUsername.empty()) return exitGame();
+        else if (selection == 6 && !cUsername.empty()) unregisterUser();
         else {
             Static::consoleOut("not a valid option...\n");
             Static::consoleOut("press enter to return to menu\n");

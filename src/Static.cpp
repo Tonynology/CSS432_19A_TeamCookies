@@ -37,13 +37,13 @@ void Static::validatePort(int &port){
     }
 }
 
-void Static::validateSelection(int &selection){
-  if (selection < 1 || selection > 6){
-    Static::consoleErr("selection must be a number between " + std::string(std::to_string(1)) + " and " + std::string(std::to_string(6)) + ". try again: ");
-    selection = Static::to_int(Static::consoleIn());
-    validateSelection(selection);
-  }
-}
+//void Static::validateSelection(int &selection){
+//  if (selection < 1 || selection > 6){
+//    Static::consoleErr("selection must be a number between " + std::string(std::to_string(1)) + " and " + std::string(std::to_string(6)) + ". try again: ");
+//    selection = Static::to_int(Static::consoleIn());
+//    validateSelection(selection);
+//  }
+//}
 
 void Static::validateCoord(std::string &coord){
     if (coord.size() != 2 || (coord[0] != 'a' && coord[0] != 'b' && coord[0] != 'c' && coord[0] != 'd' && coord[0] != 'e' && coord[0] != 'f') || (coord[1] != '1' && coord[1] != '2' && coord[1] != '3' && coord[1] != '4' && coord[1] != '5' && coord[1] != '6'))
