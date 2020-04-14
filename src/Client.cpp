@@ -8,15 +8,15 @@
 #include <netinet/tcp.h>  // SO_REUSEADDR
 #include <sys/uio.h>      // writev
 
-#include <stdio.h>
-#include <cstdlib>
-#include <limits.h>
-#define PORT_NUMBER_MAX 65535
-#define PORT_NUMBER_MIN 1023
-
 #include <string>
 #include <iostream>
 #include <future>
+#include <stdlib.h>
+#include <stdio.h>
+#include <limits.h>
+#define PORT_NUMBER_MAX 65535
+#define PORT_NUMBER_MIN 1023
+#include <pwd.h>
 
 #include "Static.h"
 
@@ -37,9 +37,10 @@ sockaddr_in sendSockAddr;
 
 void registerUser()
 {
-    char loginname[LOGIN_NAME_MAX];
-    getlogin_r(loginname, LOGIN_NAME_MAX); // user info from computer
-    cUsername = std::string(loginname);
+    //char loginname[LOGIN_NAME_MAX];
+    //getlogin_r(loginname, LOGIN_NAME_MAX); // Does not work on WSL
+    //cUsername = std::string(loginname); // user info from computer
+    cUsername = getpwuid(getuid()) -> pw_name; // user info from computer
     //cUsername = Static::consoleIn(); // user info from console, prone to errors
     //Static::consoleOut("cUsername: " + cUsername + "\n");
     srand(time(NULL));
@@ -177,7 +178,6 @@ int main(int argc, char const *argv[])
            \ " ''''''''''''''''''''''' \
     ~~jgs~^~^~^^~^~^~^~^~^~^~^~~^~^~~^~^~^^~~^~^
         )" << '\n';
-
         if (!cUsername.empty()) Static::consoleOut("\nyou are registered as " + cUsername + "@" + cAddress + ":" + std::to_string(cPort) + "\n");
         Static::consoleOut("select from the following options:\n");
 	    if (cUsername.empty()) Static::consoleOut("[1] register user\n");

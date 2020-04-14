@@ -3,6 +3,7 @@
 
 class Static {
 	public:
+		static void debug(); // Increment a counter and then print it to cerr.
 		static int errChk(int errVal, std::string errMsg); // Call with int errVal and string errMsg. If errVal is under 0, cerr errMsg and exit with errVal under 0. Else, return errVal at or over 0.
 		static int to_int(std::string s); // stoi wrapper with error checking.
 		static void validatePort(int &port);

@@ -5,6 +5,13 @@
 
 #define DATABUF_MAX 1024
 
+int buggy = 0;
+
+void Static::debug(){
+  buggy++;
+  Static::consoleErr(std::to_string(buggy));
+}
+
 int Static::errChk(int errVal, std::string errMsg){
 	if (errVal < 0){
 		Static::consoleErr(errMsg);

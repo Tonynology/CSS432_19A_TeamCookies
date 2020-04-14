@@ -8,8 +8,6 @@
 #include <netinet/tcp.h>  // SO_REUSEADDR
 #include <sys/uio.h>      // writev
 
-#include <limits.h>
-
 #include <string>
 #include <iostream>
 #include <future>
@@ -17,6 +15,7 @@
 #include <signal.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <limits.h>
 
 #include "Static.h"
 
@@ -28,13 +27,6 @@ int sPort = DEFAULT_SPORT;
 int serverSd = DEFAULT_SERVERSD;
 int newSd = DEFAULT_NEWSD;
 std::unordered_map<std::string, std::pair<int, std::string>> games; //contains peers whom have selected "join game" and have not recieved a partner.
-
-int debug = 0;
-
-void debugger(){
-    debug++;
-    std::cerr << debug;
-}
 
 int getSPort( ) { return sPort; }
 
